@@ -1,28 +1,21 @@
 /**
- * Example module entry point
- * Replace this with your actual implementation
+ * Web Search - Multi-provider web search aggregator
+ *
+ * A microservice that aggregates search results from multiple search engines
+ * (Google, DuckDuckGo, Bing) with support for result merging and reranking.
  */
 
-/**
- * Example function that adds two numbers
- * @param {number} a - First number
- * @param {number} b - Second number
- * @returns {number} Sum of a and b
- */
-export const add = (a, b) => a + b;
-
-/**
- * Example function that multiplies two numbers
- * @param {number} a - First number
- * @param {number} b - Second number
- * @returns {number} Product of a and b
- */
-export const multiply = (a, b) => a * b;
-
-/**
- * Example async function
- * @param {number} ms - Milliseconds to wait
- * @returns {Promise<void>}
- */
-export const delay = (ms) =>
-  new Promise((resolve) => globalThis.setTimeout(resolve, ms));
+export { WebSearchEngine, createSearchEngine } from './search.js';
+export {
+  BaseSearchProvider,
+  GoogleProvider,
+  DuckDuckGoProvider,
+  BingProvider,
+  getAvailableProviders,
+} from './providers/index.js';
+export {
+  mergeResults,
+  mergeWithRRF,
+  mergeWithWeights,
+  mergeWithInterleave,
+} from './merger.js';

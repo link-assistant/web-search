@@ -22,6 +22,14 @@ export default [
         __filename: 'readonly',
         // Node.js 18+ globals
         fetch: 'readonly',
+        URL: 'readonly',
+        URLSearchParams: 'readonly',
+        setTimeout: 'readonly',
+        setInterval: 'readonly',
+        clearTimeout: 'readonly',
+        clearInterval: 'readonly',
+        // Browser globals (for browser-commander integration)
+        document: 'readonly',
         // Runtime-specific globals
         Bun: 'readonly',
         Deno: 'readonly',
