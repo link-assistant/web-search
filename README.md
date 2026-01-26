@@ -1,32 +1,249 @@
-# js-ai-driven-development-pipeline-template
+# @link-assistant/web-search
 
-A comprehensive template for AI-driven JavaScript/TypeScript development with full CI/CD pipeline support.
+A web search microservice that aggregates results from multiple search engines with intelligent result merging and reranking.
 
 ## Features
 
+- **Multi-provider search**: Aggregate results from Google, DuckDuckGo, and Bing
+- **Result merging**: Combine results using RRF, weighted scoring, or interleaving
+- **Configurable weights**: Adjust provider weights for custom reranking
+- **URL deduplication**: Automatic normalization and deduplication across providers
+- **Browser testing**: Integration with browser-commander for direct browser search
 - **Multi-runtime support**: Works with Bun, Node.js, and Deno
-- **Universal testing**: Uses [test-anywhere](https://github.com/link-foundation/test-anywhere) for cross-runtime tests
-- **Automated releases**: Changesets-based versioning with GitHub Actions
-- **Code quality**: ESLint + Prettier with pre-commit hooks via Husky
-- **Package manager agnostic**: Works with bun, npm, yarn, pnpm, and deno
+
+## Installation
+
+```bash
+# With npm
+npm install @link-assistant/web-search
+
+# With bun
+bun add @link-assistant/web-search
+
+# With yarn
+yarn add @link-assistant/web-search
+```
 
 ## Quick Start
 
-### Using This Template
+### As a Library
 
-1. Click "Use this template" on GitHub to create a new repository
-2. Clone your new repository
-3. Update `package.json` with your package name and description
-4. Update the `PACKAGE_NAME` constant in these scripts:
-   - `scripts/validate-changeset.mjs`
-   - `scripts/merge-changesets.mjs`
-   - `scripts/publish-to-npm.mjs`
-   - `scripts/format-release-notes.mjs`
-   - `scripts/create-manual-changeset.mjs`
-5. Install dependencies: `bun install`
-6. Start developing!
+```javascript
+import {
+  WebSearchEngine,
+  createSearchEngine,
+} from '@link-assistant/web-search';
 
-### Development
+// Create a search engine
+const engine = createSearchEngine();
+
+// Search across all providers
+const results = await engine.search('artificial intelligence');
+
+// Search with options
+const results = await engine.search('machine learning', {
+  limit: 20,
+  providers: ['google', 'duckduckgo'],
+  strategy: 'rrf',
+  weights: { google: 1.5, duckduckgo: 1.0 },
+});
+
+// Search single provider
+const googleResults = await engine.searchSingle('deep learning', 'google');
+```
+
+### As a REST API Server
+
+```bash
+# Start the server
+npx web-search serve --port 3000
+
+# Or with bun
+bunx web-search serve --port 3000
+```
+
+API Endpoints:
+
+- `GET /search?q=<query>` - Search all providers
+- `POST /search` - Search with options in body
+- `GET /search/:provider?q=<query>` - Search single provider
+- `GET /providers` - List available providers
+- `GET /health` - Health check
+
+Example:
+
+```bash
+curl "http://localhost:3000/search?q=rust+programming&limit=10&strategy=rrf"
+```
+
+### As a CLI Tool
+
+```bash
+# Search from command line
+npx web-search "artificial intelligence"
+
+# With options
+npx web-search "machine learning" --limit 20 --providers google,bing --format json
+
+# Output just URLs
+npx web-search "deep learning" --format urls
+```
+
+## Merge Strategies
+
+### Reciprocal Rank Fusion (RRF)
+
+Default strategy. Combines results by their rank positions across providers.
+
+```javascript
+const results = await engine.search(query, { strategy: 'rrf' });
+```
+
+### Weighted Scoring
+
+Score results based on provider weights and rank positions.
+
+```javascript
+const results = await engine.search(query, {
+  strategy: 'weighted',
+  weights: { google: 2.0, duckduckgo: 1.0, bing: 0.5 },
+});
+```
+
+### Interleaving
+
+Round-robin style interleaving of results from each provider.
+
+```javascript
+const results = await engine.search(query, { strategy: 'interleave' });
+```
+
+## Search Providers
+
+### Google
+
+- Uses Custom Search API when credentials are configured
+- Falls back to web scraping otherwise
+
+```javascript
+import { GoogleProvider } from '@link-assistant/web-search';
+
+const provider = new GoogleProvider({
+  apiKey: 'your-api-key',
+  searchEngineId: 'your-cx-id',
+});
+```
+
+### DuckDuckGo
+
+- Uses HTML scraping (no API required)
+
+```javascript
+import { DuckDuckGoProvider } from '@link-assistant/web-search';
+
+const provider = new DuckDuckGoProvider();
+```
+
+### Bing
+
+- Uses Web Search API when configured
+- Falls back to web scraping otherwise
+
+```javascript
+import { BingProvider } from '@link-assistant/web-search';
+
+const provider = new BingProvider({
+  apiKey: 'your-bing-api-key',
+});
+```
+
+### Browser-Based Search
+
+- Uses browser-commander for direct browser search
+- Useful for testing and when scraping is blocked
+
+```javascript
+import { createBrowserProvider } from '@link-assistant/web-search';
+
+const provider = createBrowserProvider({
+  engine: 'google',
+  browserOptions: { headless: true },
+});
+```
+
+## API Reference
+
+### WebSearchEngine
+
+```javascript
+const engine = new WebSearchEngine(config);
+
+// Search methods
+await engine.search(query, options);
+await engine.searchSingle(query, providerName, options);
+
+// Provider management
+engine.getAvailableProviders();
+engine.getProviderStatus();
+engine.setProviderWeight(name, weight);
+engine.setProviderEnabled(name, enabled);
+engine.getProvider(name);
+```
+
+### Merge Functions
+
+```javascript
+import {
+  mergeResults,
+  mergeWithRRF,
+  mergeWithWeights,
+  mergeWithInterleave,
+} from '@link-assistant/web-search';
+
+// Merge results from multiple providers
+const merged = mergeResults(resultsByProvider, {
+  strategy: 'rrf',
+  weights: { google: 1.5 },
+  rrfK: 60,
+  removeDuplicates: true,
+});
+```
+
+## Rust Library
+
+A Rust implementation is also available in the `rust/` directory.
+
+```bash
+cd rust
+cargo build --release
+```
+
+### Rust CLI
+
+```bash
+# Search
+./target/release/web-search "artificial intelligence" --limit 10
+
+# Start server
+./target/release/web-search serve --port 3000
+```
+
+### Rust Library Usage
+
+```rust
+use web_search::{WebSearchEngine, SearchOptions, MergeStrategy};
+
+let engine = WebSearchEngine::new();
+
+let results = engine.search_with_options(
+    "machine learning",
+    SearchOptions { limit: Some(10), ..Default::default() },
+    None,
+    Some(MergeOptions { strategy: MergeStrategy::Rrf, ..Default::default() })
+).await?;
+```
+
+## Development
 
 ```bash
 # Install dependencies
@@ -35,162 +252,37 @@ bun install
 # Run tests
 bun test
 
-# Or with other runtimes:
+# Run with other runtimes
 npm test
-deno test --allow-read
+deno test --allow-read --allow-net
 
 # Lint code
 bun run lint
 
 # Format code
 bun run format
-
-# Check all (lint + format + file size)
-bun run check
 ```
 
-## Project Structure
+### Rust Development
 
-```
-.
-├── .changeset/           # Changeset configuration
-├── .github/workflows/    # GitHub Actions CI/CD
-├── .husky/               # Git hooks (pre-commit)
-├── examples/             # Usage examples
-├── scripts/              # Build and release scripts
-├── src/                  # Source code
-│   ├── index.js          # Main entry point
-│   └── index.d.ts        # TypeScript definitions
-├── tests/                # Test files
-├── .eslintrc.js          # ESLint configuration
-├── .prettierrc           # Prettier configuration
-├── bunfig.toml           # Bun configuration
-├── deno.json             # Deno configuration
-└── package.json          # Node.js package manifest
+```bash
+cd rust
+
+# Run tests
+cargo test
+
+# Run clippy
+cargo clippy
+
+# Format code
+cargo fmt
 ```
 
-## Design Choices
+## Environment Variables
 
-### Multi-Runtime Support
-
-This template is designed to work seamlessly with all major JavaScript runtimes:
-
-- **Bun**: Primary runtime with highest performance, uses native test support (`bun test`)
-- **Node.js**: Alternative runtime, uses built-in test runner (`node --test`)
-- **Deno**: Secure runtime with built-in TypeScript support (`deno test`)
-
-The [test-anywhere](https://github.com/link-foundation/test-anywhere) framework provides a unified testing API that works identically across all runtimes.
-
-### Package Manager Agnostic
-
-While `package.json` is the source of truth for dependencies, the template supports:
-
-- **bun**: Primary choice, uses `bun.lockb`
-- **npm**: Uses `package-lock.json`
-- **yarn**: Uses `yarn.lock`
-- **pnpm**: Uses `pnpm-lock.yaml`
-- **deno**: Uses `deno.json` for configuration
-
-Note: `package-lock.json` is not committed by default to allow any package manager.
-
-### Code Quality
-
-- **ESLint**: Configured with recommended rules + Prettier integration
-- **Prettier**: Consistent code formatting
-- **Husky + lint-staged**: Pre-commit hooks ensure code quality
-- **File size limit**: Scripts must stay under 1000 lines for maintainability
-
-### Release Workflow
-
-The release workflow uses [Changesets](https://github.com/changesets/changesets) for version management:
-
-1. **Creating a changeset**: Run `bun run changeset` to document changes
-2. **PR validation**: CI checks for valid changeset in each PR
-3. **Automated versioning**: Merging to `main` triggers version bump
-4. **npm publishing**: Automated via OIDC trusted publishing (no tokens needed)
-5. **GitHub releases**: Auto-created with formatted release notes
-
-#### Manual Releases
-
-Two manual release modes are available via GitHub Actions:
-
-- **Instant release**: Immediately bump version and publish
-- **Changeset PR**: Create a PR with changeset for review
-
-### CI/CD Pipeline
-
-The GitHub Actions workflow (`.github/workflows/release.yml`) provides:
-
-1. **Changeset check**: Validates PR has exactly one changeset (added by that PR)
-2. **Lint & format**: Ensures code quality standards
-3. **Test matrix**: 3 runtimes × 3 OS = 9 test combinations
-4. **Changeset merge**: Combines multiple pending changesets at release time
-5. **Release**: Automated versioning and npm publishing
-
-#### Robust Changeset Handling
-
-The CI/CD pipeline is designed to handle concurrent PRs gracefully:
-
-- **PR Validation**: Only validates changesets **added by the current PR**, not pre-existing ones from other merged PRs. This prevents false failures when multiple PRs merge before a release cycle completes.
-
-- **Release-time Merging**: If multiple changesets exist when releasing, they are automatically merged into a single changeset with:
-  - The highest version bump type (major > minor > patch)
-  - All descriptions preserved in chronological order
-
-This design decouples PR validation from the need to pull changes from the default branch, reducing conflicts and ensuring that even if CI/CD fails, all unpublished changesets will still get published when the error is resolved.
-
-## Configuration
-
-### Updating Package Name
-
-After creating a repository from this template, update the package name in:
-
-1. `package.json`: `"name": "your-package-name"`
-2. `.changeset/config.json`: Package references
-3. Scripts that reference the package name (see Quick Start)
-
-### ESLint Rules
-
-Customize ESLint in `eslint.config.js`. Current configuration:
-
-- ES Modules support
-- Prettier integration
-- No console restrictions (common in CLI tools)
-- Strict equality enforcement
-- Async/await best practices
-- **Strict unused variables rule**: No exceptions - all unused variables, arguments, and caught errors must be removed (no `_` prefix exceptions)
-
-### Prettier Options
-
-Configured in `.prettierrc`:
-
-- Single quotes
-- Semicolons
-- 2-space indentation
-- 80-character line width
-- ES5 trailing commas
-- LF line endings
-
-## Scripts Reference
-
-| Script                 | Description                             |
-| ---------------------- | --------------------------------------- |
-| `bun test`             | Run tests with Bun                      |
-| `bun run lint`         | Check code with ESLint                  |
-| `bun run lint:fix`     | Fix ESLint issues automatically         |
-| `bun run format`       | Format code with Prettier               |
-| `bun run format:check` | Check formatting without changing files |
-| `bun run check`        | Run all checks (lint + format)          |
-| `bun run changeset`    | Create a new changeset                  |
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/my-feature`
-3. Make your changes
-4. Create a changeset: `bun run changeset`
-5. Commit your changes (pre-commit hooks will run automatically)
-6. Push and create a Pull Request
+- `GOOGLE_API_KEY` - Google Custom Search API key
+- `GOOGLE_SEARCH_ENGINE_ID` - Google Custom Search Engine ID
+- `BING_API_KEY` - Bing Web Search API key
 
 ## License
 

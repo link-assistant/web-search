@@ -5,5 +5,7 @@ dist
 package-lock.json
 .eslintcache
 CLAUDE.md
+# Rust build artifacts
+rust/target
 # Case study raw data files (downloaded from external sources)
 docs/case-studies/*/data/
