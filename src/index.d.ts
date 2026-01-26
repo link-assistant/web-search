@@ -119,7 +119,10 @@ export declare abstract class BaseSearchProvider {
   /**
    * Search for results using this provider
    */
-  abstract search(query: string, options?: SearchOptions): Promise<SearchResult[]>;
+  abstract search(
+    query: string,
+    options?: SearchOptions
+  ): Promise<SearchResult[]>;
 
   /**
    * Check if the provider is available/configured
@@ -229,7 +232,9 @@ export declare class WebSearchEngine {
 /**
  * Create a default web search engine instance
  */
-export declare function createSearchEngine(config?: WebSearchConfig): WebSearchEngine;
+export declare function createSearchEngine(
+  config?: WebSearchConfig
+): WebSearchEngine;
 
 /**
  * Get list of available provider names
