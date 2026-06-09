@@ -40,3 +40,16 @@ wiremock = "0.6"
 [features]
 default = ["server"]
 server = []
+
+# Lints — adopt the safe baseline from the link-foundation Rust pipeline template.
+# `unsafe_code = "forbid"` matches the existing 100% safe codebase and is enforced
+# in CI via `RUSTFLAGS: -Dwarnings` (see .github/workflows/rust.yml).
+[lints.rust]
+unsafe_code = "forbid"
+
+# Optimized release profile from the Rust pipeline template: smaller, faster binaries
+# for the CLI/microservice without affecting debug/test builds.
+[profile.release]
+lto = true
+codegen-units = 1
+strip = true
