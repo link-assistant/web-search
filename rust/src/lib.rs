@@ -27,5 +27,8 @@ pub mod search;
 
 pub use error::SearchError;
 pub use merger::{MergeOptions, MergeStrategy};
-pub use providers::{SearchOptions, SearchResult};
-pub use search::WebSearchEngine;
+pub use providers::{
+    get_default_provider_ids, get_provider_ids, get_registry, is_known_category, RegistryEntry,
+    SearchOptions, SearchResult, CATEGORIES,
+};
+pub use search::{WebSearchConfig, WebSearchEngine};
