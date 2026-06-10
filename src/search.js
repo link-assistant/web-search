@@ -3,9 +3,11 @@
  * Main class for performing multi-provider web searches with merging and reranking
  */
 
-import { GoogleProvider } from './providers/google.js';
-import { DuckDuckGoProvider } from './providers/duckduckgo.js';
-import { BingProvider } from './providers/bing.js';
+import {
+  buildProviders,
+  getDefaultProviderIds,
+  getRegistry,
+} from './providers/registry.js';
 import { mergeResults } from './merger.js';
 
 /**
@@ -24,6 +26,7 @@ import { mergeResults } from './merger.js';
  * @property {string} [bing.apiKey] - Bing API key
  * @property {Object<string, number>} [weights] - Weights for each provider
  * @property {'rrf' | 'weighted' | 'interleave'} [mergeStrategy] - Default merge strategy
+ * @property {Function} [fetchImpl] - Injectable fetch implementation (for tests)
  */
 
 /**
@@ -41,11 +44,7 @@ export class WebSearchEngine {
    */
   constructor(config = {}) {
     this.providers = new Map();
-    this.defaultProviders = config.providers || [
-      'duckduckgo',
-      'google',
-      'bing',
-    ];
+    this.defaultProviders = config.providers || getDefaultProviderIds();
     this.defaultWeights = config.weights || {};
     this.defaultMergeStrategy = config.mergeStrategy || 'rrf';
 
@@ -57,9 +56,7 @@ export class WebSearchEngine {
    * @param {WebSearchConfig} config
    */
   initializeProviders(config) {
-    this.providers.set('google', new GoogleProvider(config.google));
-    this.providers.set('duckduckgo', new DuckDuckGoProvider());
-    this.providers.set('bing', new BingProvider(config.bing));
+    this.providers = buildProviders(config);
 
     for (const [name, weight] of Object.entries(this.defaultWeights)) {
       const provider = this.providers.get(name);
@@ -196,12 +193,19 @@ export class WebSearchEngine {
   }
 
   /**
-   * Get provider status information
-   * @returns {Object<string, {enabled: boolean, weight: number, hasApi: boolean}>}
+   * Get provider status information, enriched with registry metadata
+   * (category, label, CORS-readability, access mechanism).
+   * @returns {Object<string, {enabled: boolean, weight: number, hasApi: boolean, category: string, label: string, corsReadable: boolean, access: string}>}
    */
   getProviderStatus() {
+    const meta = {};
+    for (const entry of getRegistry()) {
+      meta[entry.id] = entry;
+    }
+
     const status = {};
     for (const [name, provider] of this.providers) {
+      const entry = meta[name] || {};
       status[name] = {
         enabled: provider.enabled,
         weight: provider.getWeight(),
@@ -209,6 +213,10 @@ export class WebSearchEngine {
           typeof provider.hasApiCredentials === 'function'
             ? provider.hasApiCredentials()
             : false,
+        category: entry.category || 'search',
+        label: entry.label || name,
+        corsReadable: Boolean(entry.corsReadable),
+        access: entry.access || 'unknown',
       };
     }
     return status;

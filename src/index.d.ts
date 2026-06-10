@@ -58,7 +58,23 @@ export interface MergeOptions {
 }
 
 /**
- * Provider status information
+ * Provider category, mirroring `formal-ai`'s `web_search_core` registry.
+ */
+export type ProviderCategory = 'search' | 'knowledge' | 'papers' | 'code';
+
+/**
+ * How a provider obtains its results.
+ */
+export type ProviderAccess =
+  | 'api'
+  | 'html'
+  | 'hybrid'
+  | 'browser'
+  | 'component'
+  | 'unknown';
+
+/**
+ * Provider status information, enriched with registry metadata.
  */
 export interface ProviderStatus {
   /** Whether the provider is enabled */
@@ -67,6 +83,53 @@ export interface ProviderStatus {
   weight: number;
   /** Whether the provider has API credentials */
   hasApi: boolean;
+  /** Provider category */
+  category: ProviderCategory;
+  /** Human-readable label */
+  label: string;
+  /** Whether the endpoint is browser-CORS readable */
+  corsReadable: boolean;
+  /** How results are obtained */
+  access: ProviderAccess;
+}
+
+/**
+ * A single registry entry describing a provider.
+ */
+export interface RegistryEntry {
+  /** Stable provider id */
+  id: string;
+  /** Human-readable label */
+  label: string;
+  /** Provider category */
+  category: ProviderCategory;
+  /** Whether the endpoint is browser-CORS readable */
+  corsReadable: boolean;
+  /** Whether this is its category's default */
+  defaultForCategory: boolean;
+  /** How results are obtained */
+  access: ProviderAccess;
+}
+
+/**
+ * A descriptor for a descriptor-driven (generic) engine.
+ */
+export interface EngineDescriptor {
+  id: string;
+  label: string;
+  category: ProviderCategory;
+  kind: 'json' | 'text' | 'html';
+  corsReadable?: boolean;
+  defaultForCategory?: boolean;
+  method?: 'GET' | 'POST';
+  buildUrl(query: string, options?: SearchOptions): string;
+  buildBody?(query: string, options?: SearchOptions): string;
+  headers?(options?: SearchOptions): Record<string, string>;
+  parse(
+    payload: unknown,
+    limit: number,
+    options?: SearchOptions
+  ): SearchResult[];
 }
 
 /**
@@ -101,6 +164,8 @@ export interface WebSearchConfig {
   weights?: Record<string, number>;
   /** Default merge strategy */
   mergeStrategy?: 'rrf' | 'weighted' | 'interleave';
+  /** Injectable fetch implementation (primarily for testing) */
+  fetchImpl?: typeof fetch;
 }
 
 /**
@@ -184,6 +249,41 @@ export declare class BrowserSearchProvider extends BaseSearchProvider {
 }
 
 /**
+ * Generic, descriptor-driven search provider. A single implementation that can
+ * speak to any engine described by a catalog descriptor.
+ */
+export declare class GenericProvider extends BaseSearchProvider {
+  constructor(
+    descriptor: EngineDescriptor,
+    config?: { fetchImpl?: typeof fetch }
+  );
+  readonly category: ProviderCategory;
+  readonly label: string;
+  readonly corsReadable: boolean;
+  search(query: string, options?: SearchOptions): Promise<SearchResult[]>;
+}
+
+/**
+ * Provider that delegates a single-provider fetch + parse to the optional
+ * `@link-assistant/web-capture` component library.
+ */
+export declare class WebCaptureProvider extends BaseSearchProvider {
+  static readonly SUPPORTED_PROVIDERS: string[];
+  constructor(config?: {
+    engine?: string;
+    fetchImpl?: typeof fetch;
+    searchImpl?: (args: {
+      query: string;
+      provider: string;
+      limit: number;
+      fetchImpl?: typeof fetch;
+    }) => Promise<{ results?: SearchResult[] }>;
+  });
+  readonly engine: string;
+  search(query: string, options?: SearchOptions): Promise<SearchResult[]>;
+}
+
+/**
  * Web Search Engine - main class for multi-provider search
  */
 export declare class WebSearchEngine {
@@ -237,7 +337,7 @@ export declare function createSearchEngine(
 ): WebSearchEngine;
 
 /**
- * Get list of available provider names
+ * Get list of available provider names (every registered engine)
  */
 export declare function getAvailableProviders(): string[];
 
@@ -249,6 +349,69 @@ export declare function createBrowserProvider(config?: {
   browserCommander?: unknown;
   browserOptions?: Record<string, unknown>;
 }): BrowserSearchProvider;
+
+/**
+ * Create a descriptor-driven generic provider
+ */
+export declare function createGenericProvider(
+  descriptor: EngineDescriptor,
+  config?: { fetchImpl?: typeof fetch }
+): GenericProvider;
+
+/**
+ * Create a web-capture-backed provider
+ */
+export declare function createWebCaptureProvider(config?: {
+  engine?: string;
+  fetchImpl?: typeof fetch;
+}): WebCaptureProvider;
+
+/** Provider categories, mirroring `formal-ai`'s `web_search_core` registry. */
+export declare const CATEGORIES: ProviderCategory[];
+
+/** All API-based engine descriptors keyed by id. */
+export declare const API_ENGINES: Record<string, EngineDescriptor>;
+
+/** All HTML-scraping engine descriptors keyed by id. */
+export declare const HTML_ENGINES: Record<string, EngineDescriptor>;
+
+/** Build the full registry of provider entries. */
+export declare function getRegistry(): RegistryEntry[];
+
+/** Get all provider ids, optionally filtered by category. */
+export declare function getProviderIds(category?: ProviderCategory): string[];
+
+/** Get the default provider ids used when the caller does not specify any. */
+export declare function getDefaultProviderIds(): string[];
+
+/** Instantiate every registered provider. */
+export declare function buildProviders(
+  config?: WebSearchConfig
+): Map<string, BaseSearchProvider>;
+
+/** Decode the common HTML entities (named + numeric) in search results. */
+export declare function decodeHtmlEntities(text: string): string;
+
+/** Strip HTML tags from a string and trim the result. */
+export declare function stripHtml(html: string): string;
+
+/** Strip tags, decode entities, and collapse whitespace. */
+export declare function cleanText(text: string): string;
+
+/** Generic HTML result-list parser driven by a per-engine regex. */
+export declare function parseAnchorList(
+  html: string,
+  config: {
+    itemRegex: RegExp;
+    source: string;
+    limit: number;
+    urlGroup: number;
+    titleGroup: number;
+    snippetGroup?: number;
+    urlTransform?: (url: string) => string;
+    skip?: (url: string) => boolean;
+  }
+): SearchResult[];
 
 /**
  * Merge search results using the specified strategy

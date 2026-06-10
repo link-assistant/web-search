@@ -85,6 +85,7 @@ export default [
     files: ['tests/**/*.js', '**/*.test.js'],
     rules: {
       'require-await': 'off', // Async functions without await are common in tests
+      'max-lines-per-function': 'off', // describe() blocks legitimately group many cases
     },
   },
   {
