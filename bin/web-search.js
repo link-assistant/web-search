@@ -8,8 +8,8 @@
  *   web-search --serve [--port 3000]  Start as API server
  */
 
-import { fileURLToPath } from 'url';
-import { dirname, resolve } from 'path';
+import { fileURLToPath } from 'node:url';
+import { dirname, resolve } from 'node:path';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -30,6 +30,7 @@ function parseArgs(args) {
     help: false,
     version: false,
     verbose: false,
+    listProviders: false,
   };
 
   const positional = [];
@@ -61,6 +62,8 @@ function parseArgs(args) {
       result.version = true;
     } else if (arg === '--verbose' || arg === '-V') {
       result.verbose = true;
+    } else if (arg === '--list-providers') {
+      result.listProviders = true;
     } else if (!arg.startsWith('-')) {
       positional.push(arg);
     }
@@ -82,7 +85,8 @@ Usage:
   web-search --serve [--port <port>] Start as API server
 
 Search Options:
-  --providers <list>   Comma-separated list of providers (google,duckduckgo,bing)
+  --providers <list>   Comma-separated list of providers (e.g. google,duckduckgo,wikipedia)
+                       Run --list-providers to see every available engine.
   --limit, -l <n>      Maximum results per provider (default: 10)
   --strategy <name>    Merge strategy: rrf, weighted, interleave (default: rrf)
   --language <code>    Language code (e.g., en, de)
@@ -93,6 +97,9 @@ Output Options:
   --format, -f <fmt>   Output format: text, json, urls (default: text)
   --verbose, -V        Show detailed output
 
+Discovery Options:
+  --list-providers     List every available provider grouped by category
+
 Server Options:
   --serve, -s          Start as HTTP API server
   --port, -p <port>    Port to listen on (default: 3000)
@@ -101,16 +108,24 @@ General Options:
   --help, -h           Show this help message
   --version, -v        Show version number
 
+Provider Categories:
+  search     Web search engines (google, bing, duckduckgo, brave, ...)
+  knowledge  Knowledge bases (wikipedia, wikidata)
+  papers     Scholarly works (crossref, openalex, arxiv)
+  code       Code & developer search (github, hackernews)
+
 Environment Variables:
   GOOGLE_API_KEY       Google Custom Search API key
   GOOGLE_CX            Google Custom Search Engine ID
   BING_API_KEY         Bing Search API key
+  GITHUB_TOKEN         GitHub token (raises GitHub search rate limits)
   PORT                 Server port (default: 3000)
 
 Examples:
   web-search "javascript tutorial"
   web-search "rust programming" --providers google,duckduckgo --limit 5
-  web-search "climate change" --format json | jq .
+  web-search "neural networks" --providers arxiv,crossref --format json | jq .
+  web-search --list-providers
   web-search --serve --port 8080
 
 API Endpoints (in server mode):
@@ -118,6 +133,7 @@ API Endpoints (in server mode):
   POST /search                     Search with JSON body
   GET  /search/:provider?q=<query> Search single provider
   GET  /providers                  List available providers
+  GET  /categories                 List provider categories
   GET  /health                     Health check
 `);
 }
@@ -127,6 +143,31 @@ async function showVersion() {
   const packagePath = resolve(__dirname, '..', 'package.json');
   const packageJson = JSON.parse(fs.readFileSync(packagePath, 'utf-8'));
   console.log(`web-search v${packageJson.version}`);
+}
+
+async function showProviders() {
+  const { CATEGORIES, getRegistry } = await import('../src/providers/index.js');
+  const registry = getRegistry();
+
+  console.log('Available providers by category:\n');
+  for (const category of CATEGORIES) {
+    const entries = registry.filter((e) => e.category === category);
+    if (entries.length === 0) {
+      continue;
+    }
+    console.log(`${category}:`);
+    for (const entry of entries) {
+      const flags = [
+        entry.defaultForCategory ? 'default' : null,
+        entry.corsReadable ? 'cors' : null,
+        entry.access,
+      ]
+        .filter(Boolean)
+        .join(', ');
+      console.log(`  ${entry.id.padEnd(16)} ${entry.label} (${flags})`);
+    }
+    console.log('');
+  }
 }
 
 async function startServer(port) {
@@ -172,7 +213,7 @@ async function performSearch(query, options) {
   const { WebSearchEngine } = await import('../src/search.js');
 
   const searchEngine = new WebSearchEngine({
-    providers: options.providers || ['duckduckgo', 'google', 'bing'],
+    providers: options.providers || undefined,
     google: {
       apiKey: process.env.GOOGLE_API_KEY,
       searchEngineId: process.env.GOOGLE_CX,
@@ -248,6 +289,11 @@ async function main() {
 
   if (args.version) {
     await showVersion();
+    return;
+  }
+
+  if (args.listProviders) {
+    await showProviders();
     return;
   }
 

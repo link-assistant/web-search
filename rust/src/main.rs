@@ -19,7 +19,10 @@ use serde::{Deserialize, Serialize};
 use tower_http::cors::CorsLayer;
 use tracing_subscriber::EnvFilter;
 
-use web_search::{MergeOptions, MergeStrategy, SearchOptions, WebSearchEngine};
+use web_search::{
+    get_provider_ids, get_registry, is_known_category, MergeOptions, MergeStrategy, RegistryEntry,
+    SearchOptions, WebSearchEngine, CATEGORIES,
+};
 
 #[derive(Parser)]
 #[command(name = "web-search")]
@@ -36,6 +39,10 @@ struct Cli {
     /// Providers to use (comma-separated)
     #[arg(long, value_delimiter = ',')]
     providers: Option<Vec<String>>,
+
+    /// List every registered provider with its metadata and exit
+    #[arg(long)]
+    list_providers: bool,
 
     /// Maximum results per provider
     #[arg(short, long, default_value = "10")]
@@ -62,7 +69,7 @@ struct Cli {
     safe: bool,
 
     /// Verbose output
-    #[arg(short = 'V', long)]
+    #[arg(short = 'v', long)]
     verbose: bool,
 }
 
@@ -130,10 +137,69 @@ async fn health_handler(State(state): State<AppState>) -> Json<HealthResponse> {
     })
 }
 
+#[derive(Debug, Deserialize)]
+struct CategoryQuery {
+    category: Option<String>,
+}
+
+#[derive(Debug, Serialize)]
+struct ProvidersResponse {
+    categories: Vec<String>,
+    count: usize,
+    providers: HashMap<String, web_search::search::ProviderStatus>,
+    registry: Vec<RegistryEntry>,
+}
+
 async fn providers_handler(
     State(state): State<AppState>,
-) -> Json<HashMap<String, web_search::search::ProviderStatus>> {
-    Json(state.engine.get_provider_status().await)
+    Query(params): Query<CategoryQuery>,
+) -> Result<Json<ProvidersResponse>, (StatusCode, Json<ErrorResponse>)> {
+    let category = params.category.filter(|c| !c.is_empty());
+    if let Some(ref c) = category {
+        if !is_known_category(c) {
+            return Err((
+                StatusCode::BAD_REQUEST,
+                Json(ErrorResponse {
+                    error: format!("Unknown category: {c}"),
+                    message: None,
+                }),
+            ));
+        }
+    }
+
+    let status = state.engine.get_provider_status().await;
+    let registry: Vec<RegistryEntry> = get_registry()
+        .into_iter()
+        .filter(|e| category.as_deref().is_none_or(|c| e.category == c))
+        .collect();
+
+    let providers = match &category {
+        Some(c) => status
+            .into_iter()
+            .filter(|(_, s)| s.category.as_deref() == Some(c.as_str()))
+            .collect(),
+        None => status,
+    };
+
+    Ok(Json(ProvidersResponse {
+        categories: CATEGORIES.iter().map(|s| s.to_string()).collect(),
+        count: registry.len(),
+        providers,
+        registry,
+    }))
+}
+
+#[derive(Debug, Serialize)]
+struct CategoriesResponse {
+    categories: HashMap<String, Vec<String>>,
+}
+
+async fn categories_handler() -> Json<CategoriesResponse> {
+    let mut categories = HashMap::new();
+    for category in CATEGORIES {
+        categories.insert(category.to_string(), get_provider_ids(Some(category)));
+    }
+    Json(CategoriesResponse { categories })
 }
 
 async fn search_handler(
@@ -269,6 +335,7 @@ async fn start_server(port: u16) -> Result<(), Box<dyn std::error::Error>> {
     let app = Router::new()
         .route("/health", get(health_handler))
         .route("/providers", get(providers_handler))
+        .route("/categories", get(categories_handler))
         .route("/search", get(search_handler))
         .route("/search/{provider}", get(search_provider_handler))
         .layer(CorsLayer::permissive())
@@ -281,6 +348,7 @@ async fn start_server(port: u16) -> Result<(), Box<dyn std::error::Error>> {
     println!("  GET  /search?q=<query>        - Search all providers");
     println!("  GET  /search/:provider?q=<query> - Search single provider");
     println!("  GET  /providers               - List available providers");
+    println!("  GET  /categories              - List provider categories");
     println!("  GET  /health                  - Health check");
     println!();
     println!("Press Ctrl+C to stop the server");
@@ -398,6 +466,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let cli = Cli::parse();
 
+    if cli.list_providers {
+        print_providers();
+        return Ok(());
+    }
+
     match &cli.command {
         Some(Commands::Serve { port }) => {
             start_server(*port).await?;
@@ -408,4 +481,28 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     Ok(())
+}
+
+/// Print the full provider registry grouped by category.
+fn print_providers() {
+    let registry = get_registry();
+    println!("Registered providers ({} total):\n", registry.len());
+    for category in CATEGORIES {
+        let entries: Vec<&RegistryEntry> =
+            registry.iter().filter(|e| e.category == category).collect();
+        println!("{} ({}):", category, entries.len());
+        for e in entries {
+            let default = if e.default_for_category {
+                " [default]"
+            } else {
+                ""
+            };
+            let cors = if e.cors_readable { ", cors" } else { "" };
+            println!(
+                "  {:<16} {} ({}{}){}",
+                e.id, e.label, e.access, cors, default
+            );
+        }
+        println!();
+    }
 }

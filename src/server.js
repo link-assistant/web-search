@@ -4,8 +4,13 @@
  */
 
 import express from 'express';
-import { fileURLToPath } from 'url';
+import { fileURLToPath } from 'node:url';
 import { WebSearchEngine } from './search.js';
+import {
+  CATEGORIES,
+  getRegistry,
+  getProviderIds,
+} from './providers/registry.js';
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -13,7 +18,6 @@ const port = process.env.PORT || 3000;
 app.use(express.json());
 
 const searchEngine = new WebSearchEngine({
-  providers: ['duckduckgo', 'google', 'bing'],
   google: {
     apiKey: process.env.GOOGLE_API_KEY,
     searchEngineId: process.env.GOOGLE_CX,
@@ -202,12 +206,44 @@ app.get('/search/:provider', async (req, res) => {
 
 /**
  * Get available providers
- * GET /providers
+ * GET /providers?category=<category>
  */
 app.get('/providers', (req, res) => {
+  const { category } = req.query;
+  if (category && !CATEGORIES.includes(category)) {
+    return res.status(400).json({
+      error: `Unknown category: ${category}`,
+      categories: CATEGORIES,
+    });
+  }
+
+  const status = searchEngine.getProviderStatus();
+  const registry = getRegistry().filter(
+    (e) => !category || e.category === category
+  );
+
   res.json({
-    providers: searchEngine.getProviderStatus(),
+    categories: CATEGORIES,
+    count: registry.length,
+    providers: category
+      ? Object.fromEntries(
+          Object.entries(status).filter(([, s]) => s.category === category)
+        )
+      : status,
+    registry,
   });
+});
+
+/**
+ * Get provider categories and the providers within each
+ * GET /categories
+ */
+app.get('/categories', (req, res) => {
+  const categories = {};
+  for (const category of CATEGORIES) {
+    categories[category] = getProviderIds(category);
+  }
+  res.json({ categories });
 });
 
 const isMainModule =
@@ -224,6 +260,7 @@ if (isMainModule) {
     console.log('  POST /search                  - Search with JSON body');
     console.log('  GET  /search/:provider?q=<query> - Search single provider');
     console.log('  GET  /providers               - List available providers');
+    console.log('  GET  /categories              - List provider categories');
     console.log('  GET  /health                  - Health check');
     console.log('');
     console.log('Query parameters:');

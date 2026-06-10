@@ -8,8 +8,8 @@ use tokio::sync::RwLock;
 use crate::error::SearchError;
 use crate::merger::{merge_results, MergeOptions, MergeStrategy};
 use crate::providers::{
-    BingConfig, BingProvider, DuckDuckGoProvider, GoogleConfig, GoogleProvider, SearchOptions,
-    SearchProvider, SearchResult,
+    build_providers, get_default_provider_ids, get_registry, BuildConfig, RegistryEntry,
+    SearchOptions, SearchProvider, SearchResult,
 };
 
 /// Configuration for the web search engine
@@ -33,11 +33,7 @@ impl WebSearchConfig {
     /// Create config from environment variables
     pub fn from_env() -> Self {
         Self {
-            providers: vec![
-                "duckduckgo".to_string(),
-                "google".to_string(),
-                "bing".to_string(),
-            ],
+            providers: get_default_provider_ids(),
             google_api_key: std::env::var("GOOGLE_API_KEY").ok(),
             google_cx: std::env::var("GOOGLE_CX").ok(),
             bing_api_key: std::env::var("BING_API_KEY").ok(),
@@ -50,6 +46,7 @@ impl WebSearchConfig {
 /// Web Search Engine
 pub struct WebSearchEngine {
     providers: HashMap<String, Arc<RwLock<Box<dyn SearchProvider>>>>,
+    registry: Vec<RegistryEntry>,
     default_providers: Vec<String>,
     default_weights: HashMap<String, f64>,
     default_strategy: MergeStrategy,
@@ -61,32 +58,27 @@ impl WebSearchEngine {
         Self::with_config(WebSearchConfig::from_env())
     }
 
-    /// Create a new web search engine with custom configuration
+    /// Create a new web search engine with custom configuration.
+    ///
+    /// Providers are instantiated from the typed registry (the single source of
+    /// truth), so every catalogued engine — class-based, descriptor-driven, and
+    /// web-capture-backed — is available for selection.
     pub fn with_config(config: WebSearchConfig) -> Self {
         let mut providers: HashMap<String, Arc<RwLock<Box<dyn SearchProvider>>>> = HashMap::new();
 
-        providers.insert(
-            "duckduckgo".to_string(),
-            Arc::new(RwLock::new(Box::new(DuckDuckGoProvider::new()))),
-        );
+        let build_config = BuildConfig {
+            google_api_key: config.google_api_key,
+            google_cx: config.google_cx,
+            bing_api_key: config.bing_api_key,
+        };
 
-        providers.insert(
-            "google".to_string(),
-            Arc::new(RwLock::new(Box::new(GoogleProvider::new(GoogleConfig {
-                api_key: config.google_api_key,
-                search_engine_id: config.google_cx,
-            })))),
-        );
-
-        providers.insert(
-            "bing".to_string(),
-            Arc::new(RwLock::new(Box::new(BingProvider::new(BingConfig {
-                api_key: config.bing_api_key,
-            })))),
-        );
+        for (id, provider) in build_providers(&build_config) {
+            providers.insert(id, Arc::new(RwLock::new(provider)));
+        }
 
         Self {
             providers,
+            registry: get_registry(),
             default_providers: config.providers,
             default_weights: config.weights,
             default_strategy: config.merge_strategy,
@@ -187,17 +179,29 @@ impl WebSearchEngine {
         self.providers.keys().cloned().collect()
     }
 
-    /// Get provider status
+    /// Get the full provider registry (metadata for every known provider).
+    pub fn get_registry(&self) -> &[RegistryEntry] {
+        &self.registry
+    }
+
+    /// Get provider status, enriched with registry metadata (category, label,
+    /// CORS readability, access mechanism) so callers see the same shape the
+    /// JavaScript implementation exposes.
     pub async fn get_provider_status(&self) -> HashMap<String, ProviderStatus> {
         let mut status = HashMap::new();
 
         for (name, provider) in &self.providers {
             let p = provider.read().await;
+            let meta = self.registry.iter().find(|e| &e.id == name);
             status.insert(
                 name.clone(),
                 ProviderStatus {
                     enabled: p.is_available(),
                     weight: p.weight(),
+                    category: meta.map(|m| m.category.clone()),
+                    label: meta.map(|m| m.label.clone()),
+                    cors_readable: meta.map(|m| m.cors_readable),
+                    access: meta.map(|m| m.access.clone()),
                 },
             );
         }
@@ -234,11 +238,24 @@ impl Default for WebSearchEngine {
     }
 }
 
-/// Provider status information
+/// Provider status information, enriched with registry metadata.
 #[derive(Debug, Clone, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ProviderStatus {
     /// Whether the provider is enabled
     pub enabled: bool,
     /// Provider weight for reranking
     pub weight: f64,
+    /// Provider category (one of the registry categories)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub category: Option<String>,
+    /// Human-readable label
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub label: Option<String>,
+    /// Whether the endpoint is browser-CORS readable
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub cors_readable: Option<bool>,
+    /// How results are obtained (api, html, hybrid, component, ...)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub access: Option<String>,
 }

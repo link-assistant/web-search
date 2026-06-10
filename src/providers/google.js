@@ -5,6 +5,7 @@
  */
 
 import { BaseSearchProvider } from './base.js';
+import { decodeHtmlEntities } from './html-utils.js';
 
 /**
  * Google search provider implementation
@@ -184,7 +185,7 @@ export class GoogleProvider extends BaseSearchProvider {
     for (const pattern of [resultPattern, alternativePattern]) {
       while ((match = pattern.exec(html)) !== null && results.length < limit) {
         const url = decodeURIComponent(match[1]).split('&')[0];
-        const title = this.decodeHtmlEntities(match[2].trim());
+        const title = decodeHtmlEntities(match[2].trim());
 
         if (
           seen.has(url) ||
@@ -207,20 +208,5 @@ export class GoogleProvider extends BaseSearchProvider {
     }
 
     return results;
-  }
-
-  /**
-   * Decode HTML entities
-   * @param {string} text
-   * @returns {string}
-   */
-  decodeHtmlEntities(text) {
-    return text
-      .replace(/&amp;/g, '&')
-      .replace(/&lt;/g, '<')
-      .replace(/&gt;/g, '>')
-      .replace(/&quot;/g, '"')
-      .replace(/&#39;/g, "'")
-      .replace(/&nbsp;/g, ' ');
   }
 }

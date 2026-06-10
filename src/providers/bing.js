@@ -5,6 +5,7 @@
  */
 
 import { BaseSearchProvider } from './base.js';
+import { decodeHtmlEntities, stripHtml } from './html-utils.js';
 
 /**
  * Bing search provider implementation
@@ -182,17 +183,17 @@ export class BingProvider extends BaseSearchProvider {
       results.length < limit
     ) {
       const url = match[1];
-      const title = this.stripHtml(match[2]);
-      const snippet = this.stripHtml(match[3]);
+      const title = stripHtml(match[2]);
+      const snippet = stripHtml(match[3]);
 
       if (url.includes('bing.com') || url.startsWith('/')) {
         continue;
       }
 
       results.push({
-        title: this.decodeHtmlEntities(title) || 'Untitled',
+        title: decodeHtmlEntities(title) || 'Untitled',
         url,
-        snippet: this.decodeHtmlEntities(snippet) || '',
+        snippet: decodeHtmlEntities(snippet) || '',
         source: this.name,
         rank: results.length + 1,
       });
@@ -213,7 +214,7 @@ export class BingProvider extends BaseSearchProvider {
         }
 
         results.push({
-          title: this.decodeHtmlEntities(title) || 'Untitled',
+          title: decodeHtmlEntities(title) || 'Untitled',
           url,
           snippet: '',
           source: this.name,
@@ -223,29 +224,5 @@ export class BingProvider extends BaseSearchProvider {
     }
 
     return results;
-  }
-
-  /**
-   * Strip HTML tags from string
-   * @param {string} html
-   * @returns {string}
-   */
-  stripHtml(html) {
-    return html.replace(/<[^>]+>/g, '').trim();
-  }
-
-  /**
-   * Decode HTML entities
-   * @param {string} text
-   * @returns {string}
-   */
-  decodeHtmlEntities(text) {
-    return text
-      .replace(/&amp;/g, '&')
-      .replace(/&lt;/g, '<')
-      .replace(/&gt;/g, '>')
-      .replace(/&quot;/g, '"')
-      .replace(/&#39;/g, "'")
-      .replace(/&nbsp;/g, ' ');
   }
 }

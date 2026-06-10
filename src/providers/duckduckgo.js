@@ -4,6 +4,7 @@
  */
 
 import { BaseSearchProvider } from './base.js';
+import { decodeHtmlEntities, stripHtml } from './html-utils.js';
 
 /**
  * DuckDuckGo search provider implementation
@@ -83,11 +84,11 @@ export class DuckDuckGoProvider extends BaseSearchProvider {
     let match;
     while ((match = resultPattern.exec(html)) !== null) {
       urls.push(decodeURIComponent(match[1]));
-      titles.push(this.decodeHtmlEntities(match[2].trim()));
+      titles.push(decodeHtmlEntities(match[2].trim()));
     }
 
     while ((match = snippetPattern.exec(html)) !== null) {
-      snippets.push(this.decodeHtmlEntities(this.stripHtml(match[1])));
+      snippets.push(decodeHtmlEntities(stripHtml(match[1])));
     }
 
     for (let i = 0; i < Math.min(urls.length, limit); i++) {
@@ -110,29 +111,5 @@ export class DuckDuckGoProvider extends BaseSearchProvider {
     }
 
     return results;
-  }
-
-  /**
-   * Strip HTML tags from string
-   * @param {string} html
-   * @returns {string}
-   */
-  stripHtml(html) {
-    return html.replace(/<[^>]+>/g, '').trim();
-  }
-
-  /**
-   * Decode HTML entities
-   * @param {string} text
-   * @returns {string}
-   */
-  decodeHtmlEntities(text) {
-    return text
-      .replace(/&amp;/g, '&')
-      .replace(/&lt;/g, '<')
-      .replace(/&gt;/g, '>')
-      .replace(/&quot;/g, '"')
-      .replace(/&#39;/g, "'")
-      .replace(/&nbsp;/g, ' ');
   }
 }
