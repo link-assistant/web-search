@@ -25,6 +25,11 @@ describe('html-utils', () => {
       expect(decodeHtmlEntities('a&nbsp;b')).toBe('a b');
     });
 
+    it('decodes typographic punctuation entities', () => {
+      expect(decodeHtmlEntities('a&hellip;')).toBe('a…');
+      expect(decodeHtmlEntities('a&mdash;b&ndash;c')).toBe('a—b–c');
+    });
+
     it('decodes decimal numeric references', () => {
       expect(decodeHtmlEntities('&#65;&#66;&#67;')).toBe('ABC');
     });

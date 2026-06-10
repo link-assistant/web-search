@@ -20,6 +20,9 @@ const NAMED_ENTITIES = {
   '&#39;': "'",
   '&apos;': "'",
   '&nbsp;': ' ',
+  '&hellip;': '…',
+  '&mdash;': '—',
+  '&ndash;': '–',
 };
 
 /**
@@ -33,7 +36,10 @@ export function decodeHtmlEntities(text) {
     return '';
   }
   return String(text)
-    .replace(/&(?:amp|lt|gt|quot|#39|apos|nbsp);/g, (m) => NAMED_ENTITIES[m])
+    .replace(
+      /&(?:amp|lt|gt|quot|#39|apos|nbsp|hellip|mdash|ndash);/g,
+      (m) => NAMED_ENTITIES[m]
+    )
     .replace(/&#(\d+);/g, (_, code) => String.fromCodePoint(Number(code)))
     .replace(/&#x([0-9a-fA-F]+);/g, (_, code) =>
       String.fromCodePoint(parseInt(code, 16))
