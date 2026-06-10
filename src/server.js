@@ -4,7 +4,7 @@
  */
 
 import express from 'express';
-import { fileURLToPath } from 'url';
+import { fileURLToPath } from 'node:url';
 import { WebSearchEngine } from './search.js';
 import {
   CATEGORIES,

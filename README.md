@@ -326,7 +326,7 @@ bun test
 
 # Run with other runtimes
 npm test
-deno test --allow-read --allow-net
+deno test --allow-read --allow-env --allow-net
 
 # Lint code
 bun run lint
