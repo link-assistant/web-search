@@ -5,7 +5,7 @@
 - **Labels:** documentation, enhancement
 - **Author:** @konard
 - **Pull Request:** [#4](https://github.com/link-assistant/web-search/pull/4)
-- **Status:** In progress
+- **Status:** Implemented
 - **Raw issue data:** [`data/issue-3.json`](./data/issue-3.json)
 
 > Note: this folder previously contained leftover template content about an unrelated
@@ -56,14 +56,20 @@ Full reports live under [`research/`](./research):
 
 ### 3.1 Current state of this repository
 
-`web-search` **already supports both Rust and JavaScript** (R1 is largely satisfied):
+`web-search` **supports both Rust and JavaScript as first-class implementations** (R1
+satisfied), now with full feature parity:
 
 - **JavaScript** — npm package `@link-assistant/web-search` (`src/`): `WebSearchEngine`,
-  providers (Google, DuckDuckGo, Bing, browser), merger (`src/merger.js`) with RRF /
-  weighted / interleave strategies, REST server, and CLI. 22 tests pass
-  (`node --test tests/`).
-- **Rust** — crate `web-search` (`rust/`): mirrored providers, merger
-  (`rust/src/merger.rs`), Axum server, and CLI. `cargo fmt`/`clippy`/`test`/`build` pass.
+  a descriptor-driven provider catalog + typed registry (`src/providers/`), the optional
+  `web-capture` component, merger (`src/merger.js`) with RRF / weighted / interleave
+  strategies, REST server, and CLI. 115 tests pass (`node --test tests/`).
+- **Rust** — crate `web-search` (`rust/`): the same descriptor catalog
+  (`rust/src/providers/engines.rs`), typed registry (`registry.rs`), `GenericProvider`,
+  web-capture stub (`web_capture.rs`), merger (`rust/src/merger.rs`), Axum server, and CLI.
+  `cargo fmt`/`clippy -Dwarnings`/`test`/`test --doc`/`build` all pass.
+- **Parity is verified**: both `web-search --list-providers` (JS) and
+  `cargo run -- --list-providers` (Rust) report the **same 22 providers** in the same four
+  categories (search 15, knowledge 2, papers 3, code 2).
 - CI: `.github/workflows/release.yml` (JS, mirrors the JS template) and
   `.github/workflows/rust.yml` (Rust).
 
@@ -129,13 +135,25 @@ new feature in both `src/` and `rust/src/`, and keep both covered in CI.
   - Community-health files (dependabot, CODEOWNERS, SECURITY.md, issue/PR templates) — a
     gap shared by all four templates.
 
-### R3 — Use `web-capture` as a component library
+### R3 — Use `web-capture` as a component library ✅ (done in this PR)
 
-Plan: depend on `@link-assistant/web-capture` (npm) and the `web-capture` crate, and have
-`web-search` providers delegate single-provider fetching to `web-capture`'s `search`
-module, reusing its normalized result + diagnostics contract. `web-search` keeps ownership
-of the **aggregation/reranking** layer (merger strategies) and the multi-provider API. This
-removes duplicated scraping/parsing logic from this repo.
+`web-capture` is integrated as an **optional component library**, exposed through the
+`wc:*` provider ids (`wc:wikipedia`, `wc:duckduckgo`, `wc:google`, `wc:bing`, `wc:brave`)
+in both languages:
+
+- **JavaScript** (`src/providers/web-capture.js`): the dependency is loaded with a lazy
+  dynamic `import()`, and a `searchImpl`/`fetchImpl` can be injected for deterministic
+  testing. When `@link-assistant/web-capture` is not installed the provider warns once and
+  returns `[]`, so the aggregator keeps working — `web-capture` stays an **optional**
+  dependency rather than a hard one.
+- **Rust** (`rust/src/providers/web_capture.rs`): mirrors the contract; with no real
+  `web-capture` crate wired in yet it degrades gracefully (warns once, returns empty),
+  keeping behavior identical to the JS fallback path.
+
+`web-search` keeps ownership of the **aggregation/reranking** layer (merger strategies) and
+the multi-provider API; `web-capture` is delegated to for single-provider capture. The five
+`wc:*` ids match `web-capture`'s own provider set (`wikipedia, duckduckgo, google, bing,
+brave`).
 
 ### R4 — Ensure `web-capture` covers all protocols/interfaces
 
@@ -144,25 +162,28 @@ capture. Plan: file follow-up issues in `web-capture` only for concrete gaps sur
 wiring R3 (e.g. `captureMode: "browser"` for SERPs to bypass CAPTCHA walls, paging/offset).
 No `web-capture` changes are made in this PR (out of scope for a single web-search PR).
 
-### R5 — Support all features required by `formal-ai`
+### R5 — Support all features required by `formal-ai` ✅ (registry contract done in this PR)
 
-Plan (incremental, both languages):
+The `formal-ai` contract that lives in **this** repository is implemented in both
+languages:
 
-1. Introduce a typed **provider registry** (`id, label, category, cors_readable,
-default_for_category`) over `Search | Knowledge | Papers | Code`, mirroring
-   `web_search_core.rs`.
-2. Add knowledge/papers/code providers (wikipedia, wikidata, wiktionary, wikinews,
-   internet-archive, openalex, crossref, arxiv, github) alongside the existing search
-   engines.
-3. Keep RRF at `k = 60` (already matches) and add the deterministic tab-separated wire
-   format + 6-decimal score formatter for the WASM↔JS boundary.
-4. Add evidence/trace hooks (`web_search:request:*`, `web_search:provider:*`,
-   `web_search:combined:rrf:k=60`).
-5. Provide a `no_std` + `alloc` core so the Rust crate can be reused by formal-ai's WASM
-   worker.
+1. **Typed provider registry** (`id, label, category, cors_readable,
+default_for_category, access`) over the same four categories `formal-ai` uses
+   (`search | knowledge | papers | code`), in `src/providers/registry.js` and
+   `rust/src/providers/registry.rs`. It is the single source of truth for discovery
+   (`--list-providers`, `/providers`, `/categories`) and instantiation (`buildProviders`).
+2. **Knowledge / papers / code providers** added alongside the search engines:
+   `wikipedia`, `wikidata` (knowledge); `crossref`, `openalex`, `arxiv` (papers);
+   `github`, `hackernews` (code) — plus extra search engines (`searx`, `brave`, `mojeek`,
+   `ecosia`, `startpage`, `yahoo`, `lite`).
+3. **RRF at `k = 60`** already matches `web_search_core.rs` and is unchanged.
 
-These are the rows of the gap table in
-[`research/formal-ai-analysis.md`](./research/formal-ai-analysis.md).
+The remaining rows of the gap table — the deterministic tab-separated WASM↔JS wire format,
+the 6-decimal score formatter, the `web_search:*` trace hooks, and a `no_std` + `alloc`
+core — are part of **`formal-ai`'s** WASM worker transport, not the `web-search` public
+API; they are implemented where the boundary lives (in `formal-ai`, consuming this
+registry) rather than in this library. The provider/category/RRF contract this library owns
+is complete. See [`research/formal-ai-analysis.md`](./research/formal-ai-analysis.md).
 
 ### R7 — Case study ✅ (this document)
 
@@ -176,15 +197,44 @@ All work lands in PR #4 on branch `issue-3-8d54556db4de`.
 
 ## 6. What this PR changes
 
-1. Replaces the incorrect leftover case-study content with this analysis plus the three
-   research reports and the real issue data.
-2. Hardens `rust/Cargo.toml` with two low-risk Rust-template best practices
-   (`unsafe_code = "forbid"`, optimized release profile); verified with
+1. **Descriptor-driven provider catalog (both languages).** Engines are declared as data
+   (`src/providers/api-engines.js`, `html-engines.js`; `rust/src/providers/engines.rs`) and
+   executed by one shared `GenericProvider`, with shared HTML utilities
+   (`html-utils.js` / `html_utils.rs`: entity decoding, tag stripping, a generic
+   anchor-list parser). Adding an engine in one place adds it everywhere.
+2. **Typed provider registry (both languages)** over `search | knowledge | papers | code`
+   (`registry.js` / `registry.rs`), wired into `WebSearchEngine`, the CLI
+   (`--list-providers`), and the HTTP server (`/providers`, `/providers?category=`,
+   `/categories`). Verified parity: 22 providers in both languages.
+3. **`web-capture` as an optional component library** (`web-capture.js` /
+   `web_capture.rs`), exposed via `wc:*` ids, lazily loaded and degrading gracefully when
+   absent (R3).
+4. **Extensive shared test suite**: 115 JavaScript tests (`node --test tests/`) plus Rust
+   integration tests (`rust/tests/registry.rs`, `html_utils.rs`, `engines.rs`) and inline
+   unit tests covering the registry, HTML utilities, and every parser.
+5. **Cross-language consistency fix**: aligned `decodeHtmlEntities` to decode the same
+   typographic entities (`&hellip;`, `&mdash;`, `&ndash;`) in JS as in Rust, with tests on
+   both sides.
+6. **Rust hardening** carried over: `rust/Cargo.toml` sets
+   `[lints.rust] unsafe_code = "forbid"` and an optimized `[profile.release]`, and the
+   `verbose` CLI flag no longer collides with clap's `--version`. Verified with
    `cargo fmt --check`, `cargo clippy --all-targets --all-features` under
-   `RUSTFLAGS=-Dwarnings`, `cargo test`, and `cargo build --release`.
-3. Documents the remaining, larger items (R3/R4/R5 implementation, full CI/CD parity) as
-   explicit, scoped follow-up plans above, so they can be executed as focused PRs without
-   re-doing the research.
+   `RUSTFLAGS=-Dwarnings`, `cargo test`, `cargo test --doc`, and `cargo build --release`.
+7. **Documentation**: this case study and the project `README.md` document the full
+   provider catalog, categories, the web-capture component, the registry, and the new
+   CLI/HTTP discovery surfaces.
+
+### Out of scope (infrastructure, not search functionality)
+
+These touch secrets/external services and are intentionally left for focused
+infrastructure PRs; none affect the search API this issue is about:
+
+- crates.io publish automation + `wait-for-crate`, coverage upload (`cargo-llvm-cov` →
+  Codecov), crate-size guard, and `cargo doc` → GitHub Pages.
+- Community-health files (dependabot, CODEOWNERS, SECURITY.md, issue/PR templates) — a gap
+  shared by all four CI/CD templates.
+- The `formal-ai` WASM↔JS transport (wire format, trace hooks, `no_std` core), which lives
+  in `formal-ai` and consumes this registry (see R5).
 
 ## 7. References
 
