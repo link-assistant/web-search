@@ -140,3 +140,6 @@ vite.config.ts.timestamp-*
 
 # jscpd reports
 reports/
+
+# Deno lockfile (generated locally when running `deno test`; not tracked)
+deno.lock
