@@ -2,7 +2,7 @@
 
 /**
  * Create GitHub Release from CHANGELOG.md
- * Usage: node scripts/create-github-release.mjs --release-version <version> --repository <repository>
+ * Usage: node js/scripts/create-github-release.mjs --release-version <version> --repository <repository>
  *   release-version: Version number (e.g., 1.0.0)
  *   repository: GitHub repository (e.g., owner/repo)
  *
@@ -56,7 +56,7 @@ const jsRoot = getJsRoot({ jsRoot: jsRootConfig, verbose: true });
 if (!version || !repository) {
   console.error('Error: Missing required arguments');
   console.error(
-    'Usage: node scripts/create-github-release.mjs --release-version <version> --repository <repository>'
+    'Usage: node js/scripts/create-github-release.mjs --release-version <version> --repository <repository>'
   );
   process.exit(1);
 }

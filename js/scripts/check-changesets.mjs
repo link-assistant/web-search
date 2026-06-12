@@ -7,7 +7,7 @@
  * and outputs the count and status for use in GitHub Actions workflow conditions.
  *
  * Usage:
- *   node scripts/check-changesets.mjs
+ *   node js/scripts/check-changesets.mjs
  *
  * Outputs (written to GITHUB_OUTPUT):
  *   - has_changesets: 'true' if there are pending changesets

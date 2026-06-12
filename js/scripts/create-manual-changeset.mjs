@@ -2,7 +2,7 @@
 
 /**
  * Create a changeset file for manual releases
- * Usage: node scripts/create-manual-changeset.mjs --bump-type <major|minor|patch> [--description <description>]
+ * Usage: node js/scripts/create-manual-changeset.mjs --bump-type <major|minor|patch> [--description <description>]
  *
  * IMPORTANT: Update the PACKAGE_NAME constant below to match your package.json
  *
@@ -68,7 +68,7 @@ try {
 
   if (!bumpType || !['major', 'minor', 'patch'].includes(bumpType)) {
     console.error(
-      'Usage: node scripts/create-manual-changeset.mjs --bump-type <major|minor|patch> [--description <description>]'
+      'Usage: node js/scripts/create-manual-changeset.mjs --bump-type <major|minor|patch> [--description <description>]'
     );
     process.exit(1);
   }

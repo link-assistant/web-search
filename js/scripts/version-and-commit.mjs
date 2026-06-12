@@ -2,7 +2,7 @@
 
 /**
  * Version packages and commit to main
- * Usage: node scripts/version-and-commit.mjs --mode <changeset|instant> [--bump-type <type>] [--description <desc>] [--js-root <path>]
+ * Usage: node js/scripts/version-and-commit.mjs --mode <changeset|instant> [--bump-type <type>] [--description <desc>] [--js-root <path>]
  *   changeset: Run changeset version
  *   instant: Run instant version bump with bump_type (patch|minor|major) and optional description
  *
@@ -22,6 +22,8 @@
  */
 
 import { readFileSync, appendFileSync, readdirSync } from 'fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 import {
   getJsRoot,
@@ -30,6 +32,9 @@ import {
   needsCd,
   parseJsRootConfig,
 } from './js-paths.mjs';
+
+const scriptDirectory = dirname(fileURLToPath(import.meta.url));
+const instantVersionScript = join(scriptDirectory, 'instant-version-bump.mjs');
 
 // Load use-m dynamically
 const { use } = eval(
@@ -94,20 +99,20 @@ if (args.length > 0 && !args[0].startsWith('--')) {
   console.error('Usage:');
   console.error('  Changeset mode:');
   console.error(
-    '    node scripts/version-and-commit.mjs --mode changeset [--js-root <path>]'
+    '    node js/scripts/version-and-commit.mjs --mode changeset [--js-root <path>]'
   );
   console.error('  Instant mode:');
   console.error(
-    '    node scripts/version-and-commit.mjs --mode instant --bump-type <major|minor|patch> [--description <desc>] [--js-root <path>]'
+    '    node js/scripts/version-and-commit.mjs --mode instant --bump-type <major|minor|patch> [--description <desc>] [--js-root <path>]'
   );
   console.error('');
   console.error('Examples:');
   console.error(
-    '  node scripts/version-and-commit.mjs --mode instant --bump-type patch --description "Fix bug"'
+    '  node js/scripts/version-and-commit.mjs --mode instant --bump-type patch --description "Fix bug"'
   );
-  console.error('  node scripts/version-and-commit.mjs --mode changeset');
+  console.error('  node js/scripts/version-and-commit.mjs --mode changeset');
   console.error(
-    '  node scripts/version-and-commit.mjs --mode changeset --js-root js'
+    '  node js/scripts/version-and-commit.mjs --mode changeset --js-root js'
   );
   process.exit(1);
 }
@@ -123,7 +128,7 @@ if (mode !== 'changeset' && mode !== 'instant') {
 if (mode === 'instant' && !bumpType) {
   console.error('Error: --bump-type is required for instant mode');
   console.error(
-    'Usage: node scripts/version-and-commit.mjs --mode instant --bump-type <major|minor|patch> [--description <desc>] [--js-root <path>]'
+    'Usage: node js/scripts/version-and-commit.mjs --mode instant --bump-type <major|minor|patch> [--description <desc>] [--js-root <path>]'
   );
   process.exit(1);
 }
@@ -228,9 +233,9 @@ async function main() {
       // Pass --js-root to ensure consistent path handling
       // Rely on command-stream's auto-quoting for proper argument handling
       if (description) {
-        await $`node scripts/instant-version-bump.mjs --bump-type ${bumpType} --description ${description} --js-root ${jsRoot}`;
+        await $`node ${instantVersionScript} --bump-type ${bumpType} --description ${description} --js-root ${jsRoot}`;
       } else {
-        await $`node scripts/instant-version-bump.mjs --bump-type ${bumpType} --js-root ${jsRoot}`;
+        await $`node ${instantVersionScript} --bump-type ${bumpType} --js-root ${jsRoot}`;
       }
     } else {
       console.log('Running changeset version...');

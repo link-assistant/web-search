@@ -26,4 +26,4 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
 
       - name: Check JS/Rust parity
-        run: node scripts/check-js-rust-parity.mjs
+        run: node js/scripts/check-js-rust-parity.mjs

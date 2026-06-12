@@ -19,7 +19,7 @@
  * - examples/ folder (example scripts)
  *
  * Usage:
- *   node scripts/detect-code-changes.mjs
+ *   node js/scripts/detect-code-changes.mjs
  *
  * Environment variables (set by GitHub Actions):
  *   - GITHUB_EVENT_NAME: 'pull_request' or 'push'
@@ -140,6 +140,105 @@ function isExcludedFromCodeChanges(filePath) {
   return false;
 }
 
+function setBooleanOutput(name, condition) {
+  setOutput(name, condition ? 'true' : 'false');
+}
+
+function logFileList(title, files) {
+  console.log(title);
+  if (files.length === 0) {
+    console.log('  (none)');
+  } else {
+    files.forEach((file) => console.log(`  ${file}`));
+  }
+  console.log('');
+}
+
+function isJsWorkflowFile(filePath) {
+  return (
+    filePath === '.github/workflows/js.yml' ||
+    filePath === '.github/workflows/parity.yml'
+  );
+}
+
+function isRustWorkflowFile(filePath) {
+  return (
+    filePath === '.github/workflows/rust.yml' ||
+    filePath === '.github/workflows/parity.yml'
+  );
+}
+
+function isScriptFile(filePath) {
+  return filePath.startsWith('js/scripts/') || filePath.startsWith('scripts/');
+}
+
+function isJsCodeFile(filePath) {
+  return (
+    /^js\/(?:src|tests|bin)\//.test(filePath) ||
+    /^js\/.*\.(?:js|mjs|json|toml|yml|yaml)$/.test(filePath)
+  );
+}
+
+function isRustCodeFile(filePath) {
+  return /^rust\/.*\.(?:rs|toml|lock|yml|yaml)$/.test(filePath);
+}
+
+function getPackageCodeFiles(changedFiles, packagePrefix) {
+  return changedFiles.filter(
+    (file) => file.startsWith(packagePrefix) && !isExcludedFromCodeChanges(file)
+  );
+}
+
+function getCodeChangedFiles(changedFiles) {
+  return changedFiles.filter((file) => !isExcludedFromCodeChanges(file));
+}
+
+function detectChangeFlags(changedFiles) {
+  const jsWorkflowChanged = changedFiles.some(isJsWorkflowFile);
+  const rustWorkflowChanged = changedFiles.some(isRustWorkflowFile);
+  const scriptsChanged = changedFiles.some(isScriptFile);
+  const jsChangedFiles = getPackageCodeFiles(changedFiles, 'js/');
+  const rustChangedFiles = getPackageCodeFiles(changedFiles, 'rust/');
+  const codeChangedFiles = getCodeChangedFiles(changedFiles);
+  const codePattern = /\.(mjs|js|json|yml|yaml)$|\.github\/workflows\//;
+
+  return {
+    mjsChanged: changedFiles.some((file) => file.endsWith('.mjs')),
+    jsChanged: changedFiles.some((file) => file.endsWith('.js')),
+    packageChanged: changedFiles.some(
+      (file) => file === 'package.json' || file === 'js/package.json'
+    ),
+    docsChanged: changedFiles.some((file) => file.endsWith('.md')),
+    workflowChanged: changedFiles.some((file) =>
+      file.startsWith('.github/workflows/')
+    ),
+    jsWorkflowChanged,
+    rustWorkflowChanged,
+    scriptsChanged,
+    jsCodeChanged:
+      jsWorkflowChanged || scriptsChanged || jsChangedFiles.some(isJsCodeFile),
+    rustCodeChanged:
+      rustWorkflowChanged || rustChangedFiles.some(isRustCodeFile),
+    codeChanged: codeChangedFiles.some((file) => codePattern.test(file)),
+    codeChangedFiles,
+  };
+}
+
+function emitChangeOutputs(flags) {
+  setBooleanOutput('mjs-changed', flags.mjsChanged);
+  setBooleanOutput('js-changed', flags.jsChanged);
+  setBooleanOutput('package-changed', flags.packageChanged);
+  setBooleanOutput('docs-changed', flags.docsChanged);
+  setBooleanOutput('workflow-changed', flags.workflowChanged);
+  setBooleanOutput('js-workflow-changed', flags.jsWorkflowChanged);
+  setBooleanOutput('rust-workflow-changed', flags.rustWorkflowChanged);
+  setBooleanOutput('scripts-changed', flags.scriptsChanged);
+  setBooleanOutput('js-code-changed', flags.jsCodeChanged);
+  setBooleanOutput('any-js-code-changed', flags.jsCodeChanged);
+  setBooleanOutput('rust-code-changed', flags.rustCodeChanged);
+  setBooleanOutput('any-rust-code-changed', flags.rustCodeChanged);
+}
+
 /**
  * Main function to detect changes
  */
@@ -148,99 +247,13 @@ function detectChanges() {
 
   const changedFiles = getChangedFiles();
 
-  console.log('Changed files:');
-  if (changedFiles.length === 0) {
-    console.log('  (none)');
-  } else {
-    changedFiles.forEach((file) => console.log(`  ${file}`));
-  }
-  console.log('');
+  logFileList('Changed files:', changedFiles);
 
-  // Detect .mjs file changes
-  const mjsChanged = changedFiles.some((file) => file.endsWith('.mjs'));
-  setOutput('mjs-changed', mjsChanged ? 'true' : 'false');
+  const flags = detectChangeFlags(changedFiles);
+  emitChangeOutputs(flags);
 
-  // Detect .js file changes
-  const jsChanged = changedFiles.some((file) => file.endsWith('.js'));
-  setOutput('js-changed', jsChanged ? 'true' : 'false');
-
-  // Detect package.json changes
-  const packageChanged = changedFiles.some(
-    (file) => file === 'package.json' || file === 'js/package.json'
-  );
-  setOutput('package-changed', packageChanged ? 'true' : 'false');
-
-  // Detect documentation changes (any .md file)
-  const docsChanged = changedFiles.some((file) => file.endsWith('.md'));
-  setOutput('docs-changed', docsChanged ? 'true' : 'false');
-
-  // Detect workflow changes
-  const workflowChanged = changedFiles.some((file) =>
-    file.startsWith('.github/workflows/')
-  );
-  setOutput('workflow-changed', workflowChanged ? 'true' : 'false');
-
-  const jsWorkflowChanged = changedFiles.some(
-    (file) =>
-      file === '.github/workflows/js.yml' ||
-      file === '.github/workflows/parity.yml'
-  );
-  setOutput('js-workflow-changed', jsWorkflowChanged ? 'true' : 'false');
-
-  const rustWorkflowChanged = changedFiles.some(
-    (file) =>
-      file === '.github/workflows/rust.yml' ||
-      file === '.github/workflows/parity.yml'
-  );
-  setOutput('rust-workflow-changed', rustWorkflowChanged ? 'true' : 'false');
-
-  const scriptsChanged = changedFiles.some((file) =>
-    file.startsWith('scripts/')
-  );
-  setOutput('scripts-changed', scriptsChanged ? 'true' : 'false');
-
-  const jsChangedFiles = changedFiles.filter(
-    (file) => file.startsWith('js/') && !isExcludedFromCodeChanges(file)
-  );
-  const jsCodeChanged =
-    jsWorkflowChanged ||
-    scriptsChanged ||
-    jsChangedFiles.some(
-      (file) =>
-        /^js\/(?:src|tests|bin)\//.test(file) ||
-        /^js\/.*\.(?:js|mjs|json|toml|yml|yaml)$/.test(file)
-    );
-  setOutput('js-code-changed', jsCodeChanged ? 'true' : 'false');
-  setOutput('any-js-code-changed', jsCodeChanged ? 'true' : 'false');
-
-  const rustChangedFiles = changedFiles.filter(
-    (file) => file.startsWith('rust/') && !isExcludedFromCodeChanges(file)
-  );
-  const rustCodeChanged =
-    rustWorkflowChanged ||
-    rustChangedFiles.some((file) =>
-      /^rust\/.*\.(?:rs|toml|lock|yml|yaml)$/.test(file)
-    );
-  setOutput('rust-code-changed', rustCodeChanged ? 'true' : 'false');
-  setOutput('any-rust-code-changed', rustCodeChanged ? 'true' : 'false');
-
-  // Detect code changes (excluding docs, changesets, experiments, examples folders, and markdown files)
-  const codeChangedFiles = changedFiles.filter(
-    (file) => !isExcludedFromCodeChanges(file)
-  );
-
-  console.log('\nFiles considered as code changes:');
-  if (codeChangedFiles.length === 0) {
-    console.log('  (none)');
-  } else {
-    codeChangedFiles.forEach((file) => console.log(`  ${file}`));
-  }
-  console.log('');
-
-  // Check if any code files changed (.mjs, .js, .json, .yml, .yaml, or workflow files)
-  const codePattern = /\.(mjs|js|json|yml|yaml)$|\.github\/workflows\//;
-  const codeChanged = codeChangedFiles.some((file) => codePattern.test(file));
-  setOutput('any-code-changed', codeChanged ? 'true' : 'false');
+  logFileList('\nFiles considered as code changes:', flags.codeChangedFiles);
+  setBooleanOutput('any-code-changed', flags.codeChanged);
 
   console.log('\nChange detection completed.');
 }

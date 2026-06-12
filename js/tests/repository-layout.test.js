@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'test-anywhere';
-import { existsSync, readdirSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -32,6 +32,7 @@ describe('repository language layout', () => {
       'tests',
       'bin',
       'examples',
+      'scripts',
     ]) {
       expect(exists(rootOnlyPath)).toBe(false);
     }
@@ -50,6 +51,10 @@ describe('repository language layout', () => {
       'tests/repository-layout.test.js',
       'bin/web-search.js',
       'examples/basic-usage.js',
+      'scripts/detect-code-changes.mjs',
+      'scripts/check-version.mjs',
+      'scripts/validate-changeset.mjs',
+      'scripts/check-js-rust-parity.mjs',
     ]) {
       expect(existsSync(join(jsRoot, jsPath))).toBe(true);
     }
@@ -63,5 +68,50 @@ describe('repository language layout', () => {
 
     expect(misplacedTests).toEqual([]);
     expect(exists('rust/tests')).toBe(true);
+  });
+
+  it('keeps CI/CD scripts in their language folders', () => {
+    for (const rustScriptPath of [
+      'rust/scripts/detect-code-changes.rs',
+      'rust/scripts/check-version-modification.rs',
+      'rust/scripts/check-changelog-fragment.rs',
+      'rust/scripts/check-file-size.rs',
+      'rust/scripts/check-crate-size.rs',
+    ]) {
+      expect(exists(rustScriptPath)).toBe(true);
+    }
+
+    const jsWorkflow = readFileSync(
+      join(projectRoot, '.github/workflows/js.yml'),
+      'utf8'
+    );
+    const rustWorkflow = readFileSync(
+      join(projectRoot, '.github/workflows/rust.yml'),
+      'utf8'
+    );
+    const parityWorkflow = readFileSync(
+      join(projectRoot, '.github/workflows/parity.yml'),
+      'utf8'
+    );
+
+    expect(jsWorkflow).toContain('node js/scripts/detect-code-changes.mjs');
+    expect(jsWorkflow).toContain('node js/scripts/validate-changeset.mjs');
+    expect(jsWorkflow).not.toContain('node scripts/');
+    expect(jsWorkflow).not.toContain('../scripts/');
+
+    expect(rustWorkflow).toContain(
+      'rust-script rust/scripts/detect-code-changes.rs'
+    );
+    expect(rustWorkflow).toContain(
+      'rust-script rust/scripts/check-version-modification.rs'
+    );
+    expect(rustWorkflow).toContain(
+      'rust-script rust/scripts/check-changelog-fragment.rs'
+    );
+
+    expect(parityWorkflow).toContain(
+      'node js/scripts/check-js-rust-parity.mjs'
+    );
+    expect(parityWorkflow).not.toContain('node scripts/');
   });
 });

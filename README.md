@@ -319,7 +319,8 @@ let results = engine.search_with_options(
 ## Development
 
 Language-specific project files live under `js/` and `rust/`; repository-level
-scripts and documentation stay at the root.
+documentation and workflow metadata stay at the root. CI/CD helper scripts live
+with their language: `js/scripts/` and `rust/scripts/`.
 
 ```bash
 cd js
@@ -339,6 +340,10 @@ bun run lint
 
 # Format code
 bun run format
+
+# Verify JavaScript/Rust layout and provider parity
+cd ..
+node js/scripts/check-js-rust-parity.mjs
 ```
 
 ### Rust Development
@@ -354,6 +359,11 @@ cargo clippy
 
 # Format code
 cargo fmt
+
+# Run Rust CI/CD guard scripts from the repository root
+cd ..
+rust-script rust/scripts/check-file-size.rs --rust-root rust
+rust-script rust/scripts/check-crate-size.rs --rust-root rust
 ```
 
 ## Environment Variables

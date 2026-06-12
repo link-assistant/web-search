@@ -4,7 +4,7 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { CATEGORIES, getRegistry } from '../js/src/providers/index.js';
+import { CATEGORIES, getRegistry } from '../src/providers/index.js';
 
 const ROOT = process.cwd();
 const ACCESS_LABELS = new Set([
@@ -46,6 +46,7 @@ function checkLanguageLayout() {
     'tests',
     'bin',
     'examples',
+    'scripts',
   ];
 
   for (const path of rootJsPaths) {
@@ -66,6 +67,15 @@ function checkLanguageLayout() {
     'js/tests/repository-layout.test.js',
     'js/bin/web-search.js',
     'js/examples/basic-usage.js',
+    'js/scripts/detect-code-changes.mjs',
+    'js/scripts/check-version.mjs',
+    'js/scripts/validate-changeset.mjs',
+    'js/scripts/check-js-rust-parity.mjs',
+    'rust/scripts/detect-code-changes.rs',
+    'rust/scripts/check-version-modification.rs',
+    'rust/scripts/check-changelog-fragment.rs',
+    'rust/scripts/check-file-size.rs',
+    'rust/scripts/check-crate-size.rs',
   ];
 
   for (const path of requiredJsPaths) {

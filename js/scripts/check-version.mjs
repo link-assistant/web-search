@@ -12,7 +12,7 @@
  * - Fails the build if manual version changes are detected
  *
  * Usage:
- *   node scripts/check-version.mjs
+ *   node js/scripts/check-version.mjs
  *
  * Environment variables (set by GitHub Actions):
  *   - GITHUB_HEAD_REF: Branch name of the PR head
@@ -33,21 +33,6 @@ import {
 
 const jsRoot = getJsRoot({ jsRoot: parseJsRootConfig(), verbose: true });
 const packageJsonPath = getPackageJsonPath({ jsRoot }).replace(/^\.\//, '');
-
-/**
- * Execute a shell command and return trimmed output
- * @param {string} command - The command to execute
- * @returns {string} - The trimmed command output
- */
-function exec(command) {
-  try {
-    return execSync(command, { encoding: 'utf-8' }).trim();
-  } catch (error) {
-    console.error(`Error executing command: ${command}`);
-    console.error(error.message);
-    return '';
-  }
-}
 
 /**
  * Check if this is an automated release PR that should skip version check

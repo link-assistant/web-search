@@ -6,13 +6,7 @@
     "javascript": "js/",
     "rust": "rust/"
   },
-  "root_shared_files": [
-    "README.md",
-    "LICENSE",
-    "docs/",
-    "scripts/",
-    ".github/workflows/"
-  ],
+  "root_shared_files": ["README.md", "LICENSE", "docs/", ".github/workflows/"],
   "javascript_package_files": {
     "package_root": "js/",
     "source": "js/src/",
@@ -27,13 +21,16 @@
       "js/.jscpd.json"
     ],
     "runtime_configs": ["js/bunfig.toml", "js/deno.json"],
-    "changesets": "js/.changeset/"
+    "changesets": "js/.changeset/",
+    "ci_scripts": "js/scripts/"
   },
   "rust_package_files": {
     "package_root": "rust/",
     "manifest": "rust/Cargo.toml",
     "source": "rust/src/",
-    "tests": "rust/tests/"
+    "tests": "rust/tests/",
+    "ci_scripts": "rust/scripts/",
+    "changelog_fragments": "rust/changelog.d/"
   },
   "github_workflows": {
     "js.yml": {
@@ -41,7 +38,7 @@
       "test_matrix": "Node.js, Bun, and Deno across Ubuntu, macOS, and Windows"
     },
     "rust.yml": {
-      "purpose": "Rust formatting, clippy, tests, doc tests, build, and package checks"
+      "purpose": "Rust change detection, version and changelog gates, formatting, clippy, tests, doc tests, build, file-size checks, and crate package checks"
     },
     "parity.yml": {
       "purpose": "Repository layout enforcement and JavaScript/Rust provider catalog parity"
@@ -50,6 +47,8 @@
   "parity_checks": [
     "JavaScript-specific package files are absent from the repository root",
     "JavaScript package files exist under js/",
+    "JavaScript CI/CD helper scripts exist under js/scripts/",
+    "Rust CI/CD helper scripts exist under rust/scripts/",
     "Rust tests stay under rust/tests and not rust/src",
     "JavaScript and Rust CLIs expose the same provider ids, categories, and access labels"
   ]

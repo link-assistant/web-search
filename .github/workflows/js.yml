@@ -65,7 +65,7 @@ jobs:
           GITHUB_EVENT_NAME: ${{ github.event_name }}
           GITHUB_BASE_SHA: ${{ github.event.pull_request.base.sha }}
           GITHUB_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-        run: node scripts/detect-code-changes.mjs
+        run: node js/scripts/detect-code-changes.mjs
 
   version-check:
     name: JS - Check for Manual Version Changes
@@ -81,7 +81,7 @@ jobs:
         env:
           GITHUB_HEAD_REF: ${{ github.head_ref }}
           GITHUB_BASE_REF: ${{ github.base_ref }}
-        run: node scripts/check-version.mjs --js-root js
+        run: node js/scripts/check-version.mjs --js-root js
 
   changeset-check:
     name: JS - Check for Changesets
@@ -113,7 +113,7 @@ jobs:
             exit 0
           fi
 
-          node scripts/validate-changeset.mjs --js-root js
+          node js/scripts/validate-changeset.mjs --js-root js
 
   lint:
     name: JS - Lint and Format Check
@@ -330,43 +330,43 @@ jobs:
 
       - name: Update npm for OIDC trusted publishing
         working-directory: .
-        run: node scripts/setup-npm.mjs
+        run: node js/scripts/setup-npm.mjs
 
       - name: Check for changesets
         id: check_changesets
         working-directory: .
-        run: node scripts/check-changesets.mjs --js-root js
+        run: node js/scripts/check-changesets.mjs --js-root js
 
       - name: Merge multiple changesets
         if: steps.check_changesets.outputs.has_changesets == 'true' && steps.check_changesets.outputs.changeset_count > 1
         working-directory: .
-        run: node scripts/merge-changesets.mjs --js-root js
+        run: node js/scripts/merge-changesets.mjs --js-root js
 
       - name: Version packages and commit to main
         if: steps.check_changesets.outputs.has_changesets == 'true'
         id: version
         working-directory: .
-        run: node scripts/version-and-commit.mjs --mode changeset --js-root js
+        run: node js/scripts/version-and-commit.mjs --mode changeset --js-root js
 
       - name: Publish to npm
         if: steps.version.outputs.version_committed == 'true' || steps.version.outputs.already_released == 'true'
         id: publish
         working-directory: .
-        run: node scripts/publish-to-npm.mjs --should-pull --js-root js
+        run: node js/scripts/publish-to-npm.mjs --should-pull --js-root js
 
       - name: Create GitHub Release
         if: steps.publish.outputs.published == 'true'
         working-directory: .
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: node scripts/create-github-release.mjs --release-version "${{ steps.publish.outputs.published_version }}" --repository "${{ github.repository }}" --js-root js
+        run: node js/scripts/create-github-release.mjs --release-version "${{ steps.publish.outputs.published_version }}" --repository "${{ github.repository }}" --js-root js
 
       - name: Format GitHub release notes
         if: steps.publish.outputs.published == 'true'
         working-directory: .
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: node scripts/format-github-release.mjs --release-version "${{ steps.publish.outputs.published_version }}" --repository "${{ github.repository }}" --commit-sha "${{ github.sha }}"
+        run: node js/scripts/format-github-release.mjs --release-version "${{ steps.publish.outputs.published_version }}" --repository "${{ github.repository }}" --commit-sha "${{ github.sha }}"
 
   instant-release:
     name: JS - Instant Release
@@ -392,32 +392,32 @@ jobs:
 
       - name: Update npm for OIDC trusted publishing
         working-directory: .
-        run: node scripts/setup-npm.mjs
+        run: node js/scripts/setup-npm.mjs
 
       - name: Version packages and commit to main
         id: version
         working-directory: .
-        run: node scripts/version-and-commit.mjs --mode instant --bump-type "${{ github.event.inputs.bump_type }}" --description "${{ github.event.inputs.description }}" --js-root js
+        run: node js/scripts/version-and-commit.mjs --mode instant --bump-type "${{ github.event.inputs.bump_type }}" --description "${{ github.event.inputs.description }}" --js-root js
 
       - name: Publish to npm
         if: steps.version.outputs.version_committed == 'true' || steps.version.outputs.already_released == 'true'
         id: publish
         working-directory: .
-        run: node scripts/publish-to-npm.mjs --js-root js
+        run: node js/scripts/publish-to-npm.mjs --js-root js
 
       - name: Create GitHub Release
         if: steps.publish.outputs.published == 'true'
         working-directory: .
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: node scripts/create-github-release.mjs --release-version "${{ steps.publish.outputs.published_version }}" --repository "${{ github.repository }}" --js-root js
+        run: node js/scripts/create-github-release.mjs --release-version "${{ steps.publish.outputs.published_version }}" --repository "${{ github.repository }}" --js-root js
 
       - name: Format GitHub release notes
         if: steps.publish.outputs.published == 'true'
         working-directory: .
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: node scripts/format-github-release.mjs --release-version "${{ steps.publish.outputs.published_version }}" --repository "${{ github.repository }}" --commit-sha "${{ github.sha }}"
+        run: node js/scripts/format-github-release.mjs --release-version "${{ steps.publish.outputs.published_version }}" --repository "${{ github.repository }}" --commit-sha "${{ github.sha }}"
 
   changeset-pr:
     name: JS - Create Changeset PR
@@ -440,7 +440,8 @@ jobs:
         run: npm install
 
       - name: Create changeset file
-        run: node ../scripts/create-manual-changeset.mjs --bump-type "${{ github.event.inputs.bump_type }}" --description "${{ github.event.inputs.description }}"
+        working-directory: .
+        run: node js/scripts/create-manual-changeset.mjs --bump-type "${{ github.event.inputs.bump_type }}" --description "${{ github.event.inputs.description }}" --js-root js
 
       - name: Format changeset with Prettier
         run: npx prettier --write ".changeset/*.md" || true
