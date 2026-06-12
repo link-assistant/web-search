@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.8.0
+
+### Minor Changes
+
+- 9838960: Move the JavaScript package into `js/`, split JavaScript/Rust CI workflows, and add layout plus provider parity checks.
+
 ## 0.7.0
 
 ### Minor Changes

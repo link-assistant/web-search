@@ -1,6 +1,6 @@
 {
   "name": "@link-assistant/web-search",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "A web search microservice that aggregates results from multiple search engines (Google, DuckDuckGo, Bing) with reranking support",
   "type": "module",
   "main": "src/index.js",
