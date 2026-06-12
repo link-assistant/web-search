@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.8.1
+
+### Patch Changes
+
+- 9c6864f: Fix npm publish metadata, restrict published package assets, and use `js-v*` GitHub release tags.
+
 ## 0.8.0
 
 ### Minor Changes
