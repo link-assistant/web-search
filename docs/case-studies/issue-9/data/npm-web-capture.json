@@ -1,0 +1,10 @@
+{
+  "version": "1.10.7",
+  "dist-tags": {
+    "latest": "1.10.7"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/link-assistant/web-capture.git"
+  }
+}

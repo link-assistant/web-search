@@ -1,0 +1,10 @@
+ Downloading crates ...
+  Downloaded html-to-markdown-rs v3.5.7
+    Checking phf v0.13.1
+    Checking web_atoms v0.2.4
+    Checking markup5ever v0.39.0
+    Checking html5ever v0.39.0
+    Checking html-to-markdown-rs v3.5.7
+    Checking web-capture v0.3.30
+    Checking web-search v0.2.0 (/tmp/gh-issue-solver-1781302286709/rust)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 6.54s

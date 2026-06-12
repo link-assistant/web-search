@@ -1,0 +1,9 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.29s
+     Running tests/web_capture.rs (target/debug/deps/web_capture-f63445a09aa22d71)
+
+running 3 tests
+test web_capture_provider_contract_tracks_the_published_crate ... ok
+test web_capture_provider_adapts_normalized_items ... ok
+test web_capture_provider_handles_empty_queries_without_network ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s

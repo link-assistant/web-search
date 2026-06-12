@@ -1,0 +1,898 @@
+
+> @link-assistant/web-search@0.8.0 test
+> node --test tests/
+
+TAP version 13
+# Subtest: api-engines
+    # Subtest: catalog
+        # Subtest: exposes every engine in API_ENGINES
+        ok 1 - exposes every engine in API_ENGINES
+          ---
+          duration_ms: 0.814095
+          ...
+        # Subtest: each descriptor has a stable id and category
+        ok 2 - each descriptor has a stable id and category
+          ---
+          duration_ms: 0.28156
+          ...
+        1..2
+    ok 1 - catalog
+      ---
+      duration_ms: 1.482774
+      type: 'suite'
+      ...
+    # Subtest: wikipedia
+        # Subtest: builds a localized REST search URL
+        ok 1 - builds a localized REST search URL
+          ---
+          duration_ms: 1.233111
+          ...
+        # Subtest: parses pages into results with article URLs
+        ok 2 - parses pages into results with article URLs
+          ---
+          duration_ms: 0.3759
+          ...
+        # Subtest: returns [] for malformed payloads
+        ok 3 - returns [] for malformed payloads
+          ---
+          duration_ms: 0.102333
+          ...
+        1..3
+    ok 2 - wikipedia
+      ---
+      duration_ms: 1.889151
+      type: 'suite'
+      ...
+    # Subtest: wikidata
+        # Subtest: parses entities and falls back to concepturi
+        ok 1 - parses entities and falls back to concepturi
+          ---
+          duration_ms: 0.179759
+          ...
+        1..1
+    ok 3 - wikidata
+      ---
+      duration_ms: 0.267028
+      type: 'suite'
+      ...
+    # Subtest: searx
+        # Subtest: honors a custom instance
+        ok 1 - honors a custom instance
+          ---
+          duration_ms: 0.244276
+          ...
+        # Subtest: parses results
+        ok 2 - parses results
+          ---
+          duration_ms: 0.163935
+          ...
+        1..2
+    ok 4 - searx
+      ---
+      duration_ms: 0.513919
+      type: 'suite'
+      ...
+    # Subtest: crossref
+        # Subtest: parses works and drops entries without a URL
+        ok 1 - parses works and drops entries without a URL
+          ---
+          duration_ms: 0.20744
+          ...
+        1..1
+    ok 5 - crossref
+      ---
+      duration_ms: 0.331124
+      type: 'suite'
+      ...
+    # Subtest: openalex
+        # Subtest: reconstructs abstracts from the inverted index
+        ok 1 - reconstructs abstracts from the inverted index
+          ---
+          duration_ms: 0.248051
+          ...
+        1..1
+    ok 6 - openalex
+      ---
+      duration_ms: 0.402951
+      type: 'suite'
+      ...
+    # Subtest: github
+        # Subtest: parses repositories
+        ok 1 - parses repositories
+          ---
+          duration_ms: 0.150956
+          ...
+        # Subtest: sets the GitHub API headers
+        ok 2 - sets the GitHub API headers
+          ---
+          duration_ms: 0.108692
+          ...
+        1..2
+    ok 7 - github
+      ---
+      duration_ms: 0.32826
+      type: 'suite'
+      ...
+    # Subtest: hackernews
+        # Subtest: falls back to the HN item URL when story has none
+        ok 1 - falls back to the HN item URL when story has none
+          ---
+          duration_ms: 0.146748
+          ...
+        1..1
+    ok 8 - hackernews
+      ---
+      duration_ms: 0.250474
+      type: 'suite'
+      ...
+    # Subtest: arxiv
+        # Subtest: parses an Atom feed
+        ok 1 - parses an Atom feed
+          ---
+          duration_ms: 0.336833
+          ...
+        # Subtest: respects the limit
+        ok 2 - respects the limit
+          ---
+          duration_ms: 0.093059
+          ...
+        1..2
+    ok 9 - arxiv
+      ---
+      duration_ms: 0.543061
+      type: 'suite'
+      ...
+    # Subtest: reconstructInvertedAbstract
+        # Subtest: orders words by their positions
+        ok 1 - orders words by their positions
+          ---
+          duration_ms: 0.135492
+          ...
+        # Subtest: returns empty string for falsy input
+        ok 2 - returns empty string for falsy input
+          ---
+          duration_ms: 0.080822
+          ...
+        1..2
+    ok 10 - reconstructInvertedAbstract
+      ---
+      duration_ms: 0.299427
+      type: 'suite'
+      ...
+    1..10
+ok 1 - api-engines
+  ---
+  duration_ms: 7.160973
+  type: 'suite'
+  ...
+# demo search error: demo returned status 503
+# demo search error: network down
+# Subtest: GenericProvider
+    # Subtest: fetches and parses a JSON engine
+    ok 1 - fetches and parses a JSON engine
+      ---
+      duration_ms: 1.033263
+      ...
+    # Subtest: exposes registry-style metadata
+    ok 2 - exposes registry-style metadata
+      ---
+      duration_ms: 0.123344
+      ...
+    # Subtest: returns [] for empty queries
+    ok 3 - returns [] for empty queries
+      ---
+      duration_ms: 0.109063
+      ...
+    # Subtest: returns [] and swallows non-ok responses
+    ok 4 - returns [] and swallows non-ok responses
+      ---
+      duration_ms: 1.51413
+      ...
+    # Subtest: returns [] when fetch throws
+    ok 5 - returns [] when fetch throws
+      ---
+      duration_ms: 0.329072
+      ...
+    # Subtest: decodes text bodies for html/text engines
+    ok 6 - decodes text bodies for html/text engines
+      ---
+      duration_ms: 0.230504
+      ...
+    # Subtest: sends a POST body when the descriptor declares one
+    ok 7 - sends a POST body when the descriptor declares one
+      ---
+      duration_ms: 0.182313
+      ...
+    # Subtest: merges descriptor-provided headers
+    ok 8 - merges descriptor-provided headers
+      ---
+      duration_ms: 0.139097
+      ...
+    1..8
+ok 2 - GenericProvider
+  ---
+  duration_ms: 4.778645
+  type: 'suite'
+  ...
+# Subtest: html-engines
+    # Subtest: catalog
+        # Subtest: exposes every engine in HTML_ENGINES
+        ok 1 - exposes every engine in HTML_ENGINES
+          ---
+          duration_ms: 0.775788
+          ...
+        1..1
+    ok 1 - catalog
+      ---
+      duration_ms: 1.278229
+      type: 'suite'
+      ...
+    # Subtest: parseAnchorList
+        # Subtest: extracts ranked results
+        ok 1 - extracts ranked results
+          ---
+          duration_ms: 0.766655
+          ...
+        # Subtest: respects the limit
+        ok 2 - respects the limit
+          ---
+          duration_ms: 0.159979
+          ...
+        # Subtest: deduplicates repeated URLs
+        ok 3 - deduplicates repeated URLs
+          ---
+          duration_ms: 0.204306
+          ...
+        # Subtest: skips URLs rejected by the skip predicate
+        ok 4 - skips URLs rejected by the skip predicate
+          ---
+          duration_ms: 0.166878
+          ...
+        # Subtest: applies a urlTransform
+        ok 5 - applies a urlTransform
+          ---
+          duration_ms: 0.129574
+          ...
+        # Subtest: returns [] for empty input
+        ok 6 - returns [] for empty input
+          ---
+          duration_ms: 0.924191
+          ...
+        1..6
+    ok 2 - parseAnchorList
+      ---
+      duration_ms: 2.69213
+      type: 'suite'
+      ...
+    # Subtest: resolveYahooHref
+        # Subtest: decodes RU redirect URLs
+        ok 1 - decodes RU redirect URLs
+          ---
+          duration_ms: 0.344975
+          ...
+        # Subtest: returns the href unchanged when no redirect present
+        ok 2 - returns the href unchanged when no redirect present
+          ---
+          duration_ms: 0.107641
+          ...
+        # Subtest: returns empty string for falsy input
+        ok 3 - returns empty string for falsy input
+          ---
+          duration_ms: 0.225737
+          ...
+        1..3
+    ok 3 - resolveYahooHref
+      ---
+      duration_ms: 0.834696
+      type: 'suite'
+      ...
+    # Subtest: buildUrl variants
+        # Subtest: brave honors safeSearch
+        ok 1 - brave honors safeSearch
+          ---
+          duration_ms: 0.567097
+          ...
+        # Subtest: mojeek disables safe search
+        ok 2 - mojeek disables safe search
+          ---
+          duration_ms: 0.154902
+          ...
+        # Subtest: ecosia passes the language
+        ok 3 - ecosia passes the language
+          ---
+          duration_ms: 0.120119
+          ...
+        # Subtest: startpage passes the language
+        ok 4 - startpage passes the language
+          ---
+          duration_ms: 0.12058
+          ...
+        # Subtest: yahoo passes the region
+        ok 5 - yahoo passes the region
+          ---
+          duration_ms: 0.158147
+          ...
+        # Subtest: lite posts to the lite endpoint with a body
+        ok 6 - lite posts to the lite endpoint with a body
+          ---
+          duration_ms: 0.176864
+          ...
+        1..6
+    ok 4 - buildUrl variants
+      ---
+      duration_ms: 1.469523
+      type: 'suite'
+      ...
+    # Subtest: engine parsers
+        # Subtest: brave parses a result block
+        ok 1 - brave parses a result block
+          ---
+          duration_ms: 0.393017
+          ...
+        # Subtest: yahoo decodes redirect URLs in results
+        ok 2 - yahoo decodes redirect URLs in results
+          ---
+          duration_ms: 0.271626
+          ...
+        # Subtest: lite parses table result links
+        ok 3 - lite parses table result links
+          ---
+          duration_ms: 0.219408
+          ...
+        1..3
+    ok 5 - engine parsers
+      ---
+      duration_ms: 0.972122
+      type: 'suite'
+      ...
+    1..5
+ok 3 - html-engines
+  ---
+  duration_ms: 8.148176
+  type: 'suite'
+  ...
+# Subtest: html-utils
+    # Subtest: decodeHtmlEntities
+        # Subtest: decodes named entities
+        ok 1 - decodes named entities
+          ---
+          duration_ms: 0.916669
+          ...
+        # Subtest: decodes apostrophe entities
+        ok 2 - decodes apostrophe entities
+          ---
+          duration_ms: 0.134892
+          ...
+        # Subtest: decodes non-breaking spaces
+        ok 3 - decodes non-breaking spaces
+          ---
+          duration_ms: 0.133209
+          ...
+        # Subtest: decodes typographic punctuation entities
+        ok 4 - decodes typographic punctuation entities
+          ---
+          duration_ms: 0.137846
+          ...
+        # Subtest: decodes decimal numeric references
+        ok 5 - decodes decimal numeric references
+          ---
+          duration_ms: 0.093559
+          ...
+        # Subtest: decodes hexadecimal numeric references
+        ok 6 - decodes hexadecimal numeric references
+          ---
+          duration_ms: 0.078157
+          ...
+        # Subtest: returns empty string for falsy input
+        ok 7 - returns empty string for falsy input
+          ---
+          duration_ms: 3.178327
+          ...
+        1..7
+    ok 1 - decodeHtmlEntities
+      ---
+      duration_ms: 5.454504
+      type: 'suite'
+      ...
+    # Subtest: stripHtml
+        # Subtest: removes tags and trims
+        ok 1 - removes tags and trims
+          ---
+          duration_ms: 0.298115
+          ...
+        # Subtest: handles self-closing and attribute-laden tags
+        ok 2 - handles self-closing and attribute-laden tags
+          ---
+          duration_ms: 0.149744
+          ...
+        # Subtest: returns empty string for falsy input
+        ok 3 - returns empty string for falsy input
+          ---
+          duration_ms: 0.173999
+          ...
+        1..3
+    ok 2 - stripHtml
+      ---
+      duration_ms: 0.808027
+      type: 'suite'
+      ...
+    # Subtest: cleanText
+        # Subtest: strips tags, decodes entities, and collapses whitespace
+        ok 1 - strips tags, decodes entities, and collapses whitespace
+          ---
+          duration_ms: 0.283383
+          ...
+        # Subtest: returns empty string for falsy input
+        ok 2 - returns empty string for falsy input
+          ---
+          duration_ms: 0.239447
+          ...
+        1..2
+    ok 3 - cleanText
+      ---
+      duration_ms: 1.855711
+      type: 'suite'
+      ...
+    1..3
+ok 4 - html-utils
+  ---
+  duration_ms: 8.778408
+  type: 'suite'
+  ...
+# Subtest: merger
+    # Subtest: mergeWithRRF
+        # Subtest: should merge results from multiple providers
+        ok 1 - should merge results from multiple providers
+          ---
+          duration_ms: 1.496575
+          ...
+        # Subtest: should handle empty results
+        ok 2 - should handle empty results
+          ---
+          duration_ms: 0.217956
+          ...
+        # Subtest: should apply provider weights
+        ok 3 - should apply provider weights
+          ---
+          duration_ms: 0.226978
+          ...
+        # Subtest: should deduplicate URLs by normalized form
+        ok 4 - should deduplicate URLs by normalized form
+          ---
+          duration_ms: 1.923693
+          ...
+        1..4
+    ok 1 - mergeWithRRF
+      ---
+      duration_ms: 4.532217
+      type: 'suite'
+      ...
+    # Subtest: mergeWithWeights
+        # Subtest: should merge using weighted scoring
+        ok 1 - should merge using weighted scoring
+          ---
+          duration_ms: 0.490693
+          ...
+        # Subtest: should respect weight overrides
+        ok 2 - should respect weight overrides
+          ---
+          duration_ms: 0.224455
+          ...
+        1..2
+    ok 2 - mergeWithWeights
+      ---
+      duration_ms: 0.906063
+      type: 'suite'
+      ...
+    # Subtest: mergeWithInterleave
+        # Subtest: should interleave results round-robin style
+        ok 1 - should interleave results round-robin style
+          ---
+          duration_ms: 1.667049
+          ...
+        # Subtest: should remove duplicates when enabled
+        ok 2 - should remove duplicates when enabled
+          ---
+          duration_ms: 0.19433
+          ...
+        1..2
+    ok 3 - mergeWithInterleave
+      ---
+      duration_ms: 2.0294
+      type: 'suite'
+      ...
+    # Subtest: mergeResults
+        # Subtest: should use RRF strategy by default
+        ok 1 - should use RRF strategy by default
+          ---
+          duration_ms: 0.215161
+          ...
+        # Subtest: should use weighted strategy when specified
+        ok 2 - should use weighted strategy when specified
+          ---
+          duration_ms: 0.164035
+          ...
+        # Subtest: should use interleave strategy when specified
+        ok 3 - should use interleave strategy when specified
+          ---
+          duration_ms: 0.129964
+          ...
+        1..3
+    ok 4 - mergeResults
+      ---
+      duration_ms: 0.598013
+      type: 'suite'
+      ...
+    1..4
+ok 5 - merger
+  ---
+  duration_ms: 12.929847
+  type: 'suite'
+  ...
+# Subtest: providers
+    # Subtest: BaseSearchProvider
+        # Subtest: should export BaseSearchProvider
+        ok 1 - should export BaseSearchProvider
+          ---
+          duration_ms: 16.171347
+          ...
+        1..1
+    ok 1 - BaseSearchProvider
+      ---
+      duration_ms: 16.358076
+      type: 'suite'
+      ...
+    # Subtest: GoogleProvider
+        # Subtest: should create GoogleProvider instance
+        ok 1 - should create GoogleProvider instance
+          ---
+          duration_ms: 16.578125
+          ...
+        # Subtest: should report API credentials status
+        ok 2 - should report API credentials status
+          ---
+          duration_ms: 0.357644
+          ...
+        1..2
+    ok 2 - GoogleProvider
+      ---
+      duration_ms: 17.241044
+      type: 'suite'
+      ...
+    # Subtest: DuckDuckGoProvider
+        # Subtest: should create DuckDuckGoProvider instance
+        ok 1 - should create DuckDuckGoProvider instance
+          ---
+          duration_ms: 8.931576
+          ...
+        1..1
+    ok 3 - DuckDuckGoProvider
+      ---
+      duration_ms: 9.193828
+      type: 'suite'
+      ...
+    # Subtest: BingProvider
+        # Subtest: should create BingProvider instance
+        ok 1 - should create BingProvider instance
+          ---
+          duration_ms: 14.342175
+          ...
+        # Subtest: should report API credentials status
+        ok 2 - should report API credentials status
+          ---
+          duration_ms: 0.343373
+          ...
+        1..2
+    ok 4 - BingProvider
+      ---
+      duration_ms: 14.886438
+      type: 'suite'
+      ...
+    1..4
+ok 6 - providers
+  ---
+  duration_ms: 57.934689
+  type: 'suite'
+  ...
+# Subtest: search engine
+    # Subtest: should create WebSearchEngine instance
+    ok 1 - should create WebSearchEngine instance
+      ---
+      duration_ms: 49.599532
+      ...
+    # Subtest: should get provider status
+    ok 2 - should get provider status
+      ---
+      duration_ms: 0.780085
+      ...
+    # Subtest: should allow setting provider weight
+    ok 3 - should allow setting provider weight
+      ---
+      duration_ms: 0.648449
+      ...
+    # Subtest: should return empty array for empty query
+    ok 4 - should return empty array for empty query
+      ---
+      duration_ms: 0.347059
+      ...
+    1..4
+ok 7 - search engine
+  ---
+  duration_ms: 57.599997
+  type: 'suite'
+  ...
+# Subtest: exports
+    # Subtest: should export all main components
+    ok 1 - should export all main components
+      ---
+      duration_ms: 28.916298
+      ...
+    1..1
+ok 8 - exports
+  ---
+  duration_ms: 29.145279
+  type: 'suite'
+  ...
+# Subtest: registry
+    # Subtest: declares the four formal-ai categories
+    ok 1 - declares the four formal-ai categories
+      ---
+      duration_ms: 0.76316
+      ...
+    # Subtest: builds a registry covering every category
+    ok 2 - builds a registry covering every category
+      ---
+      duration_ms: 0.260079
+      ...
+    # Subtest: exposes 10+ search-category engines (top 10-20 coverage)
+    ok 3 - exposes 10+ search-category engines (top 10-20 coverage)
+      ---
+      duration_ms: 0.244605
+      ...
+    # Subtest: includes knowledge, papers, and code engines
+    ok 4 - includes knowledge, papers, and code engines
+      ---
+      duration_ms: 0.238265
+      ...
+    # Subtest: registers web-capture-backed providers
+    ok 5 - registers web-capture-backed providers
+      ---
+      duration_ms: 4.659257
+      ...
+    # Subtest: every entry has well-formed metadata
+    ok 6 - every entry has well-formed metadata
+      ---
+      duration_ms: 0.198195
+      ...
+    # Subtest: ids are unique
+    ok 7 - ids are unique
+      ---
+      duration_ms: 0.199959
+      ...
+    # Subtest: returns sensible defaults spanning search + knowledge
+    ok 8 - returns sensible defaults spanning search + knowledge
+      ---
+      duration_ms: 0.105088
+      ...
+    # Subtest: default ids all exist in the registry
+    ok 9 - default ids all exist in the registry
+      ---
+      duration_ms: 0.176724
+      ...
+    # Subtest: buildProviders
+        # Subtest: instantiates every registered provider
+        ok 1 - instantiates every registered provider
+          ---
+          duration_ms: 3.259015
+          ...
+        # Subtest: passes google/bing config to class providers
+        ok 2 - passes google/bing config to class providers
+          ---
+          duration_ms: 0.263834
+          ...
+        # Subtest: threads fetchImpl into descriptor providers
+        ok 3 - threads fetchImpl into descriptor providers
+          ---
+          duration_ms: 0.182323
+          ...
+        1..3
+    ok 10 - buildProviders
+      ---
+      duration_ms: 3.861546
+      type: 'suite'
+      ...
+    1..10
+ok 9 - registry
+  ---
+  duration_ms: 12.052156
+  type: 'suite'
+  ...
+# Subtest: repository language layout
+    # Subtest: keeps JavaScript package files in js/ instead of the repository root
+    ok 1 - keeps JavaScript package files in js/ instead of the repository root
+      ---
+      duration_ms: 1.090919
+      ...
+    # Subtest: keeps Rust tests in rust/tests instead of rust/src
+    ok 2 - keeps Rust tests in rust/tests instead of rust/src
+      ---
+      duration_ms: 0.749749
+      ...
+    # Subtest: keeps CI/CD scripts in their language folders
+    ok 3 - keeps CI/CD scripts in their language folders
+      ---
+      duration_ms: 0.554348
+      ...
+    # Subtest: keeps npm publish metadata explicit and registry-safe
+    ok 4 - keeps npm publish metadata explicit and registry-safe
+      ---
+      duration_ms: 0.137876
+      ...
+    # Subtest: publishes only runtime package assets to npm
+    ok 5 - publishes only runtime package assets to npm
+      ---
+      duration_ms: 0.101001
+      ...
+    1..5
+ok 10 - repository language layout
+  ---
+  duration_ms: 3.465576
+  type: 'suite'
+  ...
+# wikipedia search error: wiki down
+# Subtest: WebSearchEngine + registry
+    # Subtest: registers every catalog provider
+    ok 1 - registers every catalog provider
+      ---
+      duration_ms: 1.295674
+      ...
+    # Subtest: enriches provider status with registry metadata
+    ok 2 - enriches provider status with registry metadata
+      ---
+      duration_ms: 0.698283
+      ...
+    # Subtest: aggregates results from descriptor providers via injected fetch
+    ok 3 - aggregates results from descriptor providers via injected fetch
+      ---
+      duration_ms: 1.437817
+      ...
+    # Subtest: searchSingle targets one descriptor provider
+    ok 4 - searchSingle targets one descriptor provider
+      ---
+      duration_ms: 0.362952
+      ...
+    # Subtest: throws for an unknown provider in searchSingle
+    ok 5 - throws for an unknown provider in searchSingle
+      ---
+      duration_ms: 0.334478
+      ...
+    # Subtest: isolates provider failures (one fails, others succeed)
+    ok 6 - isolates provider failures (one fails, others succeed)
+      ---
+      duration_ms: 1.780118
+      ...
+    # Subtest: returns [] for an empty query
+    ok 7 - returns [] for an empty query
+      ---
+      duration_ms: 0.179899
+      ...
+    1..7
+ok 11 - WebSearchEngine + registry
+  ---
+  duration_ms: 11.828062
+  type: 'suite'
+  ...
+# Subtest: REST API
+    # Subtest: GET /health reports provider status
+    ok 1 - GET /health reports provider status
+      ---
+      duration_ms: 36.23061
+      ...
+    # Subtest: GET /categories lists providers per category
+    ok 2 - GET /categories lists providers per category
+      ---
+      duration_ms: 7.270346
+      ...
+    # Subtest: GET /providers returns the full registry
+    ok 3 - GET /providers returns the full registry
+      ---
+      duration_ms: 6.312196
+      ...
+    # Subtest: GET /providers?category=code filters by category
+    ok 4 - GET /providers?category=code filters by category
+      ---
+      duration_ms: 5.827542
+      ...
+    # Subtest: GET /providers rejects an unknown category
+    ok 5 - GET /providers rejects an unknown category
+      ---
+      duration_ms: 5.493623
+      ...
+    # Subtest: GET /search without a query returns 400
+    ok 6 - GET /search without a query returns 400
+      ---
+      duration_ms: 13.347781
+      ...
+    # Subtest: GET /search rejects invalid weights JSON
+    ok 7 - GET /search rejects invalid weights JSON
+      ---
+      duration_ms: 16.369713
+      ...
+    # Subtest: POST /search without a query returns 400
+    ok 8 - POST /search without a query returns 400
+      ---
+      duration_ms: 19.524063
+      ...
+    # Subtest: GET /search/:provider rejects an unknown provider
+    ok 9 - GET /search/:provider rejects an unknown provider
+      ---
+      duration_ms: 5.589957
+      ...
+    1..9
+ok 12 - REST API
+  ---
+  duration_ms: 117.717086
+  type: 'suite'
+  ...
+# WebCaptureProvider (wikipedia) error: boom
+# Subtest: WebCaptureProvider
+    # Subtest: namespaces its provider name as wc:<engine>
+    ok 1 - namespaces its provider name as wc:<engine>
+      ---
+      duration_ms: 0.851291
+      ...
+    # Subtest: defaults to the wikipedia engine
+    ok 2 - defaults to the wikipedia engine
+      ---
+      duration_ms: 0.112969
+      ...
+    # Subtest: lists the web-capture supported providers
+    ok 3 - lists the web-capture supported providers
+      ---
+      duration_ms: 0.082814
+      ...
+    # Subtest: delegates to the injected searchImpl and adapts results
+    ok 4 - delegates to the injected searchImpl and adapts results
+      ---
+      duration_ms: 0.287259
+      ...
+    # Subtest: passes an injected fetchImpl through to web-capture
+    ok 5 - passes an injected fetchImpl through to web-capture
+      ---
+      duration_ms: 0.139508
+      ...
+    # Subtest: returns [] for empty queries
+    ok 6 - returns [] for empty queries
+      ---
+      duration_ms: 0.219007
+      ...
+    # Subtest: returns [] when searchImpl throws
+    ok 7 - returns [] when searchImpl throws
+      ---
+      duration_ms: 0.935787
+      ...
+    # Subtest: handles malformed web-capture payloads gracefully
+    ok 8 - handles malformed web-capture payloads gracefully
+      ---
+      duration_ms: 0.123774
+      ...
+    # Subtest: createWebCaptureProvider builds an instance
+    ok 9 - createWebCaptureProvider builds an instance
+      ---
+      duration_ms: 0.169974
+      ...
+    1..9
+ok 13 - WebCaptureProvider
+  ---
+  duration_ms: 4.048545
+  type: 'suite'
+  ...
+1..13
+# tests 120
+# suites 40
+# pass 120
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 584.500007

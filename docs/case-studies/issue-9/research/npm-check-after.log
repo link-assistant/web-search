@@ -1,0 +1,23 @@
+
+> @link-assistant/web-search@0.8.0 check
+> npm run lint && npm run check:scripts && npm run format:check && npm run check:duplication
+
+
+> @link-assistant/web-search@0.8.0 lint
+> eslint .
+
+
+> @link-assistant/web-search@0.8.0 check:scripts
+> for file in scripts/*.mjs; do node --check "$file"; done
+
+
+> @link-assistant/web-search@0.8.0 format:check
+> prettier --check . ../.github/workflows ../README.md ../docs/case-studies/issue-7 --config .prettierrc --ignore-path .prettierignore
+
+Checking formatting...
+All matched files use Prettier code style!
+
+> @link-assistant/web-search@0.8.0 check:duplication
+> jscpd . --config .jscpd.json
+
+[3m[90mDetection time:[39m[23m: 0.204ms

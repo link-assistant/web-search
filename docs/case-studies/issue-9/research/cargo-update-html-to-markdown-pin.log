@@ -1,0 +1,4 @@
+    Updating crates.io index
+ Downgrading html-to-markdown-rs v3.6.1 -> v3.5.7
+    Removing phf_macros v0.13.1
+note: pass `--verbose` to see 8 unchanged dependencies behind latest

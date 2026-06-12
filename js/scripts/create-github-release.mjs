@@ -61,7 +61,7 @@ if (!version || !repository) {
   process.exit(1);
 }
 
-const tag = `v${version}`;
+const tag = `js-v${version}`;
 
 console.log(`Creating GitHub release for ${tag}...`);
 
@@ -91,7 +91,7 @@ try {
   // (Previously caused apostrophes like "didn't" to appear as "didn'''" in releases)
   const payload = JSON.stringify({
     tag_name: tag,
-    name: version,
+    name: `JavaScript ${version}`,
     body: releaseNotes,
   });
 

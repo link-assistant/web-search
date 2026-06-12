@@ -1,7 +1,7 @@
 {
   "name": "@link-assistant/web-search",
   "version": "0.8.0",
-  "description": "A web search microservice that aggregates results from multiple search engines (Google, DuckDuckGo, Bing) with reranking support",
+  "description": "A 22-provider web search microservice and library with typed provider metadata, reranking, and optional web-capture backing",
   "type": "module",
   "main": "src/index.js",
   "types": "src/index.d.ts",
@@ -12,8 +12,15 @@
     }
   },
   "bin": {
-    "web-search": "./bin/web-search.js"
+    "web-search": "bin/web-search.js"
   },
+  "files": [
+    "src",
+    "bin",
+    "examples",
+    "README.md",
+    "CHANGELOG.md"
+  ],
   "scripts": {
     "test": "node --test tests/",
     "start": "node src/server.js",
@@ -25,7 +32,6 @@
     "format:check": "prettier --check . ../.github/workflows ../README.md ../docs/case-studies/issue-7 --config .prettierrc --ignore-path .prettierignore",
     "check:duplication": "jscpd . --config .jscpd.json",
     "check": "npm run lint && npm run check:scripts && npm run format:check && npm run check:duplication",
-    "prepare": "cd .. && husky js/.husky || true",
     "changeset": "changeset",
     "changeset:version": "node scripts/changeset-version.mjs",
     "changeset:publish": "changeset publish",
@@ -46,8 +52,11 @@
   "license": "Unlicense",
   "repository": {
     "type": "git",
-    "url": "https://github.com/link-assistant/web-search",
+    "url": "git+https://github.com/link-assistant/web-search.git",
     "directory": "js"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "engines": {
     "node": ">=20.0.0"

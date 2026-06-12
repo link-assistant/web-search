@@ -5,14 +5,9 @@
 //! re-implementing per-provider scraping. Mirrors the JavaScript
 //! `src/providers/web-capture.js`.
 //!
-//! There is no published `web-capture` Rust crate yet, so this provider is an
-//! optional integration point that degrades gracefully: it warns once and
-//! returns no results, exactly like the JS provider does when the optional
-//! `@link-assistant/web-capture` dependency is absent. The provider, its id
-//! namespace (`wc:<engine>`), and registry metadata are kept in full parity so
-//! that wiring a real crate later is a drop-in change.
-
-use std::sync::atomic::{AtomicBool, Ordering};
+//! The Rust provider delegates to the published `web-capture` crate and keeps
+//! the same graceful empty-result behavior the JavaScript provider uses for
+//! component errors.
 
 use async_trait::async_trait;
 
@@ -20,9 +15,7 @@ use super::base::{SearchOptions, SearchProvider, SearchResult};
 use crate::error::SearchError;
 
 /// Providers exposed by web-capture's search contract.
-pub const SUPPORTED_PROVIDERS: [&str; 5] = ["wikipedia", "duckduckgo", "google", "bing", "brave"];
-
-static WARNED: AtomicBool = AtomicBool::new(false);
+pub const SUPPORTED_PROVIDERS: [&str; 5] = web_capture::SEARCH_PROVIDERS;
 
 /// Provider that delegates to the web-capture component library.
 pub struct WebCaptureProvider {
@@ -47,6 +40,33 @@ impl WebCaptureProvider {
     /// The web-capture engine this provider delegates to.
     pub fn engine(&self) -> &str {
         &self.engine
+    }
+
+    /// Adapt normalized web-capture items into the web-search result contract.
+    pub fn adapt_items(&self, items: Vec<web_capture::SearchResultItem>) -> Vec<SearchResult> {
+        items
+            .into_iter()
+            .enumerate()
+            .filter_map(|(index, item)| {
+                if item.url.trim().is_empty() {
+                    return None;
+                }
+
+                Some(SearchResult {
+                    title: if item.title.trim().is_empty() {
+                        "Untitled".to_string()
+                    } else {
+                        item.title
+                    },
+                    url: item.url,
+                    snippet: item.snippet,
+                    source: self.name.clone(),
+                    rank: if item.rank == 0 { index + 1 } else { item.rank },
+                    score: None,
+                    sources: None,
+                })
+            })
+            .collect()
     }
 }
 
@@ -81,18 +101,24 @@ impl SearchProvider for WebCaptureProvider {
     async fn search(
         &self,
         query: &str,
-        _options: &SearchOptions,
+        options: &SearchOptions,
     ) -> Result<Vec<SearchResult>, SearchError> {
         if query.trim().is_empty() {
             return Ok(Vec::new());
         }
 
-        if !WARNED.swap(true, Ordering::Relaxed) {
-            tracing::warn!(
-                "WebCaptureProvider: the web-capture component library is not wired in the Rust \
-                 build yet; wc:* providers return no results until it is available."
-            );
+        let limit = options.limit.unwrap_or(web_capture::DEFAULT_LIMIT);
+
+        match web_capture::search(query, &self.engine, limit, "fetch", "").await {
+            Ok(result) => Ok(self.adapt_items(result.results)),
+            Err(message) => {
+                tracing::warn!(
+                    provider = self.name(),
+                    error = %message,
+                    "WebCaptureProvider returned no results"
+                );
+                Ok(Vec::new())
+            }
         }
-        Ok(Vec::new())
     }
 }

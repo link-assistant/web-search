@@ -1,0 +1,16 @@
+
+> @link-assistant/web-search@0.8.0 prepare
+> cd .. && husky js/.husky || true
+
+
+added 379 packages, and audited 380 packages in 2s
+
+84 packages are looking for funding
+  run `npm fund` for details
+
+10 vulnerabilities (6 moderate, 4 high)
+
+To address all issues, run:
+  npm audit fix
+
+Run `npm audit` for details.

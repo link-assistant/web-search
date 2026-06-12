@@ -1,0 +1,11 @@
+
+> @link-assistant/web-search@0.8.0 prepare
+> cd .. && husky js/.husky || true
+
+sh: 1: husky: not found
+npm warn publish npm auto-corrected some errors in your package.json when publishing.  Please run "npm pkg fix" to address these errors.
+npm warn publish errors corrected:
+npm warn publish "bin[web-search]" script name bin/web-search.js was invalid and removed
+npm warn publish "repository.url" was normalized to "git+https://github.com/link-assistant/web-search.git"
+npm warn publish This command requires you to be logged in to https://registry.npmjs.org/ (dry-run)
+npm notice Publishing to https://registry.npmjs.org/ with tag latest and default access (dry-run)
