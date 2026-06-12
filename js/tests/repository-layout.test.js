@@ -10,6 +10,9 @@ const projectRoot =
     ? resolve(packageOrProjectRoot, '..')
     : packageOrProjectRoot;
 const jsRoot = join(projectRoot, 'js');
+const packageJson = JSON.parse(
+  readFileSync(join(jsRoot, 'package.json'), 'utf8')
+);
 
 function exists(relativePath) {
   return existsSync(join(projectRoot, relativePath));
@@ -113,5 +116,44 @@ describe('repository language layout', () => {
       'node js/scripts/check-js-rust-parity.mjs'
     );
     expect(parityWorkflow).not.toContain('node scripts/');
+  });
+
+  it('keeps npm publish metadata explicit and registry-safe', () => {
+    expect(packageJson.bin).toEqual({
+      'web-search': 'bin/web-search.js',
+    });
+    expect(existsSync(join(jsRoot, packageJson.bin['web-search']))).toBe(true);
+
+    expect(packageJson.repository).toEqual({
+      type: 'git',
+      url: 'git+https://github.com/link-assistant/web-search.git',
+      directory: 'js',
+    });
+    expect(packageJson.publishConfig).toEqual({
+      access: 'public',
+    });
+    expect(packageJson.scripts.prepare).toBe(undefined);
+  });
+
+  it('publishes only runtime package assets to npm', () => {
+    expect(packageJson.files).toEqual([
+      'src',
+      'bin',
+      'examples',
+      'README.md',
+      'CHANGELOG.md',
+    ]);
+
+    for (const devOnlyPath of [
+      '.changeset',
+      '.husky',
+      '.jscpd.json',
+      '.prettierrc',
+      'eslint.config.js',
+      'scripts',
+      'tests',
+    ]) {
+      expect(packageJson.files.includes(devOnlyPath)).toBe(false);
+    }
   });
 });

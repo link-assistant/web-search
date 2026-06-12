@@ -1,0 +1,126 @@
+{
+  "@link-assistant/web-search": {
+    "id": "@link-assistant/web-search@0.8.0",
+    "name": "@link-assistant/web-search",
+    "version": "0.8.0",
+    "size": 28769,
+    "unpackedSize": 115797,
+    "shasum": "57ad939293df59729dee7bc49f0f26584659259a",
+    "integrity": "sha512-2N4IlIc5E0MbaIylRAaeTuPu24peIbFW5X4PKf2UdhS5+ZDDuMl4UunhIExkluIF9BgyMuzd6LN6PwTDiRrxvA==",
+    "filename": "link-assistant-web-search-0.8.0.tgz",
+    "files": [
+      {
+        "path": "CHANGELOG.md",
+        "size": 8111,
+        "mode": 420
+      },
+      {
+        "path": "README.md",
+        "size": 4360,
+        "mode": 420
+      },
+      {
+        "path": "bin/web-search.js",
+        "size": 9368,
+        "mode": 420
+      },
+      {
+        "path": "examples/basic-usage.js",
+        "size": 987,
+        "mode": 420
+      },
+      {
+        "path": "package.json",
+        "size": 2519,
+        "mode": 420
+      },
+      {
+        "path": "src/index.d.ts",
+        "size": 11449,
+        "mode": 420
+      },
+      {
+        "path": "src/index.js",
+        "size": 1151,
+        "mode": 420
+      },
+      {
+        "path": "src/merger.js",
+        "size": 6214,
+        "mode": 420
+      },
+      {
+        "path": "src/providers/api-engines.js",
+        "size": 9056,
+        "mode": 420
+      },
+      {
+        "path": "src/providers/base.js",
+        "size": 2142,
+        "mode": 420
+      },
+      {
+        "path": "src/providers/bing.js",
+        "size": 6219,
+        "mode": 420
+      },
+      {
+        "path": "src/providers/browser.js",
+        "size": 5998,
+        "mode": 420
+      },
+      {
+        "path": "src/providers/duckduckgo.js",
+        "size": 3109,
+        "mode": 420
+      },
+      {
+        "path": "src/providers/generic.js",
+        "size": 4001,
+        "mode": 420
+      },
+      {
+        "path": "src/providers/google.js",
+        "size": 5843,
+        "mode": 420
+      },
+      {
+        "path": "src/providers/html-engines.js",
+        "size": 7630,
+        "mode": 420
+      },
+      {
+        "path": "src/providers/html-utils.js",
+        "size": 1899,
+        "mode": 420
+      },
+      {
+        "path": "src/providers/index.js",
+        "size": 1182,
+        "mode": 420
+      },
+      {
+        "path": "src/providers/registry.js",
+        "size": 5438,
+        "mode": 420
+      },
+      {
+        "path": "src/providers/web-capture.js",
+        "size": 4160,
+        "mode": 420
+      },
+      {
+        "path": "src/search.js",
+        "size": 7095,
+        "mode": 420
+      },
+      {
+        "path": "src/server.js",
+        "size": 7866,
+        "mode": 420
+      }
+    ],
+    "entryCount": 22,
+    "bundled": []
+  }
+}

@@ -1,0 +1,301 @@
+[
+  {
+    "id": "@link-assistant/web-search@0.8.0",
+    "name": "@link-assistant/web-search",
+    "version": "0.8.0",
+    "size": 59742,
+    "unpackedSize": 251076,
+    "shasum": "1162243b057634351820f1e33be8378bbbbabc87",
+    "integrity": "sha512-ABNb0zkYlLpl0qKyXMaUE4HqqBT/+UQJlX1wjfxsTSzI7IU5iP+ig8Za63E+isVf5MHMGjNo98vgxAxKdWm2oA==",
+    "filename": "link-assistant-web-search-0.8.0.tgz",
+    "files": [
+      {
+        "path": ".changeset/config.json",
+        "size": 271,
+        "mode": 420
+      },
+      {
+        "path": ".changeset/README.md",
+        "size": 510,
+        "mode": 420
+      },
+      {
+        "path": ".husky/pre-commit",
+        "size": 25,
+        "mode": 420
+      },
+      {
+        "path": ".jscpd.json",
+        "size": 390,
+        "mode": 420
+      },
+      {
+        "path": ".prettierignore",
+        "size": 201,
+        "mode": 420
+      },
+      {
+        "path": ".prettierrc",
+        "size": 173,
+        "mode": 420
+      },
+      {
+        "path": "CHANGELOG.md",
+        "size": 8111,
+        "mode": 420
+      },
+      {
+        "path": "README.md",
+        "size": 442,
+        "mode": 420
+      },
+      {
+        "path": "bin/web-search.js",
+        "size": 9368,
+        "mode": 420
+      },
+      {
+        "path": "bunfig.toml",
+        "size": 136,
+        "mode": 420
+      },
+      {
+        "path": "deno.json",
+        "size": 121,
+        "mode": 420
+      },
+      {
+        "path": "eslint.config.js",
+        "size": 3192,
+        "mode": 420
+      },
+      {
+        "path": "examples/basic-usage.js",
+        "size": 987,
+        "mode": 420
+      },
+      {
+        "path": "package.json",
+        "size": 2428,
+        "mode": 420
+      },
+      {
+        "path": "scripts/changeset-version.mjs",
+        "size": 2667,
+        "mode": 420
+      },
+      {
+        "path": "scripts/check-changesets.mjs",
+        "size": 1918,
+        "mode": 420
+      },
+      {
+        "path": "scripts/check-js-rust-parity.mjs",
+        "size": 4843,
+        "mode": 420
+      },
+      {
+        "path": "scripts/check-version.mjs",
+        "size": 4039,
+        "mode": 420
+      },
+      {
+        "path": "scripts/create-github-release.mjs",
+        "size": 3456,
+        "mode": 420
+      },
+      {
+        "path": "scripts/create-manual-changeset.mjs",
+        "size": 3465,
+        "mode": 420
+      },
+      {
+        "path": "scripts/detect-code-changes.mjs",
+        "size": 8302,
+        "mode": 420
+      },
+      {
+        "path": "scripts/format-github-release.mjs",
+        "size": 3114,
+        "mode": 420
+      },
+      {
+        "path": "scripts/format-release-notes.mjs",
+        "size": 8128,
+        "mode": 420
+      },
+      {
+        "path": "scripts/instant-version-bump.mjs",
+        "size": 5931,
+        "mode": 420
+      },
+      {
+        "path": "scripts/js-paths.mjs",
+        "size": 5686,
+        "mode": 420
+      },
+      {
+        "path": "scripts/merge-changesets.mjs",
+        "size": 6503,
+        "mode": 420
+      },
+      {
+        "path": "scripts/publish-to-npm.mjs",
+        "size": 9570,
+        "mode": 420
+      },
+      {
+        "path": "scripts/setup-npm.mjs",
+        "size": 1161,
+        "mode": 420
+      },
+      {
+        "path": "scripts/validate-changeset.mjs",
+        "size": 8233,
+        "mode": 420
+      },
+      {
+        "path": "scripts/version-and-commit.mjs",
+        "size": 9818,
+        "mode": 420
+      },
+      {
+        "path": "src/index.d.ts",
+        "size": 11449,
+        "mode": 420
+      },
+      {
+        "path": "src/index.js",
+        "size": 1151,
+        "mode": 420
+      },
+      {
+        "path": "src/merger.js",
+        "size": 6214,
+        "mode": 420
+      },
+      {
+        "path": "src/providers/api-engines.js",
+        "size": 9056,
+        "mode": 420
+      },
+      {
+        "path": "src/providers/base.js",
+        "size": 2142,
+        "mode": 420
+      },
+      {
+        "path": "src/providers/bing.js",
+        "size": 6219,
+        "mode": 420
+      },
+      {
+        "path": "src/providers/browser.js",
+        "size": 5998,
+        "mode": 420
+      },
+      {
+        "path": "src/providers/duckduckgo.js",
+        "size": 3109,
+        "mode": 420
+      },
+      {
+        "path": "src/providers/generic.js",
+        "size": 4001,
+        "mode": 420
+      },
+      {
+        "path": "src/providers/google.js",
+        "size": 5843,
+        "mode": 420
+      },
+      {
+        "path": "src/providers/html-engines.js",
+        "size": 7630,
+        "mode": 420
+      },
+      {
+        "path": "src/providers/html-utils.js",
+        "size": 1899,
+        "mode": 420
+      },
+      {
+        "path": "src/providers/index.js",
+        "size": 1182,
+        "mode": 420
+      },
+      {
+        "path": "src/providers/registry.js",
+        "size": 5438,
+        "mode": 420
+      },
+      {
+        "path": "src/providers/web-capture.js",
+        "size": 4160,
+        "mode": 420
+      },
+      {
+        "path": "src/search.js",
+        "size": 7095,
+        "mode": 420
+      },
+      {
+        "path": "src/server.js",
+        "size": 7866,
+        "mode": 420
+      },
+      {
+        "path": "tests/api-engines.test.js",
+        "size": 7077,
+        "mode": 420
+      },
+      {
+        "path": "tests/generic-provider.test.js",
+        "size": 4469,
+        "mode": 420
+      },
+      {
+        "path": "tests/html-engines.test.js",
+        "size": 5367,
+        "mode": 420
+      },
+      {
+        "path": "tests/html-utils.test.js",
+        "size": 2157,
+        "mode": 420
+      },
+      {
+        "path": "tests/index.test.js",
+        "size": 9194,
+        "mode": 420
+      },
+      {
+        "path": "tests/registry.test.js",
+        "size": 3392,
+        "mode": 420
+      },
+      {
+        "path": "tests/repository-layout.test.js",
+        "size": 3584,
+        "mode": 420
+      },
+      {
+        "path": "tests/search-engine.test.js",
+        "size": 4361,
+        "mode": 420
+      },
+      {
+        "path": "tests/server.test.js",
+        "size": 4707,
+        "mode": 420
+      },
+      {
+        "path": "tests/web-capture.test.js",
+        "size": 3127,
+        "mode": 420
+      }
+    ],
+    "entryCount": 57,
+    "bundled": []
+  }
+]

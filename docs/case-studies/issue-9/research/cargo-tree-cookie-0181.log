@@ -1,0 +1,14 @@
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+cookie v0.18.1
+├── cookie_store v0.22.0
+│   └── reqwest v0.12.28
+│       ├── chromiumoxide v0.7.0
+│       │   └── browser-commander v0.9.1
+│       │       └── web-capture v0.3.30
+│       │           └── web-search v0.2.0 (/tmp/gh-issue-solver-1781302286709/rust)
+│       ├── web-capture v0.3.30 (*)
+│       └── web-search v0.2.0 (/tmp/gh-issue-solver-1781302286709/rust)
+├── fantoccini v0.21.5
+│   └── browser-commander v0.9.1 (*)
+└── reqwest v0.12.28 (*)

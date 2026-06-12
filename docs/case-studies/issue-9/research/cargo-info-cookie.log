@@ -1,0 +1,24 @@
+cookie
+HTTP cookie parsing and cookie jar management. Supports signed and private
+(encrypted, authenticated) jars.
+version: 0.18.1
+license: MIT OR Apache-2.0
+rust-version: unknown
+documentation: https://docs.rs/cookie
+repository: https://github.com/SergioBenitez/cookie-rs
+crates.io: https://crates.io/crates/cookie/0.18.1
+features:
+  aes-gcm          = [dep:aes-gcm]
+  base64           = [dep:base64]
+  hkdf             = [dep:hkdf]
+  hmac             = [dep:hmac]
+  key-expansion    = [sha2, hkdf]
+  percent-encode   = [percent-encoding]
+  percent-encoding = [dep:percent-encoding]
+  private          = [aes-gcm, base64, rand, subtle]
+  rand             = [dep:rand]
+  secure           = [private, signed, key-expansion]
+  sha2             = [dep:sha2]
+  signed           = [hmac, sha2, base64, rand, subtle]
+  subtle           = [dep:subtle]
+note: to see how you depend on cookie, run `cargo tree --invert cookie@0.18.1`

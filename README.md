@@ -1,12 +1,21 @@
 # @link-assistant/web-search
 
+[![npm package](https://img.shields.io/npm/v/@link-assistant/web-search?label=npm)](https://www.npmjs.com/package/@link-assistant/web-search)
+[![npm downloads](https://img.shields.io/npm/dm/@link-assistant/web-search?label=npm%20downloads)](https://www.npmjs.com/package/@link-assistant/web-search)
+[![crates.io crate](https://img.shields.io/crates/v/web-search?label=crates.io)](https://crates.io/crates/web-search)
+[![docs.rs](https://img.shields.io/docsrs/web-search?label=docs.rs)](https://docs.rs/web-search)
+[![JavaScript Checks and Release](https://github.com/link-assistant/web-search/actions/workflows/js.yml/badge.svg)](https://github.com/link-assistant/web-search/actions/workflows/js.yml)
+[![Rust CI](https://github.com/link-assistant/web-search/actions/workflows/rust.yml/badge.svg)](https://github.com/link-assistant/web-search/actions/workflows/rust.yml)
+[![JS release tag](https://img.shields.io/badge/GitHub%20release-js--v0.8.0-blue)](https://github.com/link-assistant/web-search/releases?q=js-v)
+[![Rust release tag](https://img.shields.io/badge/GitHub%20release-rust--v0.2.0-orange)](https://github.com/link-assistant/web-search/releases?q=rust-v)
+
 A web search microservice and library that aggregates results from 20+ search engines and knowledge/paper/code APIs, with intelligent result merging and reranking. Ships as **two first-class implementations** — JavaScript (`@link-assistant/web-search`) and Rust (the `web-search` crate) — that stay in lock-step: the same provider catalog, categories, merge strategies, and CLI/HTTP surface in both languages.
 
 ## Features
 
 - **Many providers, four categories**: 22 providers grouped into `search`, `knowledge`, `papers`, and `code` — the same categories `formal-ai` consumes (see [Search Providers](#search-providers)).
 - **Descriptor-driven catalog**: Engines are declared as data (URL, request kind, parser) and run through one shared `GenericProvider`, so adding an engine in one place adds it everywhere.
-- **web-capture component**: The optional [`@link-assistant/web-capture`](https://github.com/link-assistant/web-capture) library can back any provider; when it is not installed the library degrades gracefully.
+- **web-capture component**: JavaScript can lazily load [`@link-assistant/web-capture`](https://github.com/link-assistant/web-capture), and Rust delegates `wc:*` providers to the published `web-capture` crate.
 - **Result merging**: Combine results using RRF, weighted scoring, or interleaving.
 - **Configurable weights**: Adjust provider weights for custom reranking.
 - **URL deduplication**: Automatic normalization and deduplication across providers.

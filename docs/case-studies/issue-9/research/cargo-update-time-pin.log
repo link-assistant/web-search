@@ -1,0 +1,8 @@
+    Updating crates.io index
+ Downgrading cookie_store v0.22.1 -> v0.22.0 (available: v0.22.1)
+ Downgrading deranged v0.5.8 -> v0.3.11
+ Downgrading num-conv v0.2.2 -> v0.1.0
+ Downgrading time v0.3.48 -> v0.3.36
+ Downgrading time-core v0.1.9 -> v0.1.2 (available: v0.1.9)
+ Downgrading time-macros v0.2.28 -> v0.2.18 (available: v0.2.28)
+note: pass `--verbose` to see 4 unchanged dependencies behind latest
