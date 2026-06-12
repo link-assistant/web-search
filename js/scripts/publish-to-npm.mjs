@@ -2,7 +2,7 @@
 
 /**
  * Publish to npm using OIDC trusted publishing
- * Usage: node scripts/publish-to-npm.mjs [--should-pull] [--js-root <path>]
+ * Usage: node js/scripts/publish-to-npm.mjs [--should-pull] [--js-root <path>]
  *   should_pull: Optional flag to pull latest changes before publishing (for release job)
  *
  * IMPORTANT: Update the PACKAGE_NAME constant below to match your package.json

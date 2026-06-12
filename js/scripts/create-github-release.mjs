@@ -2,7 +2,7 @@
 
 /**
  * Create GitHub Release from CHANGELOG.md
- * Usage: node scripts/create-github-release.mjs --release-version <version> --repository <repository>
+ * Usage: node js/scripts/create-github-release.mjs --release-version <version> --repository <repository>
  *   release-version: Version number (e.g., 1.0.0)
  *   repository: GitHub repository (e.g., owner/repo)
  *
@@ -13,6 +13,9 @@
  */
 
 import { readFileSync } from 'fs';
+import { join } from 'path';
+
+import { getJsRoot, parseJsRootConfig } from './js-paths.mjs';
 
 // Load use-m dynamically
 const { use } = eval(
@@ -37,15 +40,23 @@ const config = makeConfig({
         type: 'string',
         default: getenv('REPOSITORY', ''),
         describe: 'GitHub repository (e.g., owner/repo)',
+      })
+      .option('js-root', {
+        type: 'string',
+        default: getenv('JS_ROOT', ''),
+        describe:
+          'JavaScript package root directory (auto-detected if not specified)',
       }),
 });
 
-const { releaseVersion: version, repository } = config;
+const { releaseVersion: version, repository, jsRoot: jsRootArg } = config;
+const jsRootConfig = jsRootArg || parseJsRootConfig();
+const jsRoot = getJsRoot({ jsRoot: jsRootConfig, verbose: true });
 
 if (!version || !repository) {
   console.error('Error: Missing required arguments');
   console.error(
-    'Usage: node scripts/create-github-release.mjs --release-version <version> --repository <repository>'
+    'Usage: node js/scripts/create-github-release.mjs --release-version <version> --repository <repository>'
   );
   process.exit(1);
 }
@@ -56,7 +67,9 @@ console.log(`Creating GitHub release for ${tag}...`);
 
 try {
   // Read CHANGELOG.md
-  const changelog = readFileSync('./CHANGELOG.md', 'utf8');
+  const changelogPath =
+    jsRoot === '.' ? './CHANGELOG.md' : join(jsRoot, 'CHANGELOG.md');
+  const changelog = readFileSync(changelogPath, 'utf8');
 
   // Extract changelog entry for this version
   // Read from CHANGELOG.md between this version header and the next version header

@@ -1,70 +1,55 @@
 {
-  "repository": "https://github.com/link-foundation/js-ai-driven-development-pipeline-template",
-  "analysis_date": "2025-12-18",
-  "description": "A JavaScript/TypeScript package template for AI-driven development",
-  "package_manager": "npm",
-  "configuration_files": {
-    "build_and_development": ["package.json", "bunfig.toml", "deno.json"],
-    "code_quality": ["eslint.config.js", ".prettierrc", ".prettierignore"],
-    "git_hooks": [".husky/pre-commit"],
-    "changesets": [".changeset/config.json"]
+  "repository": "https://github.com/link-assistant/web-search",
+  "analysis_date": "2026-06-12",
+  "description": "Dual JavaScript and Rust web-search package with separated language roots",
+  "language_roots": {
+    "javascript": "js/",
+    "rust": "rust/"
+  },
+  "root_shared_files": ["README.md", "LICENSE", "docs/", ".github/workflows/"],
+  "javascript_package_files": {
+    "package_root": "js/",
+    "source": "js/src/",
+    "tests": "js/tests/",
+    "examples": "js/examples/",
+    "bin": "js/bin/",
+    "package_metadata": ["js/package.json", "js/package-lock.json"],
+    "code_quality": [
+      "js/eslint.config.js",
+      "js/.prettierrc",
+      "js/.prettierignore",
+      "js/.jscpd.json"
+    ],
+    "runtime_configs": ["js/bunfig.toml", "js/deno.json"],
+    "changesets": "js/.changeset/",
+    "ci_scripts": "js/scripts/"
+  },
+  "rust_package_files": {
+    "package_root": "rust/",
+    "manifest": "rust/Cargo.toml",
+    "source": "rust/src/",
+    "tests": "rust/tests/",
+    "ci_scripts": "rust/scripts/",
+    "changelog_fragments": "rust/changelog.d/"
   },
   "github_workflows": {
-    "release.yml": {
-      "triggers": ["push to main", "pull_request", "workflow_dispatch"],
-      "jobs": [
-        "changeset-check",
-        "lint",
-        "test",
-        "release",
-        "instant-release",
-        "changeset-pr"
-      ],
-      "test_matrix": "3 runtimes x 3 OS = 9 combinations"
+    "js.yml": {
+      "purpose": "JavaScript lint, format, duplication, multi-runtime tests, npm release, and manual changeset release",
+      "test_matrix": "Node.js, Bun, and Deno across Ubuntu, macOS, and Windows"
+    },
+    "rust.yml": {
+      "purpose": "Rust change detection, version and changelog gates, formatting, clippy, tests, doc tests, build, file-size checks, and crate package checks"
+    },
+    "parity.yml": {
+      "purpose": "Repository layout enforcement and JavaScript/Rust provider catalog parity"
     }
   },
-  "eslint_rules": {
-    "base_configs": ["@eslint/js recommended", "prettier"],
-    "rules": {
-      "prettier_integration": true,
-      "no_unused_vars": "error",
-      "no_console": "off",
-      "no_debugger": "error",
-      "eqeqeq": "always",
-      "curly": "all",
-      "no_var": true,
-      "prefer_const": true,
-      "prefer_arrow_callback": true,
-      "no_duplicate_imports": true,
-      "object_shorthand": true,
-      "prefer_template": true
-    }
-  },
-  "prettier_config": {
-    "semi": true,
-    "trailingComma": "es5",
-    "singleQuote": true,
-    "printWidth": 80,
-    "tabWidth": 2,
-    "useTabs": false,
-    "arrowParens": "always",
-    "endOfLine": "lf"
-  },
-  "features": {
-    "multi_runtime_support": ["Node.js", "Bun", "Deno"],
-    "test_framework": "test-anywhere",
-    "release_automation": "Changesets",
-    "code_quality": ["ESLint", "Prettier", "Husky", "lint-staged"],
-    "file_size_limit": "1000 lines"
-  },
-  "devDependencies": [
-    "@changesets/cli",
-    "eslint",
-    "eslint-config-prettier",
-    "eslint-plugin-prettier",
-    "husky",
-    "lint-staged",
-    "prettier",
-    "test-anywhere"
+  "parity_checks": [
+    "JavaScript-specific package files are absent from the repository root",
+    "JavaScript package files exist under js/",
+    "JavaScript CI/CD helper scripts exist under js/scripts/",
+    "Rust CI/CD helper scripts exist under rust/scripts/",
+    "Rust tests stay under rust/tests and not rust/src",
+    "JavaScript and Rust CLIs expose the same provider ids, categories, and access labels"
   ]
 }

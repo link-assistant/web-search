@@ -2,7 +2,7 @@
 
 /**
  * Format GitHub release notes using the format-release-notes.mjs script
- * Usage: node scripts/format-github-release.mjs --release-version <version> --repository <repository> --commit-sha <commit_sha>
+ * Usage: node js/scripts/format-github-release.mjs --release-version <version> --repository <repository> --commit-sha <commit_sha>
  *   release-version: Version number (e.g., 1.0.0)
  *   repository: GitHub repository (e.g., owner/repo)
  *   commit_sha: Commit SHA for PR detection
@@ -12,6 +12,15 @@
  * - command-stream: Modern shell command execution with streaming support
  * - lino-arguments: Unified configuration from CLI args, env vars, and .lenv files
  */
+
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const scriptDirectory = dirname(fileURLToPath(import.meta.url));
+const formatReleaseNotesScript = join(
+  scriptDirectory,
+  'format-release-notes.mjs'
+);
 
 // Load use-m dynamically
 const { use } = eval(
@@ -49,7 +58,7 @@ const { releaseVersion: version, repository, commitSha } = config;
 if (!version || !repository || !commitSha) {
   console.error('Error: Missing required arguments');
   console.error(
-    'Usage: node scripts/format-github-release.mjs --release-version <version> --repository <repository> --commit-sha <commit_sha>'
+    'Usage: node js/scripts/format-github-release.mjs --release-version <version> --repository <repository> --commit-sha <commit_sha>'
   );
   process.exit(1);
 }
@@ -74,7 +83,7 @@ try {
     console.log(`Formatting release notes for ${tag}...`);
     // Pass the trigger commit SHA for PR detection
     // This allows proper PR lookup even if the changelog doesn't have a commit hash
-    await $`node scripts/format-release-notes.mjs --release-id "${releaseId}" --release-version "${tag}" --repository "${repository}" --commit-sha "${commitSha}"`;
+    await $`node ${formatReleaseNotesScript} --release-id "${releaseId}" --release-version "${tag}" --repository "${repository}" --commit-sha "${commitSha}"`;
     console.log(`\u2705 Formatted release notes for ${tag}`);
   }
 } catch (error) {

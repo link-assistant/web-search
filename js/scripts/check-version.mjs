@@ -12,7 +12,7 @@
  * - Fails the build if manual version changes are detected
  *
  * Usage:
- *   node scripts/check-version.mjs
+ *   node js/scripts/check-version.mjs
  *
  * Environment variables (set by GitHub Actions):
  *   - GITHUB_HEAD_REF: Branch name of the PR head
@@ -25,20 +25,14 @@
 
 import { execSync } from 'child_process';
 
-/**
- * Execute a shell command and return trimmed output
- * @param {string} command - The command to execute
- * @returns {string} - The trimmed command output
- */
-function exec(command) {
-  try {
-    return execSync(command, { encoding: 'utf-8' }).trim();
-  } catch (error) {
-    console.error(`Error executing command: ${command}`);
-    console.error(error.message);
-    return '';
-  }
-}
+import {
+  getJsRoot,
+  getPackageJsonPath,
+  parseJsRootConfig,
+} from './js-paths.mjs';
+
+const jsRoot = getJsRoot({ jsRoot: parseJsRootConfig(), verbose: true });
+const packageJsonPath = getPackageJsonPath({ jsRoot }).replace(/^\.\//, '');
 
 /**
  * Check if this is an automated release PR that should skip version check
@@ -60,33 +54,53 @@ function shouldSkipVersionCheck() {
 }
 
 /**
- * Get the version diff from package.json
- * @returns {string} The version diff line if found, empty string otherwise
+ * Read a package version from a git ref.
+ * @param {string} ref - Git ref to read from
+ * @param {string} path - Package file path at that ref
+ * @returns {string | null} Package version, or null when unavailable
+ */
+function readVersionAtRef(ref, path) {
+  let content = '';
+  try {
+    content = execSync(`git show ${ref}:${path}`, {
+      encoding: 'utf-8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+    }).trim();
+  } catch {
+    return null;
+  }
+
+  try {
+    return JSON.parse(content).version || null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Get the version change from package.json.
+ * @returns {string} The version change if found, empty string otherwise
  */
 function getVersionDiff() {
   const baseRef = process.env.GITHUB_BASE_REF || 'main';
 
-  // Get the diff for package.json, looking for added lines with "version"
-  const diffCommand = `git diff origin/${baseRef}...HEAD -- package.json`;
-  const diff = exec(diffCommand);
+  const baseVersion =
+    readVersionAtRef(`origin/${baseRef}`, packageJsonPath) ||
+    readVersionAtRef(`origin/${baseRef}`, 'package.json');
+  const headVersion = readVersionAtRef('HEAD', packageJsonPath);
 
-  if (!diff) {
+  if (!baseVersion || !headVersion || baseVersion === headVersion) {
     return '';
   }
 
-  // Look for added lines (starting with +) containing "version"
-  // Match pattern: +"version": "x.y.z"
-  const versionChangePattern = /^\+\s*"version"\s*:\s*"[^"]+"/m;
-  const match = diff.match(versionChangePattern);
-
-  return match ? match[0] : '';
+  return `${packageJsonPath}: ${baseVersion} -> ${headVersion}`;
 }
 
 /**
  * Main function to check for version changes
  */
 function checkVersion() {
-  console.log('Checking for manual version changes in package.json...\n');
+  console.log(`Checking for manual version changes in ${packageJsonPath}...\n`);
 
   // Check if we should skip the version check
   if (shouldSkipVersionCheck()) {

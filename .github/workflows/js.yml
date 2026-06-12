@@ -1,4 +1,4 @@
-name: Checks and release
+name: JavaScript Checks and Release
 
 on:
   push:
@@ -6,9 +6,9 @@ on:
       - main
   pull_request:
     types: [opened, synchronize, reopened]
-  # Manual release support - consolidated here to work with npm trusted publishing
-  # npm only allows ONE workflow file as trusted publisher, so all publishing
-  # must go through this workflow (release.yml)
+  # Manual release support is consolidated here for npm trusted publishing.
+  # npm allows one trusted-publisher workflow, so JavaScript package publishing
+  # goes through js.yml.
   workflow_dispatch:
     inputs:
       release_mode:
@@ -32,20 +32,26 @@ on:
         required: false
         type: string
 
-concurrency: ${{ github.workflow }}-${{ github.ref }}
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref == 'refs/heads/main' }}
+
+defaults:
+  run:
+    working-directory: js
 
 jobs:
-  # === DETECT CHANGES - determines which jobs should run ===
   detect-changes:
-    name: Detect Changes
+    name: JS - Detect Changes
     runs-on: ubuntu-latest
     if: github.event_name != 'workflow_dispatch'
     outputs:
-      mjs-changed: ${{ steps.changes.outputs.mjs-changed }}
-      js-changed: ${{ steps.changes.outputs.js-changed }}
-      package-changed: ${{ steps.changes.outputs.package-changed }}
+      js-code-changed: ${{ steps.changes.outputs.js-code-changed }}
+      any-js-code-changed: ${{ steps.changes.outputs.any-js-code-changed }}
       docs-changed: ${{ steps.changes.outputs.docs-changed }}
-      workflow-changed: ${{ steps.changes.outputs.workflow-changed }}
+      js-workflow-changed: ${{ steps.changes.outputs.js-workflow-changed }}
+      package-changed: ${{ steps.changes.outputs.package-changed }}
+      scripts-changed: ${{ steps.changes.outputs.scripts-changed }}
       any-code-changed: ${{ steps.changes.outputs.any-code-changed }}
     steps:
       - uses: actions/checkout@v4
@@ -54,16 +60,15 @@ jobs:
 
       - name: Detect changes
         id: changes
+        working-directory: .
         env:
           GITHUB_EVENT_NAME: ${{ github.event_name }}
           GITHUB_BASE_SHA: ${{ github.event.pull_request.base.sha }}
           GITHUB_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-        run: node scripts/detect-code-changes.mjs
+        run: node js/scripts/detect-code-changes.mjs
 
-  # === VERSION CHANGE CHECK ===
-  # Prohibit manual version changes in package.json - versions should only be changed by CI/CD
   version-check:
-    name: Check for Manual Version Changes
+    name: JS - Check for Manual Version Changes
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
     steps:
@@ -71,19 +76,18 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Check for version changes in package.json
+      - name: Check for version changes in js/package.json
+        working-directory: .
         env:
           GITHUB_HEAD_REF: ${{ github.head_ref }}
           GITHUB_BASE_REF: ${{ github.base_ref }}
-        run: node scripts/check-version.mjs
+        run: node js/scripts/check-version.mjs --js-root js
 
-  # === CHANGESET CHECK - only runs on PRs with code changes ===
-  # Docs-only PRs (./docs folder, markdown files) don't require changesets
   changeset-check:
-    name: Check for Changesets
+    name: JS - Check for Changesets
     runs-on: ubuntu-latest
     needs: [detect-changes]
-    if: github.event_name == 'pull_request' && needs.detect-changes.outputs.any-code-changed == 'true'
+    if: github.event_name == 'pull_request' && needs.detect-changes.outputs.js-code-changed == 'true'
     steps:
       - uses: actions/checkout@v4
         with:
@@ -98,47 +102,38 @@ jobs:
         run: npm install
 
       - name: Check for changesets
+        working-directory: .
         env:
-          # Pass PR context to the validation script
           GITHUB_BASE_REF: ${{ github.base_ref }}
           GITHUB_BASE_SHA: ${{ github.event.pull_request.base.sha }}
           GITHUB_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
-          # Skip changeset check for automated version PRs
           if [[ "${{ github.head_ref }}" == "changeset-release/"* ]]; then
             echo "Skipping changeset check for automated release PR"
             exit 0
           fi
 
-          # Run changeset validation script
-          # This validates that exactly ONE changeset was ADDED by this PR
-          # Pre-existing changesets from other merged PRs are ignored
-          node scripts/validate-changeset.mjs
+          node js/scripts/validate-changeset.mjs --js-root js
 
-  # === LINT AND FORMAT CHECK ===
-  # Lint runs independently of changeset-check - it's a fast check that should always run
-  # See: https://github.com/link-assistant/hive-mind/pull/1024 for why this dependency was removed
-  # IMPORTANT: ESLint includes max-lines rule (1500 lines) to ensure files stay maintainable
-  # See docs/case-studies/issue-23 for why fresh merge simulation is critical
   lint:
-    name: Lint and Format Check
+    name: JS - Lint and Format Check
     runs-on: ubuntu-latest
     needs: [detect-changes]
     if: |
-      github.event_name == 'push' ||
-      needs.detect-changes.outputs.mjs-changed == 'true' ||
-      needs.detect-changes.outputs.js-changed == 'true' ||
-      needs.detect-changes.outputs.docs-changed == 'true' ||
-      needs.detect-changes.outputs.package-changed == 'true' ||
-      needs.detect-changes.outputs.workflow-changed == 'true'
+      always() && !cancelled() && (
+        github.event_name == 'push' ||
+        github.event_name == 'workflow_dispatch' ||
+        needs.detect-changes.outputs.any-js-code-changed == 'true' ||
+        needs.detect-changes.outputs.docs-changed == 'true'
+      )
     steps:
       - uses: actions/checkout@v4
         with:
-          # For PRs, fetch enough history to merge with base branch
           fetch-depth: 0
 
       - name: Simulate fresh merge with base branch (PR only)
         if: github.event_name == 'pull_request'
+        working-directory: .
         env:
           BASE_REF: ${{ github.base_ref }}
         run: |
@@ -146,15 +141,12 @@ jobs:
           echo "This prevents stale merge preview issues (see docs/case-studies/issue-23)"
           echo ""
 
-          # Configure git for merge
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git config user.name "github-actions[bot]"
 
-          # Fetch the latest base branch
           echo "Fetching latest $BASE_REF..."
           git fetch origin "$BASE_REF"
 
-          # Get current and base branch info
           CURRENT_SHA=$(git rev-parse HEAD)
           BASE_SHA=$(git rev-parse "origin/$BASE_REF")
 
@@ -162,7 +154,6 @@ jobs:
           echo "Latest base branch ($BASE_REF): $BASE_SHA"
           echo ""
 
-          # Check if base branch has new commits not in the merge preview
           BEHIND_COUNT=$(git rev-list --count HEAD..origin/$BASE_REF)
 
           if [ "$BEHIND_COUNT" -eq 0 ]; then
@@ -172,14 +163,13 @@ jobs:
             echo "Simulating fresh merge to validate actual merge result..."
             echo ""
 
-            # Attempt to merge the latest base branch
             if git merge origin/$BASE_REF --no-edit; then
               echo ""
               echo "Fresh merge simulation successful!"
               echo "Checks will now run against the up-to-date merged state."
             else
               echo ""
-              echo "::error::Merge conflict detected! PR needs to be rebased/updated before it can be merged."
+              echo "::error::Merge conflict detected. PR needs to be rebased/updated before it can be merged."
               echo "The PR branch is out of sync with $BASE_REF and cannot be automatically merged."
               exit 1
             fi
@@ -203,15 +193,19 @@ jobs:
       - name: Check code duplication
         run: npm run check:duplication
 
-  # Test matrix: 3 runtimes (Node.js, Bun, Deno) x 3 OS (Ubuntu, macOS, Windows)
-  # IMPORTANT: Tests must validate the ACTUAL merge result, not a stale merge preview.
-  # See docs/case-studies/issue-23 for why this is critical.
   test:
-    name: Test (${{ matrix.runtime }} on ${{ matrix.os }})
+    name: JS - Test (${{ matrix.runtime }} on ${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     needs: [detect-changes, changeset-check]
-    # Run if: push event, OR changeset-check succeeded, OR changeset-check was skipped (docs-only PR)
-    if: always() && (github.event_name == 'push' || needs.changeset-check.result == 'success' || needs.changeset-check.result == 'skipped')
+    if: |
+      always() && !cancelled() && (
+        github.event_name == 'push' ||
+        github.event_name == 'workflow_dispatch' ||
+        (
+          (needs.changeset-check.result == 'success' || needs.changeset-check.result == 'skipped') &&
+          needs.detect-changes.outputs.any-js-code-changed == 'true'
+        )
+      )
     strategy:
       fail-fast: false
       matrix:
@@ -220,28 +214,25 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          # For PRs, fetch enough history to merge with base branch
           fetch-depth: 0
 
       - name: Simulate fresh merge with base branch (PR only)
         if: github.event_name == 'pull_request'
+        working-directory: .
+        shell: bash
         env:
           BASE_REF: ${{ github.base_ref }}
-        shell: bash
         run: |
           echo "=== Synchronizing PR with latest $BASE_REF ==="
           echo "This prevents stale merge preview issues (see docs/case-studies/issue-23)"
           echo ""
 
-          # Configure git for merge
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git config user.name "github-actions[bot]"
 
-          # Fetch the latest base branch
           echo "Fetching latest $BASE_REF..."
           git fetch origin "$BASE_REF"
 
-          # Get current and base branch info
           CURRENT_SHA=$(git rev-parse HEAD)
           BASE_SHA=$(git rev-parse "origin/$BASE_REF")
 
@@ -249,7 +240,6 @@ jobs:
           echo "Latest base branch ($BASE_REF): $BASE_SHA"
           echo ""
 
-          # Check if base branch has new commits not in the merge preview
           BEHIND_COUNT=$(git rev-list --count HEAD..origin/$BASE_REF)
 
           if [ "$BEHIND_COUNT" -eq 0 ]; then
@@ -259,14 +249,13 @@ jobs:
             echo "Simulating fresh merge to validate actual merge result..."
             echo ""
 
-            # Attempt to merge the latest base branch
             if git merge origin/$BASE_REF --no-edit; then
               echo ""
               echo "Fresh merge simulation successful!"
               echo "Checks will now run against the up-to-date merged state."
             else
               echo ""
-              echo "::error::Merge conflict detected! PR needs to be rebased/updated before it can be merged."
+              echo "::error::Merge conflict detected. PR needs to be rebased/updated before it can be merged."
               echo "The PR branch is out of sync with $BASE_REF and cannot be automatically merged."
               exit 1
             fi
@@ -311,15 +300,16 @@ jobs:
         if: matrix.runtime == 'deno'
         run: deno test --allow-read --allow-env --allow-net
 
-  # Release - only runs on main after tests pass (for push events)
   release:
-    name: Release
+    name: JS - Release
     needs: [lint, test]
-    # Use always() to ensure this job runs even if changeset-check was skipped
-    # This is needed because lint/test jobs have a transitive dependency on changeset-check
-    if: always() && github.ref == 'refs/heads/main' && github.event_name == 'push' && needs.lint.result == 'success' && needs.test.result == 'success'
+    if: |
+      always() &&
+      github.ref == 'refs/heads/main' &&
+      github.event_name == 'push' &&
+      needs.lint.result == 'success' &&
+      needs.test.result == 'success'
     runs-on: ubuntu-latest
-    # Permissions required for npm OIDC trusted publishing
     permissions:
       contents: write
       pull-requests: write
@@ -339,49 +329,49 @@ jobs:
         run: npm install
 
       - name: Update npm for OIDC trusted publishing
-        run: node scripts/setup-npm.mjs
+        working-directory: .
+        run: node js/scripts/setup-npm.mjs
 
       - name: Check for changesets
         id: check_changesets
-        run: node scripts/check-changesets.mjs
+        working-directory: .
+        run: node js/scripts/check-changesets.mjs --js-root js
 
       - name: Merge multiple changesets
         if: steps.check_changesets.outputs.has_changesets == 'true' && steps.check_changesets.outputs.changeset_count > 1
-        run: |
-          echo "Multiple changesets detected, merging..."
-          node scripts/merge-changesets.mjs
+        working-directory: .
+        run: node js/scripts/merge-changesets.mjs --js-root js
 
       - name: Version packages and commit to main
         if: steps.check_changesets.outputs.has_changesets == 'true'
         id: version
-        run: node scripts/version-and-commit.mjs --mode changeset
+        working-directory: .
+        run: node js/scripts/version-and-commit.mjs --mode changeset --js-root js
 
       - name: Publish to npm
-        # Run if version was committed OR if a previous attempt already committed (for re-runs)
         if: steps.version.outputs.version_committed == 'true' || steps.version.outputs.already_released == 'true'
         id: publish
-        run: node scripts/publish-to-npm.mjs --should-pull
+        working-directory: .
+        run: node js/scripts/publish-to-npm.mjs --should-pull --js-root js
 
       - name: Create GitHub Release
         if: steps.publish.outputs.published == 'true'
+        working-directory: .
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: node scripts/create-github-release.mjs --release-version "${{ steps.publish.outputs.published_version }}" --repository "${{ github.repository }}"
+        run: node js/scripts/create-github-release.mjs --release-version "${{ steps.publish.outputs.published_version }}" --repository "${{ github.repository }}" --js-root js
 
       - name: Format GitHub release notes
         if: steps.publish.outputs.published == 'true'
+        working-directory: .
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: node scripts/format-github-release.mjs --release-version "${{ steps.publish.outputs.published_version }}" --repository "${{ github.repository }}" --commit-sha "${{ github.sha }}"
+        run: node js/scripts/format-github-release.mjs --release-version "${{ steps.publish.outputs.published_version }}" --repository "${{ github.repository }}" --commit-sha "${{ github.sha }}"
 
-  # Manual Instant Release - triggered via workflow_dispatch with instant mode
-  # This job is in release.yml because npm trusted publishing
-  # only allows one workflow file to be registered as a trusted publisher
   instant-release:
-    name: Instant Release
+    name: JS - Instant Release
     if: github.event_name == 'workflow_dispatch' && github.event.inputs.release_mode == 'instant'
     runs-on: ubuntu-latest
-    # Permissions required for npm OIDC trusted publishing
     permissions:
       contents: write
       pull-requests: write
@@ -401,33 +391,36 @@ jobs:
         run: npm install
 
       - name: Update npm for OIDC trusted publishing
-        run: node scripts/setup-npm.mjs
+        working-directory: .
+        run: node js/scripts/setup-npm.mjs
 
       - name: Version packages and commit to main
         id: version
-        run: node scripts/version-and-commit.mjs --mode instant --bump-type "${{ github.event.inputs.bump_type }}" --description "${{ github.event.inputs.description }}"
+        working-directory: .
+        run: node js/scripts/version-and-commit.mjs --mode instant --bump-type "${{ github.event.inputs.bump_type }}" --description "${{ github.event.inputs.description }}" --js-root js
 
       - name: Publish to npm
-        # Run if version was committed OR if a previous attempt already committed (for re-runs)
         if: steps.version.outputs.version_committed == 'true' || steps.version.outputs.already_released == 'true'
         id: publish
-        run: node scripts/publish-to-npm.mjs
+        working-directory: .
+        run: node js/scripts/publish-to-npm.mjs --js-root js
 
       - name: Create GitHub Release
         if: steps.publish.outputs.published == 'true'
+        working-directory: .
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: node scripts/create-github-release.mjs --release-version "${{ steps.publish.outputs.published_version }}" --repository "${{ github.repository }}"
+        run: node js/scripts/create-github-release.mjs --release-version "${{ steps.publish.outputs.published_version }}" --repository "${{ github.repository }}" --js-root js
 
       - name: Format GitHub release notes
         if: steps.publish.outputs.published == 'true'
+        working-directory: .
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: node scripts/format-github-release.mjs --release-version "${{ steps.publish.outputs.published_version }}" --repository "${{ github.repository }}" --commit-sha "${{ github.sha }}"
+        run: node js/scripts/format-github-release.mjs --release-version "${{ steps.publish.outputs.published_version }}" --repository "${{ github.repository }}" --commit-sha "${{ github.sha }}"
 
-  # Manual Changeset PR - creates a pull request with the changeset for review
   changeset-pr:
-    name: Create Changeset PR
+    name: JS - Create Changeset PR
     if: github.event_name == 'workflow_dispatch' && github.event.inputs.release_mode == 'changeset-pr'
     runs-on: ubuntu-latest
     permissions:
@@ -447,14 +440,11 @@ jobs:
         run: npm install
 
       - name: Create changeset file
-        run: node scripts/create-manual-changeset.mjs --bump-type "${{ github.event.inputs.bump_type }}" --description "${{ github.event.inputs.description }}"
+        working-directory: .
+        run: node js/scripts/create-manual-changeset.mjs --bump-type "${{ github.event.inputs.bump_type }}" --description "${{ github.event.inputs.description }}" --js-root js
 
       - name: Format changeset with Prettier
-        run: |
-          # Run Prettier on the changeset file to ensure it matches project style
-          npx prettier --write ".changeset/*.md" || true
-
-          echo "Formatted changeset files"
+        run: npx prettier --write ".changeset/*.md" || true
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v7

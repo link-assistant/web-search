@@ -16,8 +16,12 @@ import { execSync } from 'child_process';
 import { readFileSync, readdirSync, existsSync } from 'fs';
 import { join } from 'path';
 
+import { getChangesetDir, getJsRoot, parseJsRootConfig } from './js-paths.mjs';
+
 const PACKAGE_NAME = '@link-assistant/web-search';
-const CHANGESET_DIR = '.changeset';
+const jsRoot = getJsRoot({ jsRoot: parseJsRootConfig(), verbose: true });
+const changesetDir = getChangesetDir({ jsRoot });
+const changesetDirForGit = changesetDir.replace(/^\.\//, '');
 
 /**
  * Ensure a git commit is available locally, fetching if necessary
@@ -50,11 +54,11 @@ function parseAddedChangesets(diffOutput) {
     const [status, filePath] = line.split('\t');
     if (
       status === 'A' &&
-      filePath.startsWith(`${CHANGESET_DIR}/`) &&
+      filePath.startsWith(`${changesetDirForGit}/`) &&
       filePath.endsWith('.md') &&
       !filePath.endsWith('README.md')
     ) {
-      addedChangesets.push(filePath.replace(`${CHANGESET_DIR}/`, ''));
+      addedChangesets.push(filePath.replace(`${changesetDirForGit}/`, ''));
     }
   }
   return addedChangesets;
@@ -113,10 +117,10 @@ function getAllChangesets() {
   console.log(
     'Warning: Could not determine PR diff, checking all changesets in directory'
   );
-  if (!existsSync(CHANGESET_DIR)) {
+  if (!existsSync(changesetDir)) {
     return [];
   }
-  return readdirSync(CHANGESET_DIR).filter(
+  return readdirSync(changesetDir).filter(
     (file) => file.endsWith('.md') && file !== 'README.md'
   );
 }
@@ -236,7 +240,7 @@ try {
   }
 
   // Validate the single changeset file
-  const changesetFile = join(CHANGESET_DIR, addedChangesetFiles[0]);
+  const changesetFile = join(changesetDir, addedChangesetFiles[0]);
   console.log(`Validating changeset: ${changesetFile}`);
 
   const validation = validateChangesetFile(changesetFile);

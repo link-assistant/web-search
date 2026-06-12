@@ -7,29 +7,113 @@ on:
     paths:
       - 'rust/**'
       - '.github/workflows/rust.yml'
+      - '.github/workflows/parity.yml'
   pull_request:
     types: [opened, synchronize, reopened]
     paths:
       - 'rust/**'
       - '.github/workflows/rust.yml'
+      - '.github/workflows/parity.yml'
 
 concurrency:
   group: rust-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 env:
   CARGO_TERM_COLOR: always
   RUSTFLAGS: -Dwarnings
 
-defaults:
-  run:
-    working-directory: rust
-
 jobs:
-  # === LINT AND FORMAT CHECK ===
-  lint:
-    name: Lint and Format
+  detect-changes:
+    name: Detect Rust Changes
     runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      rust-changed: ${{ steps.changes.outputs.rust-changed }}
+      rust-scripts-changed: ${{ steps.changes.outputs.rust-scripts-changed }}
+      rust-workflow-changed: ${{ steps.changes.outputs.rust-workflow-changed }}
+      rust-code-changed: ${{ steps.changes.outputs.rust-code-changed }}
+      any-rust-code-changed: ${{ steps.changes.outputs.any-rust-code-changed }}
+      rs-changed: ${{ steps.changes.outputs.rs-changed }}
+      toml-changed: ${{ steps.changes.outputs.toml-changed }}
+      docs-changed: ${{ steps.changes.outputs.docs-changed }}
+      workflow-changed: ${{ steps.changes.outputs.workflow-changed }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install rust-script
+        run: cargo install rust-script
+
+      - name: Detect changes
+        id: changes
+        env:
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
+        run: rust-script rust/scripts/detect-code-changes.rs --rust-root rust
+
+  version-check:
+    name: Version Modification Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install rust-script
+        run: cargo install rust-script
+
+      - name: Check for manual version changes
+        env:
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
+          GITHUB_HEAD_REF: ${{ github.head_ref }}
+          GITHUB_BASE_REF: ${{ github.base_ref }}
+        run: rust-script rust/scripts/check-version-modification.rs --rust-root rust
+
+  changelog:
+    name: Changelog Fragment Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: [detect-changes]
+    if: github.event_name == 'pull_request' && needs.detect-changes.outputs.any-rust-code-changed == 'true'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install rust-script
+        run: cargo install rust-script
+
+      - name: Check for changelog fragments
+        env:
+          GITHUB_BASE_REF: ${{ github.base_ref }}
+        run: rust-script rust/scripts/check-changelog-fragment.rs --rust-root rust
+
+  lint:
+    name: Lint and Format Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: [detect-changes]
+    if: |
+      always() && !cancelled() && (
+        github.event_name == 'push' ||
+        needs.detect-changes.outputs.rs-changed == 'true' ||
+        needs.detect-changes.outputs.toml-changed == 'true' ||
+        needs.detect-changes.outputs.docs-changed == 'true' ||
+        needs.detect-changes.outputs.rust-scripts-changed == 'true' ||
+        needs.detect-changes.outputs.rust-workflow-changed == 'true'
+      )
     steps:
       - uses: actions/checkout@v4
 
@@ -37,6 +121,9 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt, clippy
+
+      - name: Install rust-script
+        run: cargo install rust-script
 
       - name: Cache cargo registry
         uses: actions/cache@v4
@@ -50,16 +137,29 @@ jobs:
             ${{ runner.os }}-cargo-
 
       - name: Check formatting
+        working-directory: rust
         run: cargo fmt --all -- --check
 
       - name: Run Clippy
+        working-directory: rust
         run: cargo clippy --all-targets --all-features
 
-  # === TEST ===
+      - name: Check Rust file size
+        run: rust-script rust/scripts/check-file-size.rs --rust-root rust
+
   test:
     name: Test (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
-    needs: [lint]
+    timeout-minutes: 10
+    needs: [detect-changes, changelog]
+    if: |
+      always() && !cancelled() && (
+        github.event_name == 'push' ||
+        (
+          needs.detect-changes.outputs.any-rust-code-changed == 'true' &&
+          (needs.changelog.result == 'success' || needs.changelog.result == 'skipped')
+        )
+      )
     strategy:
       fail-fast: false
       matrix:
@@ -82,15 +182,17 @@ jobs:
             ${{ runner.os }}-cargo-
 
       - name: Run tests
+        working-directory: rust
         run: cargo test --all-features --verbose
 
       - name: Run doc tests
+        working-directory: rust
         run: cargo test --doc --verbose
 
-  # === BUILD ===
   build:
     name: Build Package
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     needs: [lint, test]
     if: always() && !cancelled() && needs.lint.result == 'success' && needs.test.result == 'success'
     steps:
@@ -98,6 +200,9 @@ jobs:
 
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
+
+      - name: Install rust-script
+        run: cargo install rust-script
 
       - name: Cache cargo registry
         uses: actions/cache@v4
@@ -111,7 +216,12 @@ jobs:
             ${{ runner.os }}-cargo-build-
 
       - name: Build release
+        working-directory: rust
         run: cargo build --release --verbose
 
-      - name: Check package
-        run: cargo package --list
+      - name: Check package file list
+        working-directory: rust
+        run: cargo package --list --allow-dirty
+
+      - name: Check crate package size
+        run: rust-script rust/scripts/check-crate-size.rs --rust-root rust

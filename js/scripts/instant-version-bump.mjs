@@ -4,7 +4,7 @@
  * Instant version bump script for manual releases
  * Bypasses the changeset workflow and directly updates version and changelog
  *
- * Usage: node scripts/instant-version-bump.mjs --bump-type <major|minor|patch> [--description <description>] [--js-root <path>]
+ * Usage: node js/scripts/instant-version-bump.mjs --bump-type <major|minor|patch> [--description <description>] [--js-root <path>]
  *
  * Configuration:
  * - CLI: --js-root <path> to explicitly set JavaScript root
@@ -78,7 +78,7 @@ try {
 
   if (!bumpType || !['major', 'minor', 'patch'].includes(bumpType)) {
     console.error(
-      'Usage: node scripts/instant-version-bump.mjs --bump-type <major|minor|patch> [--description <description>] [--js-root <path>]'
+      'Usage: node js/scripts/instant-version-bump.mjs --bump-type <major|minor|patch> [--description <description>] [--js-root <path>]'
     );
     process.exit(1);
   }

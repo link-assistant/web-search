@@ -137,8 +137,9 @@ const results = await engine.search(query, { strategy: 'interleave' });
 ## Search Providers
 
 Providers are organized into the four categories `formal-ai` consumes. Run
-`npx web-search --list-providers` (or `cargo run -- --list-providers` in `rust/`)
-to print the live catalog; both languages report the same 22 providers.
+`npx web-search --list-providers` (or `cargo run -- --list-providers` from
+`rust/`) to print the live catalog; both languages report the same 22
+providers.
 
 | Category    | Providers                                                                                                | Access                          |
 | ----------- | -------------------------------------------------------------------------------------------------------- | ------------------------------- |
@@ -317,7 +318,13 @@ let results = engine.search_with_options(
 
 ## Development
 
+Language-specific project files live under `js/` and `rust/`; repository-level
+documentation and workflow metadata stay at the root. CI/CD helper scripts live
+with their language: `js/scripts/` and `rust/scripts/`.
+
 ```bash
+cd js
+
 # Install dependencies
 bun install
 
@@ -333,6 +340,10 @@ bun run lint
 
 # Format code
 bun run format
+
+# Verify JavaScript/Rust layout and provider parity
+cd ..
+node js/scripts/check-js-rust-parity.mjs
 ```
 
 ### Rust Development
@@ -348,6 +359,11 @@ cargo clippy
 
 # Format code
 cargo fmt
+
+# Run Rust CI/CD guard scripts from the repository root
+cd ..
+rust-script rust/scripts/check-file-size.rs --rust-root rust
+rust-script rust/scripts/check-crate-size.rs --rust-root rust
 ```
 
 ## Environment Variables

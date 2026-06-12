@@ -25,8 +25,11 @@ import {
 } from 'fs';
 import { join } from 'path';
 
+import { getChangesetDir, getJsRoot, parseJsRootConfig } from './js-paths.mjs';
+
 const PACKAGE_NAME = '@link-assistant/web-search';
-const CHANGESET_DIR = '.changeset';
+const jsRoot = getJsRoot({ jsRoot: parseJsRootConfig(), verbose: true });
+const changesetDir = getChangesetDir({ jsRoot });
 
 // Version bump type priority (higher number = higher priority)
 const BUMP_PRIORITY = {
@@ -185,7 +188,7 @@ function main() {
   console.log('Checking for multiple changesets to merge...');
 
   // Get all changeset files
-  const changesetFiles = readdirSync(CHANGESET_DIR).filter(
+  const changesetFiles = readdirSync(changesetDir).filter(
     (file) => file.endsWith('.md') && file !== 'README.md'
   );
 
@@ -203,7 +206,7 @@ function main() {
   // Parse all changesets
   const parsedChangesets = [];
   for (const file of changesetFiles) {
-    const filePath = join(CHANGESET_DIR, file);
+    const filePath = join(changesetDir, file);
     const parsed = parseChangeset(filePath);
     if (parsed) {
       parsedChangesets.push({
@@ -242,7 +245,7 @@ function main() {
 
   // Generate a unique name for the merged changeset
   const mergedFileName = `merged-${generateChangesetName()}.md`;
-  const mergedFilePath = join(CHANGESET_DIR, mergedFileName);
+  const mergedFilePath = join(changesetDir, mergedFileName);
 
   // Write the merged changeset
   writeFileSync(mergedFilePath, mergedContent);
