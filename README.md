@@ -137,8 +137,9 @@ const results = await engine.search(query, { strategy: 'interleave' });
 ## Search Providers
 
 Providers are organized into the four categories `formal-ai` consumes. Run
-`npx web-search --list-providers` (or `cargo run -- --list-providers` in `rust/`)
-to print the live catalog; both languages report the same 22 providers.
+`npx web-search --list-providers` (or `cargo run -- --list-providers` from
+`rust/`) to print the live catalog; both languages report the same 22
+providers.
 
 | Category    | Providers                                                                                                | Access                          |
 | ----------- | -------------------------------------------------------------------------------------------------------- | ------------------------------- |
@@ -317,7 +318,12 @@ let results = engine.search_with_options(
 
 ## Development
 
+Language-specific project files live under `js/` and `rust/`; repository-level
+scripts and documentation stay at the root.
+
 ```bash
+cd js
+
 # Install dependencies
 bun install
 

@@ -16,7 +16,10 @@
 
 import { readdirSync, existsSync, appendFileSync } from 'fs';
 
-const CHANGESET_DIR = '.changeset';
+import { getChangesetDir, getJsRoot, parseJsRootConfig } from './js-paths.mjs';
+
+const jsRoot = getJsRoot({ jsRoot: parseJsRootConfig(), verbose: true });
+const changesetDir = getChangesetDir({ jsRoot });
 
 /**
  * Write output to GitHub Actions output file
@@ -36,11 +39,11 @@ function setOutput(name, value) {
  * @returns {number} Number of changeset files found
  */
 function countChangesetFiles() {
-  if (!existsSync(CHANGESET_DIR)) {
+  if (!existsSync(changesetDir)) {
     return 0;
   }
 
-  const files = readdirSync(CHANGESET_DIR);
+  const files = readdirSync(changesetDir);
   // Filter to only count .md files, excluding README.md
   const changesetFiles = files.filter(
     (file) => file.endsWith('.md') && file !== 'README.md'
@@ -53,7 +56,7 @@ function countChangesetFiles() {
  * Main function to check for changesets
  */
 function checkChangesets() {
-  console.log('Checking for pending changeset files...\n');
+  console.log(`Checking for pending changeset files in ${changesetDir}...\n`);
 
   const changesetCount = countChangesetFiles();
 

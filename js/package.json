@@ -20,13 +20,14 @@
     "dev": "node --watch src/server.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "format": "prettier --write .",
-    "format:check": "prettier --check .",
-    "check:duplication": "jscpd .",
-    "check": "npm run lint && npm run format:check && npm run check:duplication",
-    "prepare": "husky || true",
+    "check:scripts": "for file in ../scripts/*.mjs; do node --check \"$file\"; done",
+    "format": "prettier --write . ../scripts ../.github/workflows ../README.md ../docs/case-studies/issue-7 --config .prettierrc --ignore-path .prettierignore",
+    "format:check": "prettier --check . ../scripts ../.github/workflows ../README.md ../docs/case-studies/issue-7 --config .prettierrc --ignore-path .prettierignore",
+    "check:duplication": "jscpd . ../scripts --config .jscpd.json",
+    "check": "npm run lint && npm run check:scripts && npm run format:check && npm run check:duplication",
+    "prepare": "cd .. && husky js/.husky || true",
     "changeset": "changeset",
-    "changeset:version": "node scripts/changeset-version.mjs",
+    "changeset:version": "node ../scripts/changeset-version.mjs",
     "changeset:publish": "changeset publish",
     "changeset:status": "changeset status --since=origin/main"
   },
@@ -45,7 +46,8 @@
   "license": "Unlicense",
   "repository": {
     "type": "git",
-    "url": "https://github.com/link-assistant/web-search"
+    "url": "https://github.com/link-assistant/web-search",
+    "directory": "js"
   },
   "engines": {
     "node": ">=20.0.0"
