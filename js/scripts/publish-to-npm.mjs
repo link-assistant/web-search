@@ -85,6 +85,72 @@ const FAILURE_PATTERNS = [
   'ENEEDAUTH',
 ];
 
+// Failures that authentication/registry configuration cause. Retrying these is
+// pointless (the same misconfiguration produces the same error every time) and
+// only delays a clear, actionable error message. See docs/case-studies/issue-11.
+const NON_RETRYABLE_PATTERNS = [
+  'npm error 404',
+  'npm error 401',
+  'npm error 403',
+  'e404',
+  'e401',
+  'e403',
+  'access token expired',
+  'eneedauth',
+  'you must be logged in',
+  'unable to authenticate',
+];
+
+/**
+ * Determine whether a detected failure is caused by authentication / registry
+ * configuration (and therefore should not be retried).
+ * @param {string} output - Combined stdout and stderr
+ * @returns {boolean}
+ */
+function isNonRetryableFailure(output) {
+  const lowerOutput = output.toLowerCase();
+  return NON_RETRYABLE_PATTERNS.some((pattern) =>
+    lowerOutput.includes(pattern)
+  );
+}
+
+/**
+ * Build an actionable, human-readable explanation for an authentication /
+ * registry-configuration publish failure (most commonly an E404 on the very
+ * first publish of a brand-new package via OIDC trusted publishing, which npm
+ * cannot bootstrap because a trusted publisher can only be configured for a
+ * package that already exists).
+ * @returns {string}
+ */
+function buildAuthFailureGuidance() {
+  return [
+    '',
+    '=== NPM PUBLISH AUTHENTICATION / REGISTRY FAILURE ===',
+    '',
+    `Failed to publish ${PACKAGE_NAME}. This is an authentication or registry`,
+    'configuration error, not a transient one, so it was not retried.',
+    '',
+    'Most common cause: the FIRST publish of a brand-new package via npm OIDC',
+    'trusted publishing returns "E404 Not Found - PUT". npm cannot bootstrap a',
+    'new package with trusted publishing alone, because a trusted publisher can',
+    'only be configured for a package that already exists on the registry.',
+    '',
+    'SOLUTION (choose one):',
+    '  1. Bootstrap the first release with a classic automation token:',
+    '     - Create a granular/automation token on npmjs.com with publish access.',
+    `     - Add it as the repository secret NPM_TOKEN.`,
+    '     - The release workflow passes it as NODE_AUTH_TOKEN automatically, so',
+    '       the next run will publish the initial version.',
+    '  2. After the package exists, configure OIDC trusted publishing on',
+    '     npmjs.com (Package settings -> Trusted publishing) so future releases',
+    '     need no token at all. The NPM_TOKEN secret then becomes optional.',
+    '',
+    'See: https://docs.npmjs.com/trusted-publishers',
+    'See: docs/case-studies/issue-11/README.md',
+    '',
+  ].join('\n');
+}
+
 /**
  * Sleep for specified milliseconds
  * @param {number} ms
@@ -209,6 +275,14 @@ async function attemptPublish(currentVersion) {
   const analysisError = analyzePublishResult(result, error);
 
   if (analysisError) {
+    const combinedOutput = [
+      analysisError.message || '',
+      result?.stdout || '',
+      result?.stderr || '',
+    ].join('\n');
+    if (isNonRetryableFailure(combinedOutput)) {
+      analysisError.nonRetryable = true;
+    }
     return { success: false, error: analysisError };
   }
 
@@ -278,6 +352,16 @@ async function main() {
           `\u2705 Published ${PACKAGE_NAME}@${currentVersion} to npm`
         );
         return;
+      }
+
+      // Authentication / registry-configuration errors will not be fixed by
+      // retrying, so fail fast with actionable guidance instead of burning
+      // through MAX_RETRIES (which previously hid the real cause behind a
+      // generic "Failed to publish after 3 attempts" message).
+      if (error?.nonRetryable) {
+        console.error(`Publish failed: ${error.message}`);
+        console.error(buildAuthFailureGuidance());
+        process.exit(1);
       }
 
       if (i < MAX_RETRIES) {
