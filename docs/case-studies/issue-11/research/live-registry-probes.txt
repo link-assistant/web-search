@@ -1,0 +1,16 @@
+# Live registry probes captured 2026-06-13T09:14:31Z
+
+## crates.io web-search/0.2.0 WITHOUT User-Agent (reproduces CI false-negative)
+HTTP 403
+
+## crates.io web-search/0.2.0 WITH User-Agent (correct response)
+HTTP 404
+
+## curl -fsS WITHOUT User-Agent (exact old CI command; -f exits non-zero on 403)
+exit=22 (treated as NOT published -> triggers republish)
+
+## npm @link-assistant/web-search registry metadata
+HTTP 404
+
+## curl version
+curl 8.20.0 (x86_64-pc-linux-gnu) libcurl/8.20.0 OpenSSL/3.6.2 zlib/1.3.1.zlib-ng brotli/1.2.0 zstd/1.5.7 libidn2/2.3.8 libssh2/1.11.1 nghttp2/1.69.0 ngtcp2/1.23.0 nghttp3/1.16.0 mit-krb5/1.22.2 OpenLDAP/2.6.13

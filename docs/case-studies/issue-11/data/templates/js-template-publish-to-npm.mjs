@@ -2,10 +2,8 @@
 
 /**
  * Publish to npm using OIDC trusted publishing
- * Usage: node js/scripts/publish-to-npm.mjs [--should-pull] [--js-root <path>]
+ * Usage: node scripts/publish-to-npm.mjs [--should-pull] [--js-root <path>]
  *   should_pull: Optional flag to pull latest changes before publishing (for release job)
- *
- * IMPORTANT: Update the PACKAGE_NAME constant below to match your package.json
  *
  * Configuration:
  * - CLI: --js-root <path> to explicitly set JavaScript root
@@ -22,16 +20,10 @@
  * - Reference: link-assistant/agent PR #114 (configurable package root)
  */
 
-import { readFileSync, appendFileSync } from 'fs';
+import { appendFileSync } from 'fs';
 
-import {
-  getJsRoot,
-  getPackageJsonPath,
-  needsCd,
-  parseJsRootConfig,
-} from './js-paths.mjs';
-
-const PACKAGE_NAME = '@link-assistant/web-search';
+import { getJsRoot, needsCd, parseJsRootConfig } from './js-paths.mjs';
+import { formatNpmPackageVersion, readPackageInfo } from './package-info.mjs';
 
 // Load use-m dynamically
 const { use } = eval(
@@ -85,72 +77,6 @@ const FAILURE_PATTERNS = [
   'ENEEDAUTH',
 ];
 
-// Failures that authentication/registry configuration cause. Retrying these is
-// pointless (the same misconfiguration produces the same error every time) and
-// only delays a clear, actionable error message. See docs/case-studies/issue-11.
-const NON_RETRYABLE_PATTERNS = [
-  'npm error 404',
-  'npm error 401',
-  'npm error 403',
-  'e404',
-  'e401',
-  'e403',
-  'access token expired',
-  'eneedauth',
-  'you must be logged in',
-  'unable to authenticate',
-];
-
-/**
- * Determine whether a detected failure is caused by authentication / registry
- * configuration (and therefore should not be retried).
- * @param {string} output - Combined stdout and stderr
- * @returns {boolean}
- */
-function isNonRetryableFailure(output) {
-  const lowerOutput = output.toLowerCase();
-  return NON_RETRYABLE_PATTERNS.some((pattern) =>
-    lowerOutput.includes(pattern)
-  );
-}
-
-/**
- * Build an actionable, human-readable explanation for an authentication /
- * registry-configuration publish failure (most commonly an E404 on the very
- * first publish of a brand-new package via OIDC trusted publishing, which npm
- * cannot bootstrap because a trusted publisher can only be configured for a
- * package that already exists).
- * @returns {string}
- */
-function buildAuthFailureGuidance() {
-  return [
-    '',
-    '=== NPM PUBLISH AUTHENTICATION / REGISTRY FAILURE ===',
-    '',
-    `Failed to publish ${PACKAGE_NAME}. This is an authentication or registry`,
-    'configuration error, not a transient one, so it was not retried.',
-    '',
-    'Most common cause: the FIRST publish of a brand-new package via npm OIDC',
-    'trusted publishing returns "E404 Not Found - PUT". npm cannot bootstrap a',
-    'new package with trusted publishing alone, because a trusted publisher can',
-    'only be configured for a package that already exists on the registry.',
-    '',
-    'SOLUTION (choose one):',
-    '  1. Bootstrap the first release with a classic automation token:',
-    '     - Create a granular/automation token on npmjs.com with publish access.',
-    `     - Add it as the repository secret NPM_TOKEN.`,
-    '     - The release workflow passes it as NODE_AUTH_TOKEN automatically, so',
-    '       the next run will publish the initial version.',
-    '  2. After the package exists, configure OIDC trusted publishing on',
-    '     npmjs.com (Package settings -> Trusted publishing) so future releases',
-    '     need no token at all. The NPM_TOKEN secret then becomes optional.',
-    '',
-    'See: https://docs.npmjs.com/trusted-publishers',
-    'See: docs/case-studies/issue-11/README.md',
-    '',
-  ].join('\n');
-}
-
 /**
  * Sleep for specified milliseconds
  * @param {number} ms
@@ -178,14 +104,18 @@ function detectPublishFailure(output) {
 /**
  * Verify that a package version is published on npm
  * Reference: link-assistant/agent PR #116
+ * @param {Function} shell
  * @param {string} packageName
  * @param {string} version
  * @returns {Promise<boolean>}
  */
-async function verifyPublished(packageName, version) {
-  const result = await $`npm view "${packageName}@${version}" version`.run({
-    capture: true,
-  });
+async function verifyPublished(shell, packageName, version) {
+  const result =
+    await shell`npm view "${formatNpmPackageVersion(packageName, version)}" version`.run(
+      {
+        capture: true,
+      }
+    );
   return result.code === 0 && result.stdout.trim().includes(version);
 }
 
@@ -203,21 +133,28 @@ function setOutput(key, value) {
 
 /**
  * Run changeset:publish command with output capture
+ * @param {Function} shell
+ * @param {string} jsRoot
+ * @param {string} originalCwd
  * @returns {Promise<{result: object|null, error: Error|null}>}
  */
-async function runChangesetPublish() {
+async function runChangesetPublish(shell, jsRoot, originalCwd) {
   try {
     // Run changeset:publish from the js directory where package.json with this script exists
     // IMPORTANT: Use .run({ capture: true }) to capture output for failure detection
     // IMPORTANT: cd is a virtual command that calls process.chdir(), so we restore after
     if (needsCd({ jsRoot })) {
-      const result = await $`cd ${jsRoot} && npm run changeset:publish`.run({
-        capture: true,
-      });
+      const result = await shell`cd ${jsRoot} && npm run changeset:publish`.run(
+        {
+          capture: true,
+        }
+      );
       process.chdir(originalCwd);
       return { result, error: null };
     }
-    const result = await $`npm run changeset:publish`.run({ capture: true });
+    const result = await shell`npm run changeset:publish`.run({
+      capture: true,
+    });
     return { result, error: null };
   } catch (error) {
     // Restore cwd on error before retry
@@ -268,28 +205,34 @@ function analyzePublishResult(publishResult, commandError) {
 /**
  * Perform a single publish attempt with verification
  * @param {string} currentVersion
+ * @param {string} packageName
+ * @param {Function} shell
+ * @param {string} jsRoot
+ * @param {string} originalCwd
  * @returns {Promise<{success: boolean, error: Error|null}>}
  */
-async function attemptPublish(currentVersion) {
-  const { result, error } = await runChangesetPublish();
+async function attemptPublish(
+  currentVersion,
+  packageName,
+  shell,
+  jsRoot,
+  originalCwd
+) {
+  const { result, error } = await runChangesetPublish(
+    shell,
+    jsRoot,
+    originalCwd
+  );
   const analysisError = analyzePublishResult(result, error);
 
   if (analysisError) {
-    const combinedOutput = [
-      analysisError.message || '',
-      result?.stdout || '',
-      result?.stderr || '',
-    ].join('\n');
-    if (isNonRetryableFailure(combinedOutput)) {
-      analysisError.nonRetryable = true;
-    }
     return { success: false, error: analysisError };
   }
 
   // Verify the package is actually on npm (ultimate verification)
   console.log('Verifying package was published to npm...');
   await sleep(2000); // Wait for npm registry to propagate
-  const isPublished = await verifyPublished(PACKAGE_NAME, currentVersion);
+  const isPublished = await verifyPublished(shell, packageName, currentVersion);
 
   if (isPublished) {
     return { success: true, error: null };
@@ -310,9 +253,10 @@ async function main() {
     }
 
     // Get current version
-    const packageJsonPath = getPackageJsonPath({ jsRoot });
-    const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf8'));
-    const currentVersion = packageJson.version;
+    const { name: packageName, version: currentVersion } = readPackageInfo({
+      jsRoot,
+    });
+    console.log(`Package to publish: ${packageName}`);
     console.log(`Current version to publish: ${currentVersion}`);
 
     // Check if this version is already published on npm
@@ -320,9 +264,11 @@ async function main() {
       `Checking if version ${currentVersion} is already published...`
     );
     const checkResult =
-      await $`npm view "${PACKAGE_NAME}@${currentVersion}" version`.run({
-        capture: true,
-      });
+      await $`npm view "${formatNpmPackageVersion(packageName, currentVersion)}" version`.run(
+        {
+          capture: true,
+        }
+      );
 
     // command-stream returns { code: 0 } on success, { code: 1 } on failure (e.g., E404)
     // Exit code 0 means version exists, non-zero means version not found
@@ -343,25 +289,19 @@ async function main() {
     // Multi-layer failure detection based on link-assistant/agent PR #116
     for (let i = 1; i <= MAX_RETRIES; i++) {
       console.log(`Publish attempt ${i} of ${MAX_RETRIES}...`);
-      const { success, error } = await attemptPublish(currentVersion);
+      const { success, error } = await attemptPublish(
+        currentVersion,
+        packageName,
+        $,
+        jsRoot,
+        originalCwd
+      );
 
       if (success) {
         setOutput('published', 'true');
         setOutput('published_version', currentVersion);
-        console.log(
-          `\u2705 Published ${PACKAGE_NAME}@${currentVersion} to npm`
-        );
+        console.log(`\u2705 Published ${packageName}@${currentVersion} to npm`);
         return;
-      }
-
-      // Authentication / registry-configuration errors will not be fixed by
-      // retrying, so fail fast with actionable guidance instead of burning
-      // through MAX_RETRIES (which previously hid the real cause behind a
-      // generic "Failed to publish after 3 attempts" message).
-      if (error?.nonRetryable) {
-        console.error(`Publish failed: ${error.message}`);
-        console.error(buildAuthFailureGuidance());
-        process.exit(1);
       }
 
       if (i < MAX_RETRIES) {

@@ -241,8 +241,13 @@ jobs:
       needs.build.result == 'success'
     permissions:
       contents: write
+    # Support both CARGO_REGISTRY_TOKEN (cargo's native env var) and CARGO_TOKEN
+    # (for backwards compatibility / organisation secrets named CARGO_TOKEN).
+    env:
+      CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN || secrets.CARGO_TOKEN }}
+      CARGO_TOKEN: ${{ secrets.CARGO_TOKEN }}
     outputs:
-      crate-published: ${{ steps.publish.outputs.crate_published }}
+      publish-result: ${{ steps.publish.outputs.publish_result }}
       crate-version: ${{ steps.version.outputs.version }}
       release-tag: ${{ steps.version.outputs.tag }}
     steps:
@@ -250,6 +255,9 @@ jobs:
 
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
+
+      - name: Install rust-script
+        run: cargo install rust-script
 
       - name: Read crate version
         id: version
@@ -262,50 +270,54 @@ jobs:
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "tag=rust-v$VERSION" >> "$GITHUB_OUTPUT"
 
+      # Pre-flight existence check. The Rust release job runs on every push to
+      # main that touches rust/**, but the crate version is only bumped in some of
+      # those pushes. Skipping an already-published version here keeps no-op
+      # re-pushes green instead of letting `cargo publish` fail with
+      # "already exists" (a false-positive red build).
+      #
+      # IMPORTANT: crates.io returns HTTP 403 for requests without a descriptive
+      # User-Agent, which previously made EVERY version look "not published" and
+      # defeated this skip entirely. Always send a User-Agent header.
       - name: Check crates.io version
         id: crate
         run: |
           VERSION="${{ steps.version.outputs.version }}"
-          if curl -fsS "https://crates.io/api/v1/crates/web-search/$VERSION" >/dev/null; then
+          HTTP_CODE=$(curl -sS -o /dev/null -w '%{http_code}' \
+            -A "web-search-release-ci (https://github.com/${{ github.repository }})" \
+            "https://crates.io/api/v1/crates/web-search/$VERSION")
+          if [ "$HTTP_CODE" = "200" ]; then
             echo "published=true" >> "$GITHUB_OUTPUT"
             echo "web-search $VERSION is already published on crates.io"
-          else
+          elif [ "$HTTP_CODE" = "404" ]; then
             echo "published=false" >> "$GITHUB_OUTPUT"
             echo "web-search $VERSION is not published on crates.io yet"
-          fi
-
-      - name: Publish crate
-        if: steps.crate.outputs.published == 'false'
-        id: publish
-        env:
-          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
-        run: |
-          if [ -z "${CARGO_REGISTRY_TOKEN:-}" ]; then
-            echo "::error::CARGO_REGISTRY_TOKEN is required to publish the Rust crate"
+          else
+            echo "::error::Unexpected HTTP $HTTP_CODE from crates.io while checking web-search $VERSION"
             exit 1
           fi
 
-          cargo publish --manifest-path rust/Cargo.toml
+      # Publishing is delegated to rust/scripts/publish-crate.rs, which:
+      #   - reads the token from CARGO_REGISTRY_TOKEN || CARGO_TOKEN
+      #   - classifies failures (already_exists / auth_failed / rate_limited / failed)
+      #   - treats a crates.io HTTP 429 rate-limit as a deferred, recoverable
+      #     outcome (exit 0) so a transient throttle never turns the build red
+      - name: Publish crate
+        if: steps.crate.outputs.published == 'false'
+        id: publish
+        run: rust-script rust/scripts/publish-crate.rs
 
-          VERSION="${{ steps.version.outputs.version }}"
-          for attempt in $(seq 1 20); do
-            if curl -fsS "https://crates.io/api/v1/crates/web-search/$VERSION" >/dev/null; then
-              echo "crate_published=true" >> "$GITHUB_OUTPUT"
-              exit 0
-            fi
-            echo "Waiting for web-search $VERSION to appear on crates.io (attempt $attempt/20)"
-            sleep 15
-          done
+      - name: Wait for crate to be available on crates.io
+        if: steps.crate.outputs.published == 'false' && steps.publish.outputs.publish_result == 'success'
+        run: rust-script rust/scripts/wait-for-crate.rs --release-version "${{ steps.version.outputs.version }}"
 
-          echo "::error::Published crate did not become visible on crates.io"
-          exit 1
-
-      - name: Mark existing crate version
-        if: steps.crate.outputs.published == 'true'
-        id: already_published
-        run: echo "crate_published=false" >> "$GITHUB_OUTPUT"
-
+      # Create the GitHub release whenever the crate is (now or already) on
+      # crates.io. The step is idempotent: an existing tag is treated as success.
       - name: Create GitHub Release
+        if: |
+          steps.crate.outputs.published == 'true' ||
+          steps.publish.outputs.publish_result == 'success' ||
+          steps.publish.outputs.publish_result == 'already_exists'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |

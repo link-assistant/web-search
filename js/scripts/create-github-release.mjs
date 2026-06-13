@@ -63,6 +63,56 @@ if (!version || !repository) {
 
 const tag = `js-v${version}`;
 
+// Keep comfortably below GitHub's observed 125000-character release body limit.
+// Reference: link-foundation/js-ai-driven-development-pipeline-template
+const GITHUB_RELEASE_BODY_MAX_BYTES = 120_000;
+const textEncoder = new globalThis.TextEncoder();
+
+function getUtf8ByteLength(value) {
+  return textEncoder.encode(value).byteLength;
+}
+
+function truncateToUtf8Bytes(value, maxBytes) {
+  const chunks = [];
+  let usedBytes = 0;
+  for (const character of value) {
+    const characterBytes = getUtf8ByteLength(character);
+    if (usedBytes + characterBytes > maxBytes) {
+      break;
+    }
+    chunks.push(character);
+    usedBytes += characterBytes;
+  }
+  return chunks.join('');
+}
+
+/**
+ * Limit release notes to GitHub's body byte budget, appending a pointer to the
+ * full tagged CHANGELOG.md when truncation is required.
+ * @param {string} releaseNotes
+ * @returns {string}
+ */
+function limitReleaseNotesBytes(releaseNotes) {
+  if (getUtf8ByteLength(releaseNotes) <= GITHUB_RELEASE_BODY_MAX_BYTES) {
+    return releaseNotes;
+  }
+  const changelogUrl = `https://github.com/${repository}/blob/${tag}/CHANGELOG.md`;
+  const suffix = `\n\n...\n\nRelease notes were shortened to fit GitHub's release body limit. See the full tagged CHANGELOG.md: ${changelogUrl}`;
+  const availableBytes = Math.max(
+    0,
+    GITHUB_RELEASE_BODY_MAX_BYTES - getUtf8ByteLength(suffix)
+  );
+  const shortenedNotes = truncateToUtf8Bytes(
+    releaseNotes,
+    availableBytes
+  ).trimEnd();
+  const limitedNotes = `${shortenedNotes}${suffix}`;
+  if (getUtf8ByteLength(limitedNotes) <= GITHUB_RELEASE_BODY_MAX_BYTES) {
+    return limitedNotes;
+  }
+  return truncateToUtf8Bytes(limitedNotes, GITHUB_RELEASE_BODY_MAX_BYTES);
+}
+
 console.log(`Creating GitHub release for ${tag}...`);
 
 try {
@@ -92,14 +142,29 @@ try {
   const payload = JSON.stringify({
     tag_name: tag,
     name: `JavaScript ${version}`,
-    body: releaseNotes,
+    body: limitReleaseNotesBytes(releaseNotes),
   });
 
-  await $`gh api repos/${repository}/releases -X POST --input -`.run({
-    stdin: payload,
-  });
+  // Idempotent create: a re-run for an already-released version (e.g. after a
+  // transient failure in a later step) must not turn the release job red.
+  // GitHub returns HTTP 422 with an "already_exists" error code in that case.
+  const result =
+    await $`gh api repos/${repository}/releases -X POST --input -`.run({
+      stdin: payload,
+      capture: true,
+      mirror: false,
+    });
 
-  console.log(`\u2705 Created GitHub release: ${tag}`);
+  const combinedOutput = `${result.stdout || ''}\n${result.stderr || ''}`;
+
+  if (result.code === 0) {
+    console.log(`\u2705 Created GitHub release: ${tag}`);
+  } else if (/already_exists/i.test(combinedOutput)) {
+    console.log(`GitHub release already exists: ${tag}. Skipping creation.`);
+  } else {
+    console.error(combinedOutput.trim());
+    throw new Error(`gh api failed with exit code ${result.code}`);
+  }
 } catch (error) {
   console.error('Error creating release:', error.message);
   process.exit(1);
