@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.8.2
+
+### Patch Changes
+
+- d9f20c9: Fix npm release CI/CD false positives: exit immediately with actionable guidance on permanent publish failures (E404/E401/E403) instead of retrying, add an optional `NPM_TOKEN` bootstrap fallback for the first publish of the package, make GitHub Release creation idempotent, and adopt the multi-strategy npm upgrade from the pipeline template.
+
 ## 0.8.1
 
 ### Patch Changes
