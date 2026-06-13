@@ -1,19 +1,24 @@
 # @link-assistant/web-search
 
-[![npm package](https://img.shields.io/npm/v/@link-assistant/web-search?label=npm)](https://www.npmjs.com/package/@link-assistant/web-search)
-[![npm downloads](https://img.shields.io/npm/dm/@link-assistant/web-search?label=npm%20downloads)](https://www.npmjs.com/package/@link-assistant/web-search)
+<!-- Rust badges -->
+
 [![crates.io crate](https://img.shields.io/crates/v/web-search?label=crates.io)](https://crates.io/crates/web-search)
 [![docs.rs](https://img.shields.io/docsrs/web-search?label=docs.rs)](https://docs.rs/web-search)
-[![JavaScript Checks and Release](https://github.com/link-assistant/web-search/actions/workflows/js.yml/badge.svg)](https://github.com/link-assistant/web-search/actions/workflows/js.yml)
 [![Rust CI](https://github.com/link-assistant/web-search/actions/workflows/rust.yml/badge.svg)](https://github.com/link-assistant/web-search/actions/workflows/rust.yml)
-[![JS release tag](https://img.shields.io/badge/GitHub%20release-js--v0.8.0-blue)](https://github.com/link-assistant/web-search/releases?q=js-v)
 [![Rust release tag](https://img.shields.io/badge/GitHub%20release-rust--v0.2.0-orange)](https://github.com/link-assistant/web-search/releases?q=rust-v)
+
+<!-- JavaScript badges -->
+
+[![npm package](https://img.shields.io/npm/v/@link-assistant/web-search?label=npm)](https://www.npmjs.com/package/@link-assistant/web-search)
+[![npm downloads](https://img.shields.io/npm/dm/@link-assistant/web-search?label=npm%20downloads)](https://www.npmjs.com/package/@link-assistant/web-search)
+[![JavaScript Checks and Release](https://github.com/link-assistant/web-search/actions/workflows/js.yml/badge.svg)](https://github.com/link-assistant/web-search/actions/workflows/js.yml)
+[![JS release tag](https://img.shields.io/badge/GitHub%20release-js--v0.8.0-blue)](https://github.com/link-assistant/web-search/releases?q=js-v)
 
 A web search microservice and library that aggregates results from 20+ search engines and knowledge/paper/code APIs, with intelligent result merging and reranking. Ships as **two first-class implementations** — JavaScript (`@link-assistant/web-search`) and Rust (the `web-search` crate) — that stay in lock-step: the same provider catalog, categories, merge strategies, and CLI/HTTP surface in both languages.
 
 ## Features
 
-- **Many providers, four categories**: 22 providers grouped into `search`, `knowledge`, `papers`, and `code` — the same categories `formal-ai` consumes (see [Search Providers](#search-providers)).
+- **Many providers, four categories**: 40 providers grouped into `search`, `knowledge`, `papers`, and `code` — a superset of FormalAI's `web_search_core` registry (see [Search Providers](#search-providers) and the [issue #5 compatibility map](docs/case-studies/issue-5/formal-ai-compatibility.json)).
 - **Descriptor-driven catalog**: Engines are declared as data (URL, request kind, parser) and run through one shared `GenericProvider`, so adding an engine in one place adds it everywhere.
 - **web-capture component**: JavaScript can lazily load [`@link-assistant/web-capture`](https://github.com/link-assistant/web-capture), and Rust delegates `wc:*` providers to the published `web-capture` crate.
 - **Result merging**: Combine results using RRF, weighted scoring, or interleaving.
@@ -145,22 +150,32 @@ const results = await engine.search(query, { strategy: 'interleave' });
 
 ## Search Providers
 
-Providers are organized into the four categories `formal-ai` consumes. Run
-`npx web-search --list-providers` (or `cargo run -- --list-providers` from
-`rust/`) to print the live catalog; both languages report the same 22
+Providers are organized into the four categories `formal-ai` consumes, and the
+catalog is a **superset of FormalAI's `web_search_core` registry** (issue #5 —
+see the [compatibility map](docs/case-studies/issue-5/formal-ai-compatibility.json)).
+Run `npx web-search --list-providers` (or `cargo run -- --list-providers` from
+`rust/`) to print the live catalog; both languages report the same 40
 providers.
 
-| Category    | Providers                                                                                                | Access                          |
-| ----------- | -------------------------------------------------------------------------------------------------------- | ------------------------------- |
-| `search`    | google, bing, duckduckgo, searx, brave, mojeek, ecosia, startpage, yahoo, lite (DuckDuckGo Lite), `wc:*` | API / hybrid / HTML / component |
-| `knowledge` | wikipedia, wikidata                                                                                      | API (CORS-readable)             |
-| `papers`    | crossref, openalex, arxiv                                                                                | API (CORS-readable)             |
-| `code`      | github, hackernews                                                                                       | API (CORS-readable)             |
+| Category    | Providers                                                                                                                                                                                          | Access                          |
+| ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------- |
+| `search`    | google, bing, duckduckgo, searx, brave, mojeek, ecosia, startpage, yahoo, yandex, lite (DuckDuckGo Lite), `wc:*`                                                                                   | API / hybrid / HTML / component |
+| `knowledge` | wikipedia, wikidata, wiktionary, wikinews, internet-archive, dbpedia, openlibrary, semantic-scholar, openalex, crossref, cambridge-dictionary, merriam-webster, dictionary-com, collins-dictionary | API / HTML                      |
+| `papers`    | arxiv, europepmc, doaj                                                                                                                                                                             | API (CORS-readable)             |
+| `code`      | github, hackernews, gitlab, codeberg, gitee, bitbucket, gitflic                                                                                                                                    | API (CORS-readable)             |
+
+Native search providers are listed above. The optional `wc:*` providers are
+the same engines delegated through the [web-capture component](#web-capture-component).
 
 - **`api`** providers call a JSON/Atom endpoint directly.
-- **`html`** providers scrape a search-results page with a per-engine regex through the shared anchor-list parser.
+- **`html`** providers scrape a search-results page with a per-engine regex through the shared anchor-list parser (the search engines, plus the dictionary `knowledge` providers, which resolve a headword to its canonical entry page).
 - **`hybrid`** providers (google, bing) use an official API when credentials are configured and fall back to scraping otherwise.
 - **`component`** providers (`wc:*`) are backed by the optional `@link-assistant/web-capture` library — see [web-capture component](#web-capture-component).
+
+The category defaults follow FormalAI's DuckDuckGo-first plan: `duckduckgo`
+(search), `wikipedia` (knowledge), `arxiv` (papers), and `github` (code). When
+no providers are requested, the live default plan is `duckduckgo`,
+`internet-archive`, `wikipedia`, `wikidata`, `wiktionary`, `wikinews`.
 
 `GITHUB_TOKEN` is optional but raises the GitHub search rate limit when set.
 

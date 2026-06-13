@@ -1,7 +1,7 @@
 {
   "name": "@link-assistant/web-search",
   "version": "0.8.2",
-  "description": "A 22-provider web search microservice and library with typed provider metadata, reranking, and optional web-capture backing",
+  "description": "A 40-provider web search microservice and library with typed provider metadata, reranking, and optional web-capture backing",
   "type": "module",
   "main": "src/index.js",
   "types": "src/index.d.ts",
