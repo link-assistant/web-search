@@ -20,7 +20,19 @@ describe('html-engines', () => {
   describe('catalog', () => {
     it('exposes every engine in HTML_ENGINES', () => {
       expect(Object.keys(HTML_ENGINES).sort()).toEqual(
-        ['brave', 'ecosia', 'lite', 'mojeek', 'startpage', 'yahoo'].sort()
+        [
+          'brave',
+          'cambridge-dictionary',
+          'collins-dictionary',
+          'dictionary-com',
+          'ecosia',
+          'lite',
+          'merriam-webster',
+          'mojeek',
+          'startpage',
+          'yahoo',
+          'yandex',
+        ].sort()
       );
     });
   });

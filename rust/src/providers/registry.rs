@@ -66,7 +66,7 @@ const CLASS_ENGINES: [ClassEngine; 3] = [
         label: "Google",
         category: "search",
         cors_readable: false,
-        default_for_category: true,
+        default_for_category: false,
         access: "hybrid",
     },
     ClassEngine {
@@ -82,7 +82,7 @@ const CLASS_ENGINES: [ClassEngine; 3] = [
         label: "DuckDuckGo",
         category: "search",
         cors_readable: false,
-        default_for_category: false,
+        default_for_category: true,
         access: "html",
     },
 ];
@@ -140,11 +140,22 @@ pub fn get_provider_ids(category: Option<&str>) -> Vec<String> {
 }
 
 /// Get the default provider ids used when the caller does not specify providers.
+///
+/// Mirrors FormalAI's live default plan (`WEB_SEARCH_PROVIDERS`): a
+/// DuckDuckGo-first, CORS-readable knowledge sweep across the Wikimedia family
+/// and the Internet Archive (issue #5 parity requirement).
 pub fn get_default_provider_ids() -> Vec<String> {
-    ["duckduckgo", "google", "bing", "wikipedia"]
-        .iter()
-        .map(|s| s.to_string())
-        .collect()
+    [
+        "duckduckgo",
+        "internet-archive",
+        "wikipedia",
+        "wikidata",
+        "wiktionary",
+        "wikinews",
+    ]
+    .iter()
+    .map(|s| s.to_string())
+    .collect()
 }
 
 /// Whether `category` is a known category.

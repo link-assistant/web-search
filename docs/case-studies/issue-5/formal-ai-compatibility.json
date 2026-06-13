@@ -1,0 +1,269 @@
+{
+  "$schema": "./formal-ai-compatibility.schema.json",
+  "description": "Provider compatibility map between FormalAI src/web_search_core.rs (WEB_SEARCH_PROVIDER_REGISTRY) and @link-assistant/web-search. Generated for issue #5. web-search must be a superset of FormalAI provider IDs; metadata (category, defaultForCategory, corsReadable) must match except for the documented exceptions below.",
+  "formalAiSource": "https://github.com/link-assistant/formal-ai/blob/main/src/web_search_core.rs",
+  "formalAiProviders": [
+    {
+      "id": "duckduckgo",
+      "label": "DuckDuckGo Instant Answer",
+      "category": "search",
+      "corsReadable": true,
+      "defaultForCategory": true
+    },
+    {
+      "id": "google",
+      "label": "Google Search",
+      "category": "search",
+      "corsReadable": false,
+      "defaultForCategory": false
+    },
+    {
+      "id": "bing",
+      "label": "Bing Search",
+      "category": "search",
+      "corsReadable": false,
+      "defaultForCategory": false
+    },
+    {
+      "id": "brave",
+      "label": "Brave Search",
+      "category": "search",
+      "corsReadable": false,
+      "defaultForCategory": false
+    },
+    {
+      "id": "yahoo",
+      "label": "Yahoo Search",
+      "category": "search",
+      "corsReadable": false,
+      "defaultForCategory": false
+    },
+    {
+      "id": "yandex",
+      "label": "Yandex Search",
+      "category": "search",
+      "corsReadable": false,
+      "defaultForCategory": false
+    },
+    {
+      "id": "ecosia",
+      "label": "Ecosia",
+      "category": "search",
+      "corsReadable": false,
+      "defaultForCategory": false
+    },
+    {
+      "id": "mojeek",
+      "label": "Mojeek",
+      "category": "search",
+      "corsReadable": false,
+      "defaultForCategory": false
+    },
+    {
+      "id": "startpage",
+      "label": "Startpage",
+      "category": "search",
+      "corsReadable": false,
+      "defaultForCategory": false
+    },
+    {
+      "id": "wikipedia",
+      "label": "Wikipedia REST",
+      "category": "knowledge",
+      "corsReadable": true,
+      "defaultForCategory": true
+    },
+    {
+      "id": "wikidata",
+      "label": "Wikidata entities",
+      "category": "knowledge",
+      "corsReadable": true,
+      "defaultForCategory": false
+    },
+    {
+      "id": "wiktionary",
+      "label": "Wiktionary opensearch",
+      "category": "knowledge",
+      "corsReadable": true,
+      "defaultForCategory": false
+    },
+    {
+      "id": "wikinews",
+      "label": "Wikinews opensearch",
+      "category": "knowledge",
+      "corsReadable": true,
+      "defaultForCategory": false
+    },
+    {
+      "id": "cambridge-dictionary",
+      "label": "Cambridge Dictionary",
+      "category": "knowledge",
+      "corsReadable": false,
+      "defaultForCategory": false
+    },
+    {
+      "id": "merriam-webster",
+      "label": "Merriam-Webster Dictionary",
+      "category": "knowledge",
+      "corsReadable": false,
+      "defaultForCategory": false
+    },
+    {
+      "id": "dictionary-com",
+      "label": "Dictionary.com",
+      "category": "knowledge",
+      "corsReadable": false,
+      "defaultForCategory": false
+    },
+    {
+      "id": "collins-dictionary",
+      "label": "Collins English Dictionary",
+      "category": "knowledge",
+      "corsReadable": false,
+      "defaultForCategory": false
+    },
+    {
+      "id": "internet-archive",
+      "label": "Internet Archive (archive.org)",
+      "category": "knowledge",
+      "corsReadable": true,
+      "defaultForCategory": false
+    },
+    {
+      "id": "dbpedia",
+      "label": "DBpedia Lookup",
+      "category": "knowledge",
+      "corsReadable": false,
+      "defaultForCategory": false
+    },
+    {
+      "id": "openlibrary",
+      "label": "Open Library",
+      "category": "knowledge",
+      "corsReadable": true,
+      "defaultForCategory": false
+    },
+    {
+      "id": "openalex",
+      "label": "OpenAlex works",
+      "category": "knowledge",
+      "corsReadable": true,
+      "defaultForCategory": false
+    },
+    {
+      "id": "crossref",
+      "label": "Crossref works",
+      "category": "knowledge",
+      "corsReadable": true,
+      "defaultForCategory": false
+    },
+    {
+      "id": "semantic-scholar",
+      "label": "Semantic Scholar",
+      "category": "knowledge",
+      "corsReadable": true,
+      "defaultForCategory": false
+    },
+    {
+      "id": "arxiv",
+      "label": "arXiv atom export",
+      "category": "papers",
+      "corsReadable": true,
+      "defaultForCategory": true
+    },
+    {
+      "id": "europepmc",
+      "label": "Europe PMC",
+      "category": "papers",
+      "corsReadable": true,
+      "defaultForCategory": false
+    },
+    {
+      "id": "doaj",
+      "label": "DOAJ articles",
+      "category": "papers",
+      "corsReadable": true,
+      "defaultForCategory": false
+    },
+    {
+      "id": "github",
+      "label": "GitHub repositories",
+      "category": "code",
+      "corsReadable": true,
+      "defaultForCategory": true
+    },
+    {
+      "id": "gitlab",
+      "label": "GitLab projects",
+      "category": "code",
+      "corsReadable": true,
+      "defaultForCategory": false
+    },
+    {
+      "id": "codeberg",
+      "label": "Codeberg",
+      "category": "code",
+      "corsReadable": true,
+      "defaultForCategory": false
+    },
+    {
+      "id": "gitee",
+      "label": "Gitee",
+      "category": "code",
+      "corsReadable": true,
+      "defaultForCategory": false
+    },
+    {
+      "id": "bitbucket",
+      "label": "Bitbucket Cloud",
+      "category": "code",
+      "corsReadable": true,
+      "defaultForCategory": false
+    },
+    {
+      "id": "gitflic",
+      "label": "GitFlic",
+      "category": "code",
+      "corsReadable": false,
+      "defaultForCategory": false
+    }
+  ],
+  "formalAiDefaultPlan": [
+    "duckduckgo",
+    "internet-archive",
+    "wikipedia",
+    "wikidata",
+    "wiktionary",
+    "wikinews"
+  ],
+  "corsReadableExceptions": [
+    {
+      "id": "duckduckgo",
+      "formalAi": true,
+      "webSearch": false,
+      "reason": "FormalAI models the DuckDuckGo Instant Answer JSON API (CORS-readable). web-search ships an HTML-SERP scraper (html.duckduckgo.com / lite.duckduckgo.com), which is not browser-CORS-readable. The id, category, label intent, and default-for-search flag all match; only the fetch mechanism differs."
+    }
+  ],
+  "webSearchOnlyProviders": [
+    {
+      "id": "searx",
+      "category": "search",
+      "note": "Extra meta-search engine (SearXNG public instance)."
+    },
+    {
+      "id": "lite",
+      "category": "search",
+      "note": "Extra DuckDuckGo Lite HTML endpoint."
+    },
+    {
+      "id": "hackernews",
+      "category": "code",
+      "note": "Extra Hacker News (Algolia) code/discussion source."
+    },
+    {
+      "id": "wc:*",
+      "category": "search",
+      "note": "Optional web-capture-delegated providers (wc:wikipedia, wc:duckduckgo, wc:google, wc:bing, wc:brave). access=component."
+    }
+  ]
+}

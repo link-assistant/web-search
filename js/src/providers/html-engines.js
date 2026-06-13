@@ -233,6 +233,125 @@ export const yahoo = {
   },
 };
 
+/** Yandex Search — HTML SERP (organic result links). */
+export const yandex = {
+  id: 'yandex',
+  label: 'Yandex',
+  category: 'search',
+  kind: 'html',
+  corsReadable: false,
+  buildUrl(query, options = {}) {
+    const params = new URLSearchParams({ text: query });
+    if (options.language) {
+      params.set('lang', options.language);
+    }
+    return `https://yandex.com/search/?${params}`;
+  },
+  parse(html, limit) {
+    return parseAnchorList(html, {
+      source: 'yandex',
+      limit,
+      urlGroup: 1,
+      titleGroup: 2,
+      itemRegex:
+        /<a[^>]+class="[^"]*OrganicTitle-Link[^"]*"[^>]*href="(https?:\/\/[^"]+)"[^>]*>([\s\S]*?)<\/a>/g,
+      skip: (url) => url.includes('yandex.'),
+    });
+  },
+};
+
+/**
+ * Extract a single canonical definition result from a dictionary SERP.
+ *
+ * Dictionary providers resolve a headword to one authoritative entry page, so
+ * the parser only needs the canonical URL (from `<link rel="canonical">` or the
+ * `og:url` meta tag), a title, and the page description as the gloss snippet.
+ *
+ * @param {string} html - Definition page HTML
+ * @param {string} source - Provider id
+ * @param {number} limit - Max results (0 yields none)
+ * @returns {SearchResult[]}
+ */
+export function parseDefinition(html, source, limit) {
+  if (limit < 1 || !html) {
+    return [];
+  }
+  const url =
+    html.match(/<link[^>]+rel="canonical"[^>]+href="([^"]+)"/i)?.[1] ||
+    html.match(/<meta[^>]+property="og:url"[^>]+content="([^"]+)"/i)?.[1] ||
+    '';
+  if (!url) {
+    return [];
+  }
+  const title =
+    cleanText(
+      html.match(/<meta[^>]+property="og:title"[^>]+content="([^"]+)"/i)?.[1] ||
+        html.match(/<title>([\s\S]*?)<\/title>/i)?.[1]
+    ) || source;
+  const snippet = cleanText(
+    html.match(
+      /<meta[^>]+(?:name="description"|property="og:description")[^>]+content="([^"]+)"/i
+    )?.[1]
+  );
+  return [{ title, url, snippet, source, rank: 1 }];
+}
+
+/**
+ * Build a dictionary engine descriptor.
+ *
+ * Each dictionary resolves a headword by URL template and shares the canonical
+ * definition parser, differing only by base URL (issue #5 / formal-ai parity).
+ *
+ * @param {Object} spec - Engine spec
+ * @param {string} spec.id - Provider id
+ * @param {string} spec.label - Human-readable label
+ * @param {string} spec.base - URL prefix the headword is appended to
+ * @returns {Object} Engine descriptor
+ */
+export function dictionaryEngine({ id, label, base }) {
+  return {
+    id,
+    label,
+    category: 'knowledge',
+    kind: 'html',
+    corsReadable: false,
+    buildUrl(query) {
+      return `${base}${encodeURIComponent(query)}`;
+    },
+    parse(html, limit) {
+      return parseDefinition(html, id, limit);
+    },
+  };
+}
+
+/** Cambridge Dictionary — canonical definition page. */
+export const cambridgeDictionary = dictionaryEngine({
+  id: 'cambridge-dictionary',
+  label: 'Cambridge Dictionary',
+  base: 'https://dictionary.cambridge.org/dictionary/english/',
+});
+
+/** Merriam-Webster — canonical definition page. */
+export const merriamWebster = dictionaryEngine({
+  id: 'merriam-webster',
+  label: 'Merriam-Webster',
+  base: 'https://www.merriam-webster.com/dictionary/',
+});
+
+/** Dictionary.com — canonical definition page. */
+export const dictionaryCom = dictionaryEngine({
+  id: 'dictionary-com',
+  label: 'Dictionary.com',
+  base: 'https://www.dictionary.com/browse/',
+});
+
+/** Collins Dictionary — canonical definition page. */
+export const collinsDictionary = dictionaryEngine({
+  id: 'collins-dictionary',
+  label: 'Collins Dictionary',
+  base: 'https://www.collinsdictionary.com/dictionary/english/',
+});
+
 /** DuckDuckGo Lite — lightweight table-based SERP. */
 export const lite = {
   id: 'lite',
@@ -271,5 +390,10 @@ export const HTML_ENGINES = {
   ecosia,
   startpage,
   yahoo,
+  yandex,
+  'cambridge-dictionary': cambridgeDictionary,
+  'merriam-webster': merriamWebster,
+  'dictionary-com': dictionaryCom,
+  'collins-dictionary': collinsDictionary,
   lite,
 };
