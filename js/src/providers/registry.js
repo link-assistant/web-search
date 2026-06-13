@@ -42,7 +42,7 @@ const CLASS_ENGINES = {
     label: 'Google',
     category: 'search',
     corsReadable: false,
-    defaultForCategory: true,
+    defaultForCategory: false,
     access: 'hybrid',
     create: (config) => new GoogleProvider(config.google),
   },
@@ -60,7 +60,7 @@ const CLASS_ENGINES = {
     label: 'DuckDuckGo',
     category: 'search',
     corsReadable: false,
-    defaultForCategory: false,
+    defaultForCategory: true,
     access: 'html',
     create: () => new DuckDuckGoProvider(),
   },
@@ -143,13 +143,23 @@ export function getProviderIds(category) {
 }
 
 /**
- * Get the default provider ids (one or more sensible defaults per the
- * `search` category) used when the caller does not specify providers.
+ * Get the default provider ids used when the caller does not specify providers.
+ *
+ * Mirrors FormalAI's live default plan (`WEB_SEARCH_PROVIDERS`): a
+ * DuckDuckGo-first, CORS-readable knowledge sweep across the Wikimedia family
+ * and the Internet Archive (issue #5 parity requirement).
  *
  * @returns {string[]}
  */
 export function getDefaultProviderIds() {
-  return ['duckduckgo', 'google', 'bing', 'wikipedia'];
+  return [
+    'duckduckgo',
+    'internet-archive',
+    'wikipedia',
+    'wikidata',
+    'wiktionary',
+    'wikinews',
+  ];
 }
 
 /**
