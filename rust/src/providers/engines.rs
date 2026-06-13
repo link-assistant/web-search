@@ -187,45 +187,129 @@ fn str_field<'a>(item: &'a Value, key: &str) -> &'a str {
     item.get(key).and_then(Value::as_str).unwrap_or("")
 }
 
+/// Project a JSON array into normalized results.
+///
+/// Centralizes the slice/rank/filter loop (mirrors the JavaScript
+/// `listResults` helper): each engine only declares how to turn one raw item
+/// into `(title, url, snippet)`, and items whose `url` is empty are dropped.
+fn list_results<F>(
+    source: &str,
+    items: Option<&Value>,
+    limit: usize,
+    project: F,
+) -> Vec<SearchResult>
+where
+    F: Fn(&Value) -> (String, String, String),
+{
+    let arr = match items.and_then(Value::as_array) {
+        Some(arr) => arr,
+        None => return Vec::new(),
+    };
+    let mut out = Vec::new();
+    for item in arr {
+        if out.len() >= limit {
+            break;
+        }
+        let (title, url, snippet) = project(item);
+        if url.is_empty() {
+            continue;
+        }
+        let rank = out.len() + 1;
+        out.push(make_result(source, &title, &url, &snippet, rank));
+    }
+    out
+}
+
+/// Normalize a code-host repository list into results (mirrors the JavaScript
+/// `repoResults` helper).
+fn repo_results(
+    source: &str,
+    data: &Value,
+    limit: usize,
+    container: Option<&str>,
+    title_field: &str,
+    url_field: &str,
+) -> Vec<SearchResult> {
+    let items = match container {
+        Some(key) => data.get(key),
+        None => Some(data),
+    };
+    list_results(source, items, limit, |it| {
+        let title = if str_field(it, title_field).is_empty() {
+            str_field(it, "name")
+        } else {
+            str_field(it, title_field)
+        };
+        (
+            title.to_string(),
+            str_field(it, url_field).to_string(),
+            str_field(it, "description").to_string(),
+        )
+    })
+}
+
 // ---------------------------------------------------------------------------
 // API engines
 // ---------------------------------------------------------------------------
 
-fn wikipedia_url(query: &str, options: &SearchOptions) -> String {
+/// Build a MediaWiki REST `search/page` URL for a given host domain.
+///
+/// Wikipedia, Wiktionary, and Wikinews share the same CORS-readable REST
+/// endpoint and article-URL shape, differing only by host domain (issue #5 /
+/// formal-ai parity). Rust's fn-pointer descriptors cannot capture the domain
+/// in a closure, so each engine has a thin wrapper around these helpers.
+fn mediawiki_url(domain: &str, query: &str, options: &SearchOptions) -> String {
     let limit = limit_of(options, 100);
     let lang = language_of(options);
     format!(
-        "https://{lang}.wikipedia.org/w/rest.php/v1/search/page?q={}&limit={limit}",
+        "https://{lang}.{domain}/w/rest.php/v1/search/page?q={}&limit={limit}",
         urlencoding::encode(query)
     )
 }
 
-fn wikipedia_parse(body: &str, limit: usize, options: &SearchOptions) -> Vec<SearchResult> {
+fn mediawiki_parse(
+    source: &str,
+    domain: &str,
+    body: &str,
+    limit: usize,
+    options: &SearchOptions,
+) -> Vec<SearchResult> {
     let lang = language_of(options);
     let data = json(body);
-    data.get("pages")
-        .and_then(Value::as_array)
-        .map(|pages| {
-            pages
-                .iter()
-                .take(limit)
-                .enumerate()
-                .map(|(i, p)| {
-                    let key = str_field(p, "key");
-                    let url = format!(
-                        "https://{lang}.wikipedia.org/wiki/{}",
-                        urlencoding::encode(key)
-                    );
-                    let snippet = if str_field(p, "excerpt").is_empty() {
-                        str_field(p, "description")
-                    } else {
-                        str_field(p, "excerpt")
-                    };
-                    make_result("wikipedia", str_field(p, "title"), &url, snippet, i + 1)
-                })
-                .collect()
-        })
-        .unwrap_or_default()
+    list_results(source, data.get("pages"), limit, |p| {
+        let key = str_field(p, "key");
+        let url = format!("https://{lang}.{domain}/wiki/{}", urlencoding::encode(key));
+        let snippet = if str_field(p, "excerpt").is_empty() {
+            str_field(p, "description")
+        } else {
+            str_field(p, "excerpt")
+        };
+        (str_field(p, "title").to_string(), url, snippet.to_string())
+    })
+}
+
+fn wikipedia_url(query: &str, options: &SearchOptions) -> String {
+    mediawiki_url("wikipedia.org", query, options)
+}
+
+fn wikipedia_parse(body: &str, limit: usize, options: &SearchOptions) -> Vec<SearchResult> {
+    mediawiki_parse("wikipedia", "wikipedia.org", body, limit, options)
+}
+
+fn wiktionary_url(query: &str, options: &SearchOptions) -> String {
+    mediawiki_url("wiktionary.org", query, options)
+}
+
+fn wiktionary_parse(body: &str, limit: usize, options: &SearchOptions) -> Vec<SearchResult> {
+    mediawiki_parse("wiktionary", "wiktionary.org", body, limit, options)
+}
+
+fn wikinews_url(query: &str, options: &SearchOptions) -> String {
+    mediawiki_url("wikinews.org", query, options)
+}
+
+fn wikinews_parse(body: &str, limit: usize, options: &SearchOptions) -> Vec<SearchResult> {
+    mediawiki_parse("wikinews", "wikinews.org", body, limit, options)
 }
 
 fn wikidata_url(query: &str, options: &SearchOptions) -> String {
@@ -502,6 +586,316 @@ fn arxiv_parse(body: &str, limit: usize, _options: &SearchOptions) -> Vec<Search
     parse_arxiv_atom(body, limit)
 }
 
+fn internet_archive_url(query: &str, options: &SearchOptions) -> String {
+    let rows = limit_of(options, 50);
+    format!(
+        "https://archive.org/advancedsearch.php?q={}&fl[]=identifier&fl[]=title&fl[]=description&rows={rows}&page=1&output=json",
+        urlencoding::encode(query)
+    )
+}
+
+fn internet_archive_parse(body: &str, limit: usize, _options: &SearchOptions) -> Vec<SearchResult> {
+    let data = json(body);
+    let docs = data.get("response").and_then(|r| r.get("docs"));
+    list_results("internet-archive", docs, limit, |d| {
+        let identifier = str_field(d, "identifier");
+        let url = if identifier.is_empty() {
+            String::new()
+        } else {
+            format!("https://archive.org/details/{identifier}")
+        };
+        (
+            first_str(d.get("title")),
+            url,
+            first_str(d.get("description")),
+        )
+    })
+}
+
+fn dbpedia_url(query: &str, options: &SearchOptions) -> String {
+    let max = limit_of(options, 50);
+    format!(
+        "https://lookup.dbpedia.org/api/search?format=json&maxResults={max}&query={}",
+        urlencoding::encode(query)
+    )
+}
+
+fn dbpedia_parse(body: &str, limit: usize, _options: &SearchOptions) -> Vec<SearchResult> {
+    let data = json(body);
+    list_results("dbpedia", data.get("docs"), limit, |d| {
+        (
+            first_str(d.get("label")),
+            first_str(d.get("resource")),
+            first_str(d.get("comment")),
+        )
+    })
+}
+
+fn openlibrary_url(query: &str, options: &SearchOptions) -> String {
+    let limit = limit_of(options, 50);
+    format!(
+        "https://openlibrary.org/search.json?q={}&limit={limit}",
+        urlencoding::encode(query)
+    )
+}
+
+fn openlibrary_parse(body: &str, limit: usize, _options: &SearchOptions) -> Vec<SearchResult> {
+    let data = json(body);
+    list_results("openlibrary", data.get("docs"), limit, |d| {
+        let key = str_field(d, "key");
+        let url = if key.is_empty() {
+            String::new()
+        } else {
+            format!("https://openlibrary.org{key}")
+        };
+        let authors = d
+            .get("author_name")
+            .and_then(Value::as_array)
+            .map(|arr| {
+                arr.iter()
+                    .filter_map(Value::as_str)
+                    .collect::<Vec<_>>()
+                    .join(", ")
+            })
+            .unwrap_or_default();
+        (str_field(d, "title").to_string(), url, authors)
+    })
+}
+
+fn semantic_scholar_url(query: &str, options: &SearchOptions) -> String {
+    let limit = limit_of(options, 50);
+    format!(
+        "https://api.semanticscholar.org/graph/v1/paper/search?query={}&limit={limit}&fields=title,abstract,url,year",
+        urlencoding::encode(query)
+    )
+}
+
+fn semantic_scholar_parse(body: &str, limit: usize, _options: &SearchOptions) -> Vec<SearchResult> {
+    let data = json(body);
+    list_results("semantic-scholar", data.get("data"), limit, |p| {
+        let url = if !str_field(p, "url").is_empty() {
+            str_field(p, "url").to_string()
+        } else {
+            let paper_id = str_field(p, "paperId");
+            if paper_id.is_empty() {
+                String::new()
+            } else {
+                format!("https://www.semanticscholar.org/paper/{paper_id}")
+            }
+        };
+        (
+            str_field(p, "title").to_string(),
+            url,
+            str_field(p, "abstract").to_string(),
+        )
+    })
+}
+
+fn europepmc_url(query: &str, options: &SearchOptions) -> String {
+    let page_size = limit_of(options, 50);
+    format!(
+        "https://www.ebi.ac.uk/europepmc/webservices/rest/search?query={}&format=json&pageSize={page_size}",
+        urlencoding::encode(query)
+    )
+}
+
+fn europepmc_parse(body: &str, limit: usize, _options: &SearchOptions) -> Vec<SearchResult> {
+    let data = json(body);
+    let results = data.get("resultList").and_then(|r| r.get("result"));
+    list_results("europepmc", results, limit, |r| {
+        let doi = str_field(r, "doi");
+        let url = if !doi.is_empty() {
+            format!("https://doi.org/{doi}")
+        } else {
+            let id = str_field(r, "id");
+            let source = str_field(r, "source");
+            if id.is_empty() || source.is_empty() {
+                String::new()
+            } else {
+                format!("https://europepmc.org/article/{source}/{id}")
+            }
+        };
+        (
+            str_field(r, "title").to_string(),
+            url,
+            str_field(r, "abstractText").to_string(),
+        )
+    })
+}
+
+fn doaj_url(query: &str, options: &SearchOptions) -> String {
+    let page_size = limit_of(options, 50);
+    format!(
+        "https://doaj.org/api/search/articles/{}?pageSize={page_size}",
+        urlencoding::encode(query)
+    )
+}
+
+fn doaj_parse(body: &str, limit: usize, _options: &SearchOptions) -> Vec<SearchResult> {
+    let data = json(body);
+    list_results("doaj", data.get("results"), limit, |r| {
+        let bibjson = r.get("bibjson");
+        let title = bibjson
+            .and_then(|b| b.get("title"))
+            .and_then(Value::as_str)
+            .unwrap_or("")
+            .to_string();
+        let abstract_text = bibjson
+            .and_then(|b| b.get("abstract"))
+            .and_then(Value::as_str)
+            .unwrap_or("")
+            .to_string();
+        let links = bibjson
+            .and_then(|b| b.get("link"))
+            .and_then(Value::as_array);
+        let url = links
+            .map(|arr| {
+                let chosen = arr
+                    .iter()
+                    .find(|l| str_field(l, "type") == "fulltext")
+                    .or_else(|| arr.first());
+                chosen
+                    .map(|l| str_field(l, "url").to_string())
+                    .unwrap_or_default()
+            })
+            .filter(|u| !u.is_empty())
+            .unwrap_or_else(|| {
+                let id = str_field(r, "id");
+                if id.is_empty() {
+                    String::new()
+                } else {
+                    format!("https://doaj.org/article/{id}")
+                }
+            });
+        (title, url, abstract_text)
+    })
+}
+
+fn gitlab_url(query: &str, options: &SearchOptions) -> String {
+    let per_page = limit_of(options, 50);
+    format!(
+        "https://gitlab.com/api/v4/projects?search={}&per_page={per_page}&order_by=star_count&sort=desc",
+        urlencoding::encode(query)
+    )
+}
+
+fn gitlab_parse(body: &str, limit: usize, _options: &SearchOptions) -> Vec<SearchResult> {
+    repo_results(
+        "gitlab",
+        &json(body),
+        limit,
+        None,
+        "path_with_namespace",
+        "web_url",
+    )
+}
+
+fn codeberg_url(query: &str, options: &SearchOptions) -> String {
+    let limit = limit_of(options, 50);
+    format!(
+        "https://codeberg.org/api/v1/repos/search?q={}&limit={limit}",
+        urlencoding::encode(query)
+    )
+}
+
+fn codeberg_parse(body: &str, limit: usize, _options: &SearchOptions) -> Vec<SearchResult> {
+    repo_results(
+        "codeberg",
+        &json(body),
+        limit,
+        Some("data"),
+        "full_name",
+        "html_url",
+    )
+}
+
+fn gitee_url(query: &str, options: &SearchOptions) -> String {
+    let per_page = limit_of(options, 50);
+    format!(
+        "https://gitee.com/api/v5/search/repositories?q={}&per_page={per_page}",
+        urlencoding::encode(query)
+    )
+}
+
+fn gitee_parse(body: &str, limit: usize, _options: &SearchOptions) -> Vec<SearchResult> {
+    repo_results("gitee", &json(body), limit, None, "full_name", "html_url")
+}
+
+fn bitbucket_url(query: &str, options: &SearchOptions) -> String {
+    let pagelen = limit_of(options, 50);
+    let query_expr = format!("name~\"{query}\"");
+    let q = urlencoding::encode(&query_expr);
+    format!(
+        "https://api.bitbucket.org/2.0/repositories?q={q}&pagelen={pagelen}&fields=values.full_name,values.links.html.href,values.description"
+    )
+}
+
+fn bitbucket_parse(body: &str, limit: usize, _options: &SearchOptions) -> Vec<SearchResult> {
+    let data = json(body);
+    list_results("bitbucket", data.get("values"), limit, |v| {
+        let url = v
+            .get("links")
+            .and_then(|l| l.get("html"))
+            .and_then(|h| h.get("href"))
+            .and_then(Value::as_str)
+            .unwrap_or("")
+            .to_string();
+        (
+            str_field(v, "full_name").to_string(),
+            url,
+            str_field(v, "description").to_string(),
+        )
+    })
+}
+
+fn gitflic_url(query: &str, options: &SearchOptions) -> String {
+    let size = limit_of(options, 50);
+    format!(
+        "https://api.gitflic.ru/project?query={}&size={size}",
+        urlencoding::encode(query)
+    )
+}
+
+fn gitflic_parse(body: &str, limit: usize, _options: &SearchOptions) -> Vec<SearchResult> {
+    let data = json(body);
+    let items = data
+        .get("_embedded")
+        .and_then(|e| e.get("projectList"))
+        .or_else(|| data.get("items"))
+        .or_else(|| data.get("results"))
+        .or(Some(&data));
+    list_results("gitflic", items, limit, |it| {
+        let title = [
+            str_field(it, "title"),
+            str_field(it, "name"),
+            str_field(it, "alias"),
+        ]
+        .into_iter()
+        .find(|s| !s.is_empty())
+        .unwrap_or("")
+        .to_string();
+        let url = if !str_field(it, "url").is_empty() {
+            str_field(it, "url").to_string()
+        } else if let Some(href) = it
+            .get("_links")
+            .and_then(|l| l.get("self"))
+            .and_then(|s| s.get("href"))
+            .and_then(Value::as_str)
+        {
+            href.to_string()
+        } else {
+            let owner = str_field(it, "owner");
+            let alias = str_field(it, "alias");
+            if owner.is_empty() || alias.is_empty() {
+                String::new()
+            } else {
+                format!("https://gitflic.ru/project/{owner}/{alias}")
+            }
+        };
+        (title, url, str_field(it, "description").to_string())
+    })
+}
+
 // ---------------------------------------------------------------------------
 // HTML engines
 // ---------------------------------------------------------------------------
@@ -717,6 +1111,132 @@ fn lite_parse(html: &str, limit: usize, _options: &SearchOptions) -> Vec<SearchR
     )
 }
 
+fn yandex_url(query: &str, options: &SearchOptions) -> String {
+    let mut url = format!(
+        "https://yandex.com/search/?text={}",
+        urlencoding::encode(query)
+    );
+    if let Some(ref lang) = options.language {
+        url.push_str(&format!("&lang={lang}"));
+    }
+    url
+}
+
+static YANDEX_RE: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(
+        r#"(?s)<a[^>]+class="[^"]*OrganicTitle-Link[^"]*"[^>]*href="(https?://[^"]+)"[^>]*>(.*?)</a>"#,
+    )
+    .unwrap()
+});
+
+fn yandex_parse(html: &str, limit: usize, _options: &SearchOptions) -> Vec<SearchResult> {
+    parse_anchor_list(
+        html,
+        &AnchorConfig {
+            source: "yandex",
+            limit,
+            item_regex: &YANDEX_RE,
+            url_group: 1,
+            title_group: 2,
+            snippet_group: None,
+            url_transform: None,
+            skip: Some(|url| url.contains("yandex.")),
+        },
+    )
+}
+
+/// Extract a single canonical definition result from a dictionary SERP.
+///
+/// Dictionary providers resolve a headword to one authoritative entry page, so
+/// the parser only needs the canonical URL (from `<link rel="canonical">` or
+/// the `og:url` meta tag), a title, and the page description as the gloss
+/// snippet (mirrors the JavaScript `parseDefinition` helper).
+fn parse_definition(source: &str, html: &str, limit: usize) -> Vec<SearchResult> {
+    if limit < 1 || html.is_empty() {
+        return Vec::new();
+    }
+    static CANONICAL: LazyLock<Regex> = LazyLock::new(|| {
+        Regex::new(r#"(?i)<link[^>]+rel="canonical"[^>]+href="([^"]+)""#).unwrap()
+    });
+    static OG_URL: LazyLock<Regex> = LazyLock::new(|| {
+        Regex::new(r#"(?i)<meta[^>]+property="og:url"[^>]+content="([^"]+)""#).unwrap()
+    });
+    static OG_TITLE: LazyLock<Regex> = LazyLock::new(|| {
+        Regex::new(r#"(?i)<meta[^>]+property="og:title"[^>]+content="([^"]+)""#).unwrap()
+    });
+    static TITLE: LazyLock<Regex> =
+        LazyLock::new(|| Regex::new(r"(?is)<title>(.*?)</title>").unwrap());
+    static DESCRIPTION: LazyLock<Regex> = LazyLock::new(|| {
+        Regex::new(
+            r#"(?i)<meta[^>]+(?:name="description"|property="og:description")[^>]+content="([^"]+)""#,
+        )
+        .unwrap()
+    });
+
+    let url = CANONICAL
+        .captures(html)
+        .or_else(|| OG_URL.captures(html))
+        .map(|c| c[1].to_string())
+        .unwrap_or_default();
+    if url.is_empty() {
+        return Vec::new();
+    }
+    let title = OG_TITLE
+        .captures(html)
+        .or_else(|| TITLE.captures(html))
+        .map(|c| c[1].to_string())
+        .unwrap_or_default();
+    let snippet = DESCRIPTION
+        .captures(html)
+        .map(|c| c[1].to_string())
+        .unwrap_or_default();
+    vec![make_result(source, &title, &url, &snippet, 1)]
+}
+
+fn cambridge_url(query: &str, _options: &SearchOptions) -> String {
+    format!(
+        "https://dictionary.cambridge.org/dictionary/english/{}",
+        urlencoding::encode(query)
+    )
+}
+
+fn cambridge_parse(html: &str, limit: usize, _options: &SearchOptions) -> Vec<SearchResult> {
+    parse_definition("cambridge-dictionary", html, limit)
+}
+
+fn merriam_url(query: &str, _options: &SearchOptions) -> String {
+    format!(
+        "https://www.merriam-webster.com/dictionary/{}",
+        urlencoding::encode(query)
+    )
+}
+
+fn merriam_parse(html: &str, limit: usize, _options: &SearchOptions) -> Vec<SearchResult> {
+    parse_definition("merriam-webster", html, limit)
+}
+
+fn dictionary_com_url(query: &str, _options: &SearchOptions) -> String {
+    format!(
+        "https://www.dictionary.com/browse/{}",
+        urlencoding::encode(query)
+    )
+}
+
+fn dictionary_com_parse(html: &str, limit: usize, _options: &SearchOptions) -> Vec<SearchResult> {
+    parse_definition("dictionary-com", html, limit)
+}
+
+fn collins_url(query: &str, _options: &SearchOptions) -> String {
+    format!(
+        "https://www.collinsdictionary.com/dictionary/english/{}",
+        urlencoding::encode(query)
+    )
+}
+
+fn collins_parse(html: &str, limit: usize, _options: &SearchOptions) -> Vec<SearchResult> {
+    parse_definition("collins-dictionary", html, limit)
+}
+
 /// All API-based engine descriptors, in catalog order.
 pub fn api_engines() -> Vec<EngineDescriptor> {
     vec![
@@ -747,6 +1267,110 @@ pub fn api_engines() -> Vec<EngineDescriptor> {
             parse: wikidata_parse,
         },
         EngineDescriptor {
+            id: "wiktionary",
+            label: "Wiktionary",
+            category: "knowledge",
+            kind: EngineKind::Json,
+            cors_readable: true,
+            default_for_category: false,
+            method: HttpMethod::Get,
+            build_url: wiktionary_url,
+            build_body: None,
+            headers: None,
+            parse: wiktionary_parse,
+        },
+        EngineDescriptor {
+            id: "wikinews",
+            label: "Wikinews",
+            category: "knowledge",
+            kind: EngineKind::Json,
+            cors_readable: true,
+            default_for_category: false,
+            method: HttpMethod::Get,
+            build_url: wikinews_url,
+            build_body: None,
+            headers: None,
+            parse: wikinews_parse,
+        },
+        EngineDescriptor {
+            id: "internet-archive",
+            label: "Internet Archive",
+            category: "knowledge",
+            kind: EngineKind::Json,
+            cors_readable: true,
+            default_for_category: false,
+            method: HttpMethod::Get,
+            build_url: internet_archive_url,
+            build_body: None,
+            headers: None,
+            parse: internet_archive_parse,
+        },
+        EngineDescriptor {
+            id: "dbpedia",
+            label: "DBpedia",
+            category: "knowledge",
+            kind: EngineKind::Json,
+            cors_readable: false,
+            default_for_category: false,
+            method: HttpMethod::Get,
+            build_url: dbpedia_url,
+            build_body: None,
+            headers: None,
+            parse: dbpedia_parse,
+        },
+        EngineDescriptor {
+            id: "openlibrary",
+            label: "Open Library",
+            category: "knowledge",
+            kind: EngineKind::Json,
+            cors_readable: true,
+            default_for_category: false,
+            method: HttpMethod::Get,
+            build_url: openlibrary_url,
+            build_body: None,
+            headers: None,
+            parse: openlibrary_parse,
+        },
+        EngineDescriptor {
+            id: "semantic-scholar",
+            label: "Semantic Scholar",
+            category: "knowledge",
+            kind: EngineKind::Json,
+            cors_readable: true,
+            default_for_category: false,
+            method: HttpMethod::Get,
+            build_url: semantic_scholar_url,
+            build_body: None,
+            headers: None,
+            parse: semantic_scholar_parse,
+        },
+        EngineDescriptor {
+            id: "openalex",
+            label: "OpenAlex",
+            category: "knowledge",
+            kind: EngineKind::Json,
+            cors_readable: true,
+            default_for_category: false,
+            method: HttpMethod::Get,
+            build_url: openalex_url,
+            build_body: None,
+            headers: None,
+            parse: openalex_parse,
+        },
+        EngineDescriptor {
+            id: "crossref",
+            label: "Crossref",
+            category: "knowledge",
+            kind: EngineKind::Json,
+            cors_readable: true,
+            default_for_category: false,
+            method: HttpMethod::Get,
+            build_url: crossref_url,
+            build_body: None,
+            headers: None,
+            parse: crossref_parse,
+        },
+        EngineDescriptor {
             id: "searx",
             label: "SearXNG",
             category: "search",
@@ -760,30 +1384,43 @@ pub fn api_engines() -> Vec<EngineDescriptor> {
             parse: searx_parse,
         },
         EngineDescriptor {
-            id: "crossref",
-            label: "Crossref",
+            id: "arxiv",
+            label: "arXiv",
             category: "papers",
-            kind: EngineKind::Json,
+            kind: EngineKind::Text,
             cors_readable: true,
             default_for_category: true,
             method: HttpMethod::Get,
-            build_url: crossref_url,
+            build_url: arxiv_url,
             build_body: None,
             headers: None,
-            parse: crossref_parse,
+            parse: arxiv_parse,
         },
         EngineDescriptor {
-            id: "openalex",
-            label: "OpenAlex",
+            id: "europepmc",
+            label: "Europe PMC",
             category: "papers",
             kind: EngineKind::Json,
             cors_readable: true,
             default_for_category: false,
             method: HttpMethod::Get,
-            build_url: openalex_url,
+            build_url: europepmc_url,
             build_body: None,
             headers: None,
-            parse: openalex_parse,
+            parse: europepmc_parse,
+        },
+        EngineDescriptor {
+            id: "doaj",
+            label: "DOAJ",
+            category: "papers",
+            kind: EngineKind::Json,
+            cors_readable: true,
+            default_for_category: false,
+            method: HttpMethod::Get,
+            build_url: doaj_url,
+            build_body: None,
+            headers: None,
+            parse: doaj_parse,
         },
         EngineDescriptor {
             id: "github",
@@ -812,17 +1449,69 @@ pub fn api_engines() -> Vec<EngineDescriptor> {
             parse: hackernews_parse,
         },
         EngineDescriptor {
-            id: "arxiv",
-            label: "arXiv",
-            category: "papers",
-            kind: EngineKind::Text,
+            id: "gitlab",
+            label: "GitLab",
+            category: "code",
+            kind: EngineKind::Json,
             cors_readable: true,
             default_for_category: false,
             method: HttpMethod::Get,
-            build_url: arxiv_url,
+            build_url: gitlab_url,
             build_body: None,
             headers: None,
-            parse: arxiv_parse,
+            parse: gitlab_parse,
+        },
+        EngineDescriptor {
+            id: "codeberg",
+            label: "Codeberg",
+            category: "code",
+            kind: EngineKind::Json,
+            cors_readable: true,
+            default_for_category: false,
+            method: HttpMethod::Get,
+            build_url: codeberg_url,
+            build_body: None,
+            headers: None,
+            parse: codeberg_parse,
+        },
+        EngineDescriptor {
+            id: "gitee",
+            label: "Gitee",
+            category: "code",
+            kind: EngineKind::Json,
+            cors_readable: true,
+            default_for_category: false,
+            method: HttpMethod::Get,
+            build_url: gitee_url,
+            build_body: None,
+            headers: None,
+            parse: gitee_parse,
+        },
+        EngineDescriptor {
+            id: "bitbucket",
+            label: "Bitbucket",
+            category: "code",
+            kind: EngineKind::Json,
+            cors_readable: true,
+            default_for_category: false,
+            method: HttpMethod::Get,
+            build_url: bitbucket_url,
+            build_body: None,
+            headers: None,
+            parse: bitbucket_parse,
+        },
+        EngineDescriptor {
+            id: "gitflic",
+            label: "GitFlic",
+            category: "code",
+            kind: EngineKind::Json,
+            cors_readable: false,
+            default_for_category: false,
+            method: HttpMethod::Get,
+            build_url: gitflic_url,
+            build_body: None,
+            headers: None,
+            parse: gitflic_parse,
         },
     ]
 }
@@ -894,6 +1583,71 @@ pub fn html_engines() -> Vec<EngineDescriptor> {
             build_body: None,
             headers: None,
             parse: yahoo_parse,
+        },
+        EngineDescriptor {
+            id: "yandex",
+            label: "Yandex",
+            category: "search",
+            kind: EngineKind::Html,
+            cors_readable: false,
+            default_for_category: false,
+            method: HttpMethod::Get,
+            build_url: yandex_url,
+            build_body: None,
+            headers: None,
+            parse: yandex_parse,
+        },
+        EngineDescriptor {
+            id: "cambridge-dictionary",
+            label: "Cambridge Dictionary",
+            category: "knowledge",
+            kind: EngineKind::Html,
+            cors_readable: false,
+            default_for_category: false,
+            method: HttpMethod::Get,
+            build_url: cambridge_url,
+            build_body: None,
+            headers: None,
+            parse: cambridge_parse,
+        },
+        EngineDescriptor {
+            id: "merriam-webster",
+            label: "Merriam-Webster",
+            category: "knowledge",
+            kind: EngineKind::Html,
+            cors_readable: false,
+            default_for_category: false,
+            method: HttpMethod::Get,
+            build_url: merriam_url,
+            build_body: None,
+            headers: None,
+            parse: merriam_parse,
+        },
+        EngineDescriptor {
+            id: "dictionary-com",
+            label: "Dictionary.com",
+            category: "knowledge",
+            kind: EngineKind::Html,
+            cors_readable: false,
+            default_for_category: false,
+            method: HttpMethod::Get,
+            build_url: dictionary_com_url,
+            build_body: None,
+            headers: None,
+            parse: dictionary_com_parse,
+        },
+        EngineDescriptor {
+            id: "collins-dictionary",
+            label: "Collins Dictionary",
+            category: "knowledge",
+            kind: EngineKind::Html,
+            cors_readable: false,
+            default_for_category: false,
+            method: HttpMethod::Get,
+            build_url: collins_url,
+            build_body: None,
+            headers: None,
+            parse: collins_parse,
         },
         EngineDescriptor {
             id: "lite",

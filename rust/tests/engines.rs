@@ -21,22 +21,40 @@ fn parse(id: &str, body: &str) -> Vec<web_search::SearchResult> {
 #[test]
 fn catalog_contains_all_engines() {
     let ids: Vec<&str> = all_descriptor_engines().iter().map(|d| d.id).collect();
-    // 8 API engines + 6 HTML engines = 14 descriptor-driven engines.
-    assert_eq!(ids.len(), 14);
+    // 21 API engines + 11 HTML engines = 32 descriptor-driven engines.
+    assert_eq!(ids.len(), 32);
     for id in [
         "wikipedia",
         "wikidata",
-        "searx",
-        "crossref",
+        "wiktionary",
+        "wikinews",
+        "internet-archive",
+        "dbpedia",
+        "openlibrary",
+        "semantic-scholar",
         "openalex",
+        "crossref",
+        "searx",
+        "arxiv",
+        "europepmc",
+        "doaj",
         "github",
         "hackernews",
-        "arxiv",
+        "gitlab",
+        "codeberg",
+        "gitee",
+        "bitbucket",
+        "gitflic",
         "brave",
         "mojeek",
         "ecosia",
         "startpage",
         "yahoo",
+        "yandex",
+        "cambridge-dictionary",
+        "merriam-webster",
+        "dictionary-com",
+        "collins-dictionary",
         "lite",
     ] {
         assert!(ids.contains(&id), "missing descriptor {id}");
@@ -143,6 +161,83 @@ fn lite_parses_result_links_and_dedupes() {
     assert_eq!(results[0].url, "https://example.com/a");
     assert_eq!(results[0].title, "First");
     assert_eq!(results[1].url, "https://example.com/b");
+}
+
+#[test]
+fn internet_archive_builds_details_urls() {
+    let body = r#"{"response":{"docs":[
+        {"identifier":"some-item","title":"Some Item","description":"A scanned book"}
+    ]}}"#;
+    let results = parse("internet-archive", body);
+    assert_eq!(results.len(), 1);
+    assert_eq!(results[0].url, "https://archive.org/details/some-item");
+    assert_eq!(results[0].title, "Some Item");
+    assert_eq!(results[0].source, "internet-archive");
+}
+
+#[test]
+fn semantic_scholar_falls_back_to_paper_url() {
+    let body = r#"{"data":[
+        {"title":"Graph Paper","paperId":"abc123","abstract":"On graphs."},
+        {"title":"Direct","url":"https://example.com/p","abstract":"x"}
+    ]}"#;
+    let results = parse("semantic-scholar", body);
+    assert_eq!(results.len(), 2);
+    assert_eq!(
+        results[0].url,
+        "https://www.semanticscholar.org/paper/abc123"
+    );
+    assert_eq!(results[1].url, "https://example.com/p");
+}
+
+#[test]
+fn gitlab_parses_projects_from_array_body() {
+    let body = r#"[
+        {"path_with_namespace":"group/proj","web_url":"https://gitlab.com/group/proj","description":"A project"}
+    ]"#;
+    let results = parse("gitlab", body);
+    assert_eq!(results.len(), 1);
+    assert_eq!(results[0].title, "group/proj");
+    assert_eq!(results[0].url, "https://gitlab.com/group/proj");
+}
+
+#[test]
+fn codeberg_parses_projects_from_data_container() {
+    let body = r#"{"data":[
+        {"full_name":"user/repo","html_url":"https://codeberg.org/user/repo","description":"A repo"}
+    ]}"#;
+    let results = parse("codeberg", body);
+    assert_eq!(results.len(), 1);
+    assert_eq!(results[0].title, "user/repo");
+    assert_eq!(results[0].url, "https://codeberg.org/user/repo");
+}
+
+#[test]
+fn dictionary_parses_canonical_definition() {
+    let body = r#"<html><head>
+        <link rel="canonical" href="https://dictionary.cambridge.org/dictionary/english/quantum" />
+        <meta property="og:title" content="QUANTUM | meaning" />
+        <meta name="description" content="the smallest amount of something" />
+      </head><body></body></html>"#;
+    let results = parse("cambridge-dictionary", body);
+    assert_eq!(results.len(), 1);
+    assert_eq!(
+        results[0].url,
+        "https://dictionary.cambridge.org/dictionary/english/quantum"
+    );
+    assert_eq!(results[0].title, "QUANTUM | meaning");
+    assert_eq!(results[0].snippet, "the smallest amount of something");
+    assert_eq!(results[0].source, "cambridge-dictionary");
+}
+
+#[test]
+fn yandex_parses_organic_links() {
+    let body =
+        r#"<a class="Link OrganicTitle-Link" href="https://example.org/page">Example Result</a>"#;
+    let results = parse("yandex", body);
+    assert_eq!(results.len(), 1);
+    assert_eq!(results[0].url, "https://example.org/page");
+    assert_eq!(results[0].title, "Example Result");
 }
 
 #[test]

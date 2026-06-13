@@ -391,9 +391,9 @@ export const HTML_ENGINES = {
   startpage,
   yahoo,
   yandex,
-  cambridgeDictionary,
-  merriamWebster,
-  dictionaryCom,
-  collinsDictionary,
+  'cambridge-dictionary': cambridgeDictionary,
+  'merriam-webster': merriamWebster,
+  'dictionary-com': dictionaryCom,
+  'collins-dictionary': collinsDictionary,
   lite,
 };

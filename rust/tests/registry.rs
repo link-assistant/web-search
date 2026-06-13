@@ -15,8 +15,8 @@ fn categories_are_in_canonical_order() {
 #[test]
 fn registry_lists_every_catalogued_provider() {
     let registry = get_registry();
-    // 3 class engines + 8 API + 6 HTML + 5 web-capture = 22.
-    assert_eq!(registry.len(), 22);
+    // 3 class engines + 21 API + 11 HTML + 5 web-capture = 40.
+    assert_eq!(registry.len(), 40);
 
     let ids: Vec<&str> = registry.iter().map(|e| e.id.as_str()).collect();
     for expected in [
@@ -25,17 +25,35 @@ fn registry_lists_every_catalogued_provider() {
         "duckduckgo",
         "wikipedia",
         "wikidata",
-        "searx",
-        "crossref",
+        "wiktionary",
+        "wikinews",
+        "internet-archive",
+        "dbpedia",
+        "openlibrary",
+        "semantic-scholar",
         "openalex",
+        "crossref",
+        "searx",
+        "arxiv",
+        "europepmc",
+        "doaj",
         "github",
         "hackernews",
-        "arxiv",
+        "gitlab",
+        "codeberg",
+        "gitee",
+        "bitbucket",
+        "gitflic",
         "brave",
         "mojeek",
         "ecosia",
         "startpage",
         "yahoo",
+        "yandex",
+        "cambridge-dictionary",
+        "merriam-webster",
+        "dictionary-com",
+        "collins-dictionary",
         "lite",
         "wc:wikipedia",
         "wc:brave",
@@ -58,15 +76,41 @@ fn every_entry_has_a_known_category() {
 
 #[test]
 fn provider_ids_filter_by_category() {
-    assert_eq!(get_provider_ids(None).len(), 22);
-    assert_eq!(get_provider_ids(Some("code")), ["github", "hackernews"]);
+    assert_eq!(get_provider_ids(None).len(), 40);
+    assert_eq!(
+        get_provider_ids(Some("code")),
+        [
+            "github",
+            "hackernews",
+            "gitlab",
+            "codeberg",
+            "gitee",
+            "bitbucket",
+            "gitflic"
+        ]
+    );
     assert_eq!(
         get_provider_ids(Some("papers")),
-        ["crossref", "openalex", "arxiv"]
+        ["arxiv", "europepmc", "doaj"]
     );
     assert_eq!(
         get_provider_ids(Some("knowledge")),
-        ["wikipedia", "wikidata"]
+        [
+            "wikipedia",
+            "wikidata",
+            "wiktionary",
+            "wikinews",
+            "internet-archive",
+            "dbpedia",
+            "openlibrary",
+            "semantic-scholar",
+            "openalex",
+            "crossref",
+            "cambridge-dictionary",
+            "merriam-webster",
+            "dictionary-com",
+            "collins-dictionary"
+        ]
     );
     // Every search-category provider, including the web-capture namespace.
     assert!(get_provider_ids(Some("search")).len() >= 10);
@@ -76,7 +120,14 @@ fn provider_ids_filter_by_category() {
 fn defaults_cover_one_provider_per_category_intent() {
     assert_eq!(
         get_default_provider_ids(),
-        ["duckduckgo", "google", "bing", "wikipedia"]
+        [
+            "duckduckgo",
+            "internet-archive",
+            "wikipedia",
+            "wikidata",
+            "wiktionary",
+            "wikinews"
+        ]
     );
 }
 
@@ -100,7 +151,7 @@ fn default_for_category_flags_exactly_one_default_per_category() {
 #[test]
 fn build_providers_instantiates_the_whole_catalog() {
     let providers = build_providers(&BuildConfig::default());
-    assert_eq!(providers.len(), 22);
+    assert_eq!(providers.len(), 40);
 
     let names: Vec<&str> = providers.iter().map(|(id, _)| id.as_str()).collect();
     assert!(names.contains(&"github"));

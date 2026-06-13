@@ -25,13 +25,26 @@ describe('api-engines', () => {
       expect(Object.keys(API_ENGINES).sort()).toEqual(
         [
           'arxiv',
+          'bitbucket',
+          'codeberg',
           'crossref',
+          'dbpedia',
+          'doaj',
+          'europepmc',
+          'gitee',
+          'gitflic',
           'github',
+          'gitlab',
           'hackernews',
+          'internet-archive',
           'openalex',
+          'openlibrary',
           'searx',
+          'semantic-scholar',
           'wikidata',
+          'wikinews',
           'wikipedia',
+          'wiktionary',
         ].sort()
       );
     });
