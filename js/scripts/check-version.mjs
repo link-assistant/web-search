@@ -60,7 +60,7 @@ function shouldSkipVersionCheck() {
  * @returns {string | null} Package version, or null when unavailable
  */
 function readVersionAtRef(ref, path) {
-  let content = '';
+  let content;
   try {
     content = execSync(`git show ${ref}:${path}`, {
       encoding: 'utf-8',

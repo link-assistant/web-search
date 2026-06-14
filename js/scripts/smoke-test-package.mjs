@@ -68,7 +68,8 @@ function installFromNpm(dir, spec) {
     } catch (error) {
       if (attempt === maxAttempts) {
         throw new Error(
-          `Failed to install ${spec} after ${maxAttempts} attempts: ${error.message}`
+          `Failed to install ${spec} after ${maxAttempts} attempts: ${error.message}`,
+          { cause: error }
         );
       }
       const waitSeconds = attempt * 10;
@@ -134,7 +135,8 @@ async function checkServer(dir, binPath) {
     log('server OK: /health responded');
   } catch (error) {
     throw new Error(
-      `HTTP server smoke test failed: ${error.message}\nServer stderr:\n${stderr}`
+      `HTTP server smoke test failed: ${error.message}\nServer stderr:\n${stderr}`,
+      { cause: error }
     );
   } finally {
     child.kill('SIGINT');
