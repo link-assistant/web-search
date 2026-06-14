@@ -1,0 +1,10 @@
+{
+  "captured": "2026-06-14",
+  "npm": { "package": "@link-assistant/web-search", "latest": "0.8.2", "versions": ["0.8.2"], "package_json_on_main": "0.10.1" },
+  "crates_io": { "crate": "web-search", "versions": ["0.2.0"], "cargo_toml_on_main": "0.2.0" },
+  "github_releases_js": [],
+  "github_releases_rust": [
+    { "tag": "rust_v0.2.0", "title": "[Rust] 0.2.0", "created": "2026-06-14T10:40:52Z", "latest": true },
+    { "tag": "rust-v0.2.0", "title": "Rust web-search 0.2.0", "created": "2026-06-13T11:56:52Z" }
+  ]
+}
