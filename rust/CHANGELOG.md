@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 <!-- changelog-insert-here -->
+## [0.3.1] - 2026-06-14
+
+### Changed
+
+- Bump the Rust dependency baseline, including `web-capture 0.3.31` and the Rust 1.96 MSRV it requires.
+
 
 ## [0.3.0] - 2026-06-14
 
