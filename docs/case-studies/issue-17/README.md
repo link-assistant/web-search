@@ -204,15 +204,19 @@ Going forward the short-tag scheme yields exactly one tag per version
 The full list of defects shared with the templates — each with `file:line`, a
 reproduction, and a suggested fix — is in
 [`template-comparison.md` §"Shared bugs to report upstream"](./template-comparison.md).
-Highest-value candidates to file against the link-foundation template repos:
+Three were verified against the live `link-foundation/js-ai-driven-development-pipeline-template`
+source and **filed upstream**:
 
 1. **CHANGELOG `## 1.2` vs `## 1.2.3` prefix collision (JS)** — the release-notes
-   extraction regex is unescaped and unanchored, so extracting notes for `1.2`
-   can match the `## 1.2.3` section. Fix: `## ${escapeRegex(version)}(?=\s|$)`.
+   extraction regex is escaped but unanchored, so extracting notes for `1.2`
+   matches the `## 1.2.3` section. Fix: `## ${escapeRegex(version)}(?=\s|$)`.
+   → [js-template#85](https://github.com/link-foundation/js-ai-driven-development-pipeline-template/issues/85)
 2. **Changeset detection counts arbitrary `.md` files** — a stray
    `.changeset/NOTES.md` is treated as a pending changeset.
+   → [js-template#86](https://github.com/link-foundation/js-ai-driven-development-pipeline-template/issues/86)
 3. **`merge-changesets` silently drops malformed changesets** — a broken
    frontmatter file is skipped with only a warning, losing its notes/bump.
+   → [js-template#87](https://github.com/link-foundation/js-ai-driven-development-pipeline-template/issues/87)
 
 These are JS-template defects; `tpl-rust` is immune to (1) (bracket-delimited,
 escaped, line-anchored regex). The Rust auto-bump scripts added here were ported
