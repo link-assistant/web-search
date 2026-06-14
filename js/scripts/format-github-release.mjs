@@ -16,6 +16,9 @@
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { getJsRoot, parseJsRootConfig } from './js-paths.mjs';
+import { buildReleaseTag, normalizeVersion } from './release-naming.mjs';
+
 const scriptDirectory = dirname(fileURLToPath(import.meta.url));
 const formatReleaseNotesScript = join(
   scriptDirectory,
@@ -50,10 +53,21 @@ const config = makeConfig({
         type: 'string',
         default: getenv('COMMIT_SHA', ''),
         describe: 'Commit SHA for PR detection',
+      })
+      .option('js-root', {
+        type: 'string',
+        default: getenv('JS_ROOT', ''),
+        describe:
+          'JavaScript package root directory (auto-detected if not specified)',
       }),
 });
 
-const { releaseVersion: version, repository, commitSha } = config;
+const {
+  releaseVersion: version,
+  repository,
+  commitSha,
+  jsRoot: jsRootArg,
+} = config;
 
 if (!version || !repository || !commitSha) {
   console.error('Error: Missing required arguments');
@@ -63,7 +77,12 @@ if (!version || !repository || !commitSha) {
   process.exit(1);
 }
 
-const tag = `js-v${version}`;
+const jsRoot = getJsRoot({ jsRoot: jsRootArg || parseJsRootConfig() });
+
+// Resolve the tag the same way create-github-release.mjs does, so formatting
+// always targets the release that was actually created (js_v… in multi-language
+// repos, v… in single-language repos).
+const tag = buildReleaseTag(version, { jsRoot });
 
 try {
   // Get the release ID for this version
@@ -83,7 +102,9 @@ try {
     console.log(`Formatting release notes for ${tag}...`);
     // Pass the trigger commit SHA for PR detection
     // This allows proper PR lookup even if the changelog doesn't have a commit hash
-    await $`node ${formatReleaseNotesScript} --release-id "${releaseId}" --release-version "${tag}" --repository "${repository}" --commit-sha "${commitSha}"`;
+    // Pass the bare semver (not the tag) so the npm version badge links to the
+    // correct https://www.npmjs.com/package/<pkg>/v/<version> page.
+    await $`node ${formatReleaseNotesScript} --release-id "${releaseId}" --release-version "${normalizeVersion(version)}" --repository "${repository}" --commit-sha "${commitSha}"`;
     console.log(`\u2705 Formatted release notes for ${tag}`);
   }
 } catch (error) {
