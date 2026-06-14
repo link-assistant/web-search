@@ -40,7 +40,7 @@ jobs:
       docs-changed: ${{ steps.changes.outputs.docs-changed }}
       workflow-changed: ${{ steps.changes.outputs.workflow-changed }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
@@ -62,7 +62,7 @@ jobs:
     timeout-minutes: 5
     if: github.event_name == 'pull_request'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
@@ -86,7 +86,7 @@ jobs:
     needs: [detect-changes]
     if: github.event_name == 'pull_request' && needs.detect-changes.outputs.any-rust-code-changed == 'true'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
@@ -117,7 +117,7 @@ jobs:
         needs.detect-changes.outputs.rust-workflow-changed == 'true'
       )
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
@@ -128,7 +128,7 @@ jobs:
         run: cargo install rust-script
 
       - name: Cache cargo registry
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             ~/.cargo/registry
@@ -168,13 +168,13 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
 
       - name: Cache cargo registry
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             ~/.cargo/registry
@@ -199,7 +199,7 @@ jobs:
     needs: [lint, test]
     if: always() && !cancelled() && needs.lint.result == 'success' && needs.test.result == 'success'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
@@ -208,7 +208,7 @@ jobs:
         run: cargo install rust-script
 
       - name: Cache cargo registry
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             ~/.cargo/registry
@@ -251,13 +251,84 @@ jobs:
       crate-version: ${{ steps.version.outputs.version }}
       release-tag: ${{ steps.version.outputs.tag }}
     steps:
-      - uses: actions/checkout@v4
+      # Full history so the auto-bump step can fast-forward to the latest main
+      # and push the version commit back without a shallow-clone push rejection.
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
 
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
 
       - name: Install rust-script
         run: cargo install rust-script
+
+      # Auto-bump the crate version from changelog.d fragments (issue #17).
+      #
+      # ROOT CAUSE this fixes: the Rust release job had NO version-bump step, so
+      # the crate version never advanced past its initial value. Fragments piled
+      # up in changelog.d/ unconsumed, check-version-modification.rs forbade
+      # editing the version by hand in PRs, and so no new crates.io or GitHub
+      # release was ever produced — the "I don't see all the releases" symptom.
+      #
+      # This mirrors the JavaScript changeset flow and the link-foundation rust
+      # pipeline template: fragments declare patch|minor|major and the highest
+      # wins. It runs ONLY on real pushes to main (guarded by the job-level `if`),
+      # never on pull requests, so it never trips check-version-modification.rs
+      # (which only runs on pull_request events).
+      #
+      # Concurrency safety: rust.yml serialises main runs (cancel-in-progress is
+      # false on main), but a run may still have been triggered from a SHA that is
+      # now behind. The step therefore hard-resets to the freshest origin/main
+      # BEFORE deciding whether to bump, so fragments already consumed by an
+      # earlier run are seen as gone (has_fragments=false) and we no-op instead of
+      # double-bumping. Everything downstream (version read, publish, release)
+      # then operates on this up-to-date, possibly-bumped tree.
+      - name: Auto-bump version from changelog fragments
+        id: bump
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Re-align to the newest main so concurrent releases don't double-bump.
+          git fetch origin main
+          git checkout -B main origin/main
+
+          # Run once and parse both outputs from the captured stdout (compiling
+          # rust-script twice just to read a second value is wasteful).
+          BUMP_OUT=$(rust-script rust/scripts/get-bump-type.rs --rust-root rust)
+          echo "$BUMP_OUT"
+          HAS_FRAGMENTS=$(printf '%s\n' "$BUMP_OUT" | sed -n 's/^Output: has_fragments=//p')
+          BUMP_TYPE=$(printf '%s\n' "$BUMP_OUT" | sed -n 's/^Output: bump_type=//p')
+
+          if [ "$HAS_FRAGMENTS" != "true" ]; then
+            echo "No changelog fragments — version already final; skipping bump"
+            echo "bumped=false" >> "$GITHUB_OUTPUT"
+            echo "release_sha=$GITHUB_SHA" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "Applying $BUMP_TYPE bump from changelog fragments"
+          rust-script rust/scripts/bump-version.rs --bump-type "$BUMP_TYPE" --rust-root rust
+          rust-script rust/scripts/collect-changelog.rs --rust-root rust
+
+          # Keep Cargo.lock's recorded crate version in step with Cargo.toml.
+          # `-p <name>` limits the update to the local package (1 entry), leaving
+          # every pinned dependency untouched; `|| true` keeps a transient
+          # registry-index hiccup from failing the release (the lockfile version
+          # is not load-bearing for the un-`--locked` build/test jobs).
+          NAME=$(sed -n 's/^name = "\(.*\)"/\1/p' rust/Cargo.toml | head -n 1)
+          (cd rust && cargo update -p "$NAME") || true
+
+          git add rust/Cargo.toml rust/Cargo.lock rust/CHANGELOG.md rust/changelog.d
+          NEW_VERSION=$(sed -n 's/^version = "\(.*\)"/\1/p' rust/Cargo.toml | head -n 1)
+          git commit -m "rust-$NEW_VERSION"
+          git push origin main
+
+          echo "bumped=true" >> "$GITHUB_OUTPUT"
+          echo "release_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          echo "Bumped to $NEW_VERSION and pushed to main"
 
       - name: Read crate version
         id: version
@@ -286,12 +357,13 @@ jobs:
             exit 1
           fi
 
-          # Multi-language → namespaced tag `rust_v<semver>`; single-language →
-          # plain `v<semver>` (nothing to disambiguate against).
+          # Tags are deliberately SHORT (issue #17): no `v` prefix, single
+          # hyphen separator. Multi-language → namespaced tag `rust-<semver>`;
+          # single-language → bare `<semver>` (nothing to disambiguate against).
           if [ "$MULTI_LANG" = "true" ]; then
-            TAG="rust_v$VERSION"
+            TAG="rust-$VERSION"
           else
-            TAG="v$VERSION"
+            TAG="$VERSION"
           fi
 
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
@@ -376,9 +448,17 @@ jobs:
           NOTES="$(printf '%s\n\nRust crate release for `%s` %s.\n\nInstall with `cargo add %s@%s`. Crate page: %s' \
             "$BADGE" "$NAME" "$VERSION" "$NAME" "$VERSION" "$CRATE_URL")"
 
+          # Target the auto-bump commit when one was made this run, otherwise the
+          # triggering commit. This guarantees the tag points at the tree that
+          # actually carries the released version.
+          TARGET_SHA="${{ steps.bump.outputs.release_sha }}"
+          if [ -z "$TARGET_SHA" ]; then
+            TARGET_SHA="$GITHUB_SHA"
+          fi
+
           gh release create "$TAG" \
             --title "$TITLE" \
-            --target "$GITHUB_SHA" \
+            --target "$TARGET_SHA" \
             --notes "$NOTES"
 
       # Install-from-package smoke test (issue #6): prove the published crate is
@@ -443,6 +523,20 @@ jobs:
           cargo new --bin "$WORK/lib-consumer" >/dev/null
           cd "$WORK/lib-consumer"
           cargo add web-search@"$VERSION" >/dev/null
+          # Unify the duplicated alloc-no-stdlib in the freshly-resolved lock
+          # (issue #17). brotli 8.0.3 — pulled transitively via
+          # tower-http → async-compression → compression-codecs — requires
+          # alloc-no-stdlib ^2, but a fresh resolve also lets brotli-decompressor
+          # pull alloc-no-stdlib 3.0.0. With both majors present, `StandardAlloc`
+          # from 2.0.4 no longer satisfies brotli's `Allocator` trait bound from
+          # 3.0.0, so the consumer fails to compile (E0277). The repo's committed
+          # Cargo.lock already pins the single working 2.0.4 line; downstream
+          # consumers that resolve fresh hit the split unless they do the same.
+          # Collapsing the 3.0.0 instance to 2.0.4 (which brotli accepts) restores
+          # a single version. This is a no-op (rc 0) once the duplicate is gone,
+          # so it is safe to run unconditionally and future-proof if upstream
+          # later aligns the alloc-no-stdlib requirement.
+          cargo update -p alloc-no-stdlib@3.0.0 --precise 2.0.4 2>/dev/null || true
           cat > src/main.rs <<'EOF'
           use web_search::WebSearchEngine;
 
