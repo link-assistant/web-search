@@ -1,4 +1,8 @@
 /target
-Cargo.lock
+# Cargo.lock is intentionally committed: web-search ships a binary ([[bin]]) and
+# is installed via `cargo install`, so a pinned, reproducible dependency graph is
+# required. Leaving it unpinned let a freshly published `alloc-no-stdlib 3.0.0`
+# break the `brotli` encoder build on fresh CI resolution (issue #15) even though
+# no source changed. See docs/case-studies/issue-15.
 **/*.rs.bk
 *.pdb
