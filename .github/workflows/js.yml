@@ -397,6 +397,15 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: node js/scripts/format-github-release.mjs --release-version "${{ steps.publish.outputs.published_version }}" --repository "${{ github.repository }}" --commit-sha "${{ github.sha }}"
 
+      # Install-from-package smoke test (issue #6): prove the just-published
+      # artifact is actually installable from npm and that the library, CLI and
+      # HTTP-server entry points all work from a clean install (not the repo
+      # checkout). Fails the release loudly if a broken package was published.
+      - name: Smoke-test published npm package
+        if: steps.publish.outputs.published == 'true'
+        working-directory: .
+        run: node js/scripts/smoke-test-package.mjs --package-version "${{ steps.publish.outputs.published_version }}" --js-root js
+
   instant-release:
     name: JS - Instant Release
     if: github.event_name == 'workflow_dispatch' && github.event.inputs.release_mode == 'instant'

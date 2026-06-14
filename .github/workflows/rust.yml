@@ -333,3 +333,72 @@ jobs:
             --title "Rust web-search $VERSION" \
             --target "$GITHUB_SHA" \
             --notes "Rust crate release for web-search $VERSION. Crate: https://crates.io/crates/web-search/$VERSION"
+
+      # Install-from-package smoke test (issue #6): prove the published crate is
+      # actually installable from crates.io and that all three entry points work
+      # from a clean install — NOT from the repo checkout:
+      #   1. Library — a fresh crate that depends on web-search@VERSION compiles
+      #   2. CLI     — `web-search --list-providers` (offline, no network)
+      #   3. HTTP    — `web-search serve` boots and answers /health
+      - name: Smoke-test published crate
+        if: |
+          steps.crate.outputs.published == 'true' ||
+          steps.publish.outputs.publish_result == 'success' ||
+          steps.publish.outputs.publish_result == 'already_exists'
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          set -euo pipefail
+          WORK="$(mktemp -d)"
+          trap 'rm -rf "$WORK"' EXIT
+
+          echo "::group::Install web-search@$VERSION binary from crates.io"
+          cargo install web-search --version "$VERSION" --root "$WORK/install" --locked
+          BIN="$WORK/install/bin/web-search"
+          echo "::endgroup::"
+
+          echo "::group::CLI entry point — web-search --list-providers"
+          "$BIN" --list-providers | head -n 5
+          if [ -z "$("$BIN" --list-providers)" ]; then
+            echo "::error::CLI --list-providers produced no output"
+            exit 1
+          fi
+          echo "CLI OK"
+          echo "::endgroup::"
+
+          echo "::group::HTTP server entry point — web-search serve"
+          "$BIN" serve --port 38218 &
+          SRV=$!
+          for i in $(seq 1 30); do
+            if curl -fsS "http://localhost:38218/health" >/dev/null 2>&1; then
+              echo "server OK: /health responded"
+              break
+            fi
+            if [ "$i" = "30" ]; then
+              echo "::error::HTTP server did not answer /health in time"
+              kill "$SRV" 2>/dev/null || true
+              exit 1
+            fi
+            sleep 1
+          done
+          kill "$SRV" 2>/dev/null || true
+          echo "::endgroup::"
+
+          echo "::group::Library entry point — dependent crate compiles"
+          cargo new --bin "$WORK/lib-consumer" >/dev/null
+          cd "$WORK/lib-consumer"
+          cargo add web-search@"$VERSION" >/dev/null
+          cat > src/main.rs <<'EOF'
+          use web_search::WebSearchEngine;
+
+          fn main() {
+              // Constructing the engine proves the published library entry point
+              // is usable from a downstream crate.
+              let _engine = WebSearchEngine::new();
+              println!("library OK: WebSearchEngine constructed from web-search crate");
+          }
+          EOF
+          cargo run --quiet
+          echo "::endgroup::"
+
+          echo "All entry points verified for web-search@$VERSION"
