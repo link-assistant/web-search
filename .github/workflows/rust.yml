@@ -262,13 +262,43 @@ jobs:
       - name: Read crate version
         id: version
         run: |
-          VERSION=$(sed -n 's/^version = "\(.*\)"/\1/p' rust/Cargo.toml | head -n 1)
+          # Single-language vs multi-language auto-detection: a Cargo.toml at the
+          # repo root means the crate IS the repository (single-language); a
+          # crate under rust/ means the repo hosts multiple languages and the
+          # GitHub Releases list is shared, so releases must be namespaced.
+          if [ -f Cargo.toml ]; then
+            RUST_ROOT="."
+            MULTI_LANG=false
+          else
+            RUST_ROOT="rust"
+            MULTI_LANG=true
+          fi
+          CARGO_TOML="$RUST_ROOT/Cargo.toml"
+
+          VERSION=$(sed -n 's/^version = "\(.*\)"/\1/p' "$CARGO_TOML" | head -n 1)
+          NAME=$(sed -n 's/^name = "\(.*\)"/\1/p' "$CARGO_TOML" | head -n 1)
           if [ -z "$VERSION" ]; then
-            echo "::error::Could not read crate version from rust/Cargo.toml"
+            echo "::error::Could not read crate version from $CARGO_TOML"
             exit 1
           fi
+          if [ -z "$NAME" ]; then
+            echo "::error::Could not read crate name from $CARGO_TOML"
+            exit 1
+          fi
+
+          # Multi-language → namespaced tag `rust_v<semver>`; single-language →
+          # plain `v<semver>` (nothing to disambiguate against).
+          if [ "$MULTI_LANG" = "true" ]; then
+            TAG="rust_v$VERSION"
+          else
+            TAG="v$VERSION"
+          fi
+
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-          echo "tag=rust-v$VERSION" >> "$GITHUB_OUTPUT"
+          echo "name=$NAME" >> "$GITHUB_OUTPUT"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "multi_lang=$MULTI_LANG" >> "$GITHUB_OUTPUT"
+          echo "Detected layout: multi_lang=$MULTI_LANG, crate=$NAME, version=$VERSION, tag=$TAG"
 
       # Pre-flight existence check. The Rust release job runs on every push to
       # main that touches rust/**, but the crate version is only bumped in some of
@@ -323,16 +353,33 @@ jobs:
         run: |
           VERSION="${{ steps.version.outputs.version }}"
           TAG="${{ steps.version.outputs.tag }}"
+          NAME="${{ steps.version.outputs.name }}"
+          MULTI_LANG="${{ steps.version.outputs.multi_lang }}"
 
           if gh release view "$TAG" >/dev/null 2>&1; then
             echo "GitHub release $TAG already exists"
             exit 0
           fi
 
+          # Multi-language repos prefix the title with the language so [Rust] and
+          # [JavaScript] releases are distinguishable in one shared list.
+          if [ "$MULTI_LANG" = "true" ]; then
+            TITLE="[Rust] $VERSION"
+          else
+            TITLE="$NAME $VERSION"
+          fi
+
+          # crates.io badge whose link points at THIS version's crate page, so the
+          # release leads directly to the matching package-manager release.
+          CRATE_URL="https://crates.io/crates/$NAME/$VERSION"
+          BADGE="[![crates.io](https://img.shields.io/badge/crates.io-v$VERSION-orange?logo=rust)]($CRATE_URL)"
+          NOTES="$(printf '%s\n\nRust crate release for `%s` %s.\n\nInstall with `cargo add %s@%s`. Crate page: %s' \
+            "$BADGE" "$NAME" "$VERSION" "$NAME" "$VERSION" "$CRATE_URL")"
+
           gh release create "$TAG" \
-            --title "Rust web-search $VERSION" \
+            --title "$TITLE" \
             --target "$GITHUB_SHA" \
-            --notes "Rust crate release for web-search $VERSION. Crate: https://crates.io/crates/web-search/$VERSION"
+            --notes "$NOTES"
 
       # Install-from-package smoke test (issue #6): prove the published crate is
       # actually installable from crates.io and that all three entry points work
@@ -358,11 +405,19 @@ jobs:
           echo "::endgroup::"
 
           echo "::group::CLI entry point — web-search --list-providers"
-          "$BIN" --list-providers | head -n 5
-          if [ -z "$("$BIN" --list-providers)" ]; then
+          # Capture the full output FIRST instead of piping the binary straight
+          # into `head`. A pipe to `head -n 5` closes the read end after five
+          # lines, so the binary gets SIGPIPE on its next write and aborts
+          # ("failed printing to stdout: Broken pipe", exit 101). Under
+          # `set -o pipefail` that turned a perfectly healthy CLI into a red
+          # smoke test — the exact false-positive this change removes. Capturing
+          # to a variable severs the pipe; we only paginate the captured text.
+          PROVIDERS_OUTPUT="$("$BIN" --list-providers)"
+          if [ -z "$PROVIDERS_OUTPUT" ]; then
             echo "::error::CLI --list-providers produced no output"
             exit 1
           fi
+          printf '%s\n' "$PROVIDERS_OUTPUT" | head -n 5
           echo "CLI OK"
           echo "::endgroup::"
 

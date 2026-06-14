@@ -467,8 +467,18 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let cli = Cli::parse();
 
     if cli.list_providers {
-        print_providers();
-        return Ok(());
+        // Write the rendered listing through a single fallible write so a
+        // downstream reader that closes early (e.g. `web-search --list-providers
+        // | head`) results in a clean exit instead of a panic. Rust ignores
+        // SIGPIPE by default and surfaces the closed pipe as an EPIPE error;
+        // `println!` would turn that into "failed printing to stdout: Broken
+        // pipe" and abort with exit code 101. Treating BrokenPipe as success
+        // keeps piped usage (and the release smoke test) green.
+        return match write_stdout(&render_providers()) {
+            Ok(()) => Ok(()),
+            Err(error) if error.kind() == std::io::ErrorKind::BrokenPipe => Ok(()),
+            Err(error) => Err(error.into()),
+        };
     }
 
     match &cli.command {
@@ -483,14 +493,20 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-/// Print the full provider registry grouped by category.
-fn print_providers() {
+/// Render the full provider registry grouped by category into a single string.
+///
+/// Building the listing as a string (rather than emitting it with `println!`
+/// line by line) lets the caller perform one fallible write to stdout and treat
+/// a closed pipe (`| head`) as a clean exit instead of a panic.
+fn render_providers() -> String {
+    use std::fmt::Write as _;
     let registry = get_registry();
-    println!("Registered providers ({} total):\n", registry.len());
+    let mut out = String::new();
+    let _ = writeln!(out, "Registered providers ({} total):\n", registry.len());
     for category in CATEGORIES {
         let entries: Vec<&RegistryEntry> =
             registry.iter().filter(|e| e.category == category).collect();
-        println!("{} ({}):", category, entries.len());
+        let _ = writeln!(out, "{} ({}):", category, entries.len());
         for e in entries {
             let default = if e.default_for_category {
                 " [default]"
@@ -498,11 +514,23 @@ fn print_providers() {
                 ""
             };
             let cors = if e.cors_readable { ", cors" } else { "" };
-            println!(
+            let _ = writeln!(
+                out,
                 "  {:<16} {} ({}{}){}",
                 e.id, e.label, e.access, cors, default
             );
         }
-        println!();
+        let _ = writeln!(out);
     }
+    out
+}
+
+/// Write text to stdout in one shot, propagating the I/O error (including
+/// `BrokenPipe`) to the caller instead of panicking the way `println!` does.
+fn write_stdout(text: &str) -> std::io::Result<()> {
+    use std::io::Write as _;
+    let stdout = std::io::stdout();
+    let mut handle = stdout.lock();
+    handle.write_all(text.as_bytes())?;
+    handle.flush()
 }

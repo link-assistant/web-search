@@ -25,6 +25,8 @@
 
 const PACKAGE_NAME = '@link-assistant/web-search';
 
+import { buildNpmBadge, normalizeVersion } from './release-naming.mjs';
+
 // Load use-m dynamically
 const { use } = eval(
   await (await fetch('https://unpkg.com/use-m/use.js')).text()
@@ -187,9 +189,12 @@ try {
     console.log('ℹ️ No commit SHA available - not adding PR link');
   }
 
-  // Build formatted release notes
-  const versionWithoutV = version.replace(/^v/, '');
-  const npmBadge = `[![npm version](https://img.shields.io/badge/npm-${versionWithoutV}-blue.svg)](https://www.npmjs.com/package/${PACKAGE_NAME}/v/${versionWithoutV})`;
+  // Build formatted release notes.
+  // normalizeVersion strips any tag prefix (v / js-v / js_v / rust_v) so the
+  // npm badge always links to the correct .../package/<pkg>/v/<semver> page,
+  // even when callers pass a full tag instead of a bare version.
+  const versionWithoutV = normalizeVersion(version);
+  const npmBadge = buildNpmBadge(PACKAGE_NAME, versionWithoutV);
 
   let formattedBody = `${cleanDescription}`;
 

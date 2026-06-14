@@ -1,0 +1,24 @@
+{
+  "release_run_main_5a07f9b": {
+    "rust_run_id": 27483856057,
+    "head_branch": "main",
+    "head_sha": "5a07f9b5e9b3c460030a903eda36ad201ac8eb12",
+    "jobs": {
+      "Build Package": "success (used Swatinem/rust-cache — brotli not recompiled)",
+      "Rust - Publish and Release": "failure (smoke-test step: broken pipe, exit 101)"
+    },
+    "js_run_id": 27483856051,
+    "js_release_job": "failure (ENEEDAUTH — no npm auth available for 0.10.0 publish)"
+  },
+  "parity_anomaly": {
+    "passed": {"run_id": 27483754964, "branch": "issue-6-9ad68b60fc91", "sha": "f4cc1c5", "at": "2026-06-14T00:41:00Z"},
+    "failed": {"run_id": 27494793249, "branch": "issue-15-7e5742952426", "sha": "e8beaaa", "at": "2026-06-14T09:34:50Z",
+               "reason": "brotli E0277 StandardAlloc: Allocator<ZopfliNode> — fresh dependency resolution picked alloc-no-stdlib 3.0.0; Cargo.lock was gitignored so no pin existed"}
+  },
+  "published_state_2026-06-14": {
+    "npm": ["0.8.2"],
+    "crates_io": ["0.2.0"],
+    "git_tags": ["rust-v0.2.0"],
+    "github_releases": ["Rust web-search 0.2.0 (rust-v0.2.0)"]
+  }
+}

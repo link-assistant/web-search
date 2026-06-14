@@ -16,6 +16,7 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 
 import { getJsRoot, parseJsRootConfig } from './js-paths.mjs';
+import { buildReleaseTag, buildReleaseTitle } from './release-naming.mjs';
 
 // Load use-m dynamically
 const { use } = eval(
@@ -61,7 +62,11 @@ if (!version || !repository) {
   process.exit(1);
 }
 
-const tag = `js-v${version}`;
+// Tag and title honour the single-vs-multi-language layout (see release-naming.mjs).
+// Multi-language repos namespace the tag (`js_v1.2.3`) and prefix the title
+// (`[JavaScript] 1.2.3`) so JS and Rust releases never collide in one list.
+const tag = buildReleaseTag(version, { jsRoot });
+const releaseTitle = buildReleaseTitle(version, { jsRoot });
 
 // Keep comfortably below GitHub's observed 125000-character release body limit.
 // Reference: link-foundation/js-ai-driven-development-pipeline-template
@@ -141,7 +146,7 @@ try {
   // (Previously caused apostrophes like "didn't" to appear as "didn'''" in releases)
   const payload = JSON.stringify({
     tag_name: tag,
-    name: `JavaScript ${version}`,
+    name: releaseTitle,
     body: limitReleaseNotesBytes(releaseNotes),
   });
 
