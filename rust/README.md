@@ -115,10 +115,8 @@ The Rust workflow publishes `web-search` to crates.io from `main` after lint,
 tests, doc tests, and package checks pass. GitHub releases are tagged as
 `rust-v<version>` so they stay distinct from JavaScript `js-v<version>` releases.
 
-The current `web-capture 0.3.30` dependency requires two transitive pins:
-`html-to-markdown-rs = 3.5.7` and `time = 0.3.36`. They match the dependency
-graph the component was released against and avoid known compile breaks in newer
-compatible-range releases.
+The current `web-capture 0.3.31` dependency requires Rust 1.96 or newer, which
+is declared as this crate's MSRV in `Cargo.toml`.
 
 ## Development
 

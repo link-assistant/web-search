@@ -2,6 +2,7 @@
 name = "web-search"
 version = "0.3.0"
 edition = "2021"
+rust-version = "1.96"
 description = "A multi-provider web search aggregator with reranking support"
 license = "Unlicense"
 repository = "https://github.com/link-assistant/web-search"
@@ -18,29 +19,22 @@ name = "web-search"
 path = "src/main.rs"
 
 [dependencies]
-tokio = { version = "1.43", features = ["full"] }
-reqwest = { version = "0.12", features = ["json"] }
+tokio = { version = "1.52", features = ["full"] }
+reqwest = { version = "0.13", features = ["form", "json"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-scraper = "0.22"
+scraper = "0.27"
 regex = "1"
 thiserror = "2.0"
 async-trait = "0.1"
-clap = { version = "4.5", features = ["derive"] }
+clap = { version = "4.6", features = ["derive"] }
 axum = "0.8"
 tower-http = { version = "0.6", features = ["cors"] }
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 url = "2.5"
 urlencoding = "2.1"
-web-capture = "0.3.30"
-# web-capture 0.3.30 was released against html-to-markdown-rs 3.5.7; 3.6.x
-# changed the InlineImage dimensions contract used by web-capture's lib build.
-html-to-markdown-rs = "=3.5.7"
-# cookie 0.18.1, pulled in by web-capture's browser stack, conflicts with the
-# latest time 0.3.x under Rust 1.96. Pin the compatible line until cookie ships a
-# patched release.
-time = "=0.3.36"
+web-capture = "0.3.31"
 
 [dev-dependencies]
 tokio-test = "0.4"
