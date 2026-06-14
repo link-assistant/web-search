@@ -184,11 +184,14 @@ monorepo and must coexist with the others). Primary: **js** and **rust**.
 
 ---
 
-## Filing status
+## Filing status (filed 2026-06-14)
 
-| Report | Templates | Action |
-| ------ | --------- | ------ |
-| A — SIGPIPE-safe smoke test | rust (primary), js, python, csharp | amend issue-6 issues #73/#81/#20/#27 |
-| B — multi-language tag/title/detection | js, rust (primary), python, csharp | new issue per template |
-| C — release-body package badge | js, rust, python, csharp | new issue per template |
-| D — commit `Cargo.lock` for binaries | rust | new issue (low priority) |
+Reports B and C were filed together as one "multi-language release metadata"
+issue per template (auto-detection + tag/title namespacing + artifact badge are
+one cohesive release-job change).
+
+| Report | Templates | Filed |
+| ------ | --------- | ----- |
+| A — SIGPIPE-safe smoke test | rust, js, python, csharp | comments on rust#73, js#81, python#20, csharp#27 |
+| B+C — multi-language tags/titles/detection + release badge | js, rust, python, csharp | js#82, rust#74, python#21, csharp#28 |
+| D — commit `Cargo.lock` for binaries | rust | rust#75 |
