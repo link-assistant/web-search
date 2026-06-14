@@ -69,6 +69,14 @@ function parseArgs(args) {
     }
   }
 
+  // Support a `serve` subcommand as an alias for `--serve`, mirroring the Rust
+  // CLI (`web-search serve --port <port>`) so both languages share the same
+  // HTTP-server entry-point syntax.
+  if (positional[0] === 'serve') {
+    result.serve = true;
+    positional.shift();
+  }
+
   if (positional.length > 0) {
     result.query = positional.join(' ');
   }
@@ -82,7 +90,8 @@ web-search - Multi-provider web search aggregator
 
 Usage:
   web-search <query> [options]       Search the web
-  web-search --serve [--port <port>] Start as API server
+  web-search serve [--port <port>]   Start as API server
+  web-search --serve [--port <port>] Start as API server (flag alias)
 
 Search Options:
   --providers <list>   Comma-separated list of providers (e.g. google,duckduckgo,wikipedia)
@@ -316,7 +325,14 @@ async function main() {
   }
 }
 
-main().catch((err) => {
-  console.error('Fatal error:', err.message);
-  process.exit(1);
-});
+// Only auto-run the CLI when this file is executed directly, so the argument
+// parser can be unit-tested by importing it.
+const isMain = process.argv[1] === __filename;
+if (isMain) {
+  main().catch((err) => {
+    console.error('Fatal error:', err.message);
+    process.exit(1);
+  });
+}
+
+export { parseArgs };
