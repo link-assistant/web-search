@@ -275,8 +275,20 @@ async function main() {
       console.log('\u2705 Version bump committed and pushed to main');
       setOutput('version_committed', 'true');
     } else {
-      console.log('No changes to commit');
+      // Nothing to commit means package.json already holds the final version
+      // (e.g. a previous run bumped + pushed but then failed before publishing,
+      // consuming the changeset on the way). Without signalling the publish step
+      // here, that version falls into limbo: present on main but missing from npm
+      // and GitHub Releases, with no changeset left to retrigger it (issue #17,
+      // observed as 0.10.1 stuck unpublished). Mark already_released so the
+      // idempotent publish step still runs — publish-to-npm.mjs checks npm first
+      // and no-ops when the version is genuinely already published, so this is
+      // safe to assert unconditionally and lets the pipeline self-heal.
+      console.log(
+        'No changes to commit — version already final; signalling publish step to verify npm and self-heal if unpublished'
+      );
       setOutput('version_committed', 'false');
+      setOutput('already_released', 'true');
     }
   } catch (error) {
     // Restore cwd on error

@@ -190,7 +190,7 @@ try {
   }
 
   // Build formatted release notes.
-  // normalizeVersion strips any tag prefix (v / js-v / js_v / rust_v) so the
+  // normalizeVersion strips any tag prefix (v / js- / js-v / js_v / rust- / rust_v) so the
   // npm badge always links to the correct .../package/<pkg>/v/<semver> page,
   // even when callers pass a full tag instead of a bare version.
   const versionWithoutV = normalizeVersion(version);

@@ -15,16 +15,17 @@
  *
  * In a multi-language repo the JavaScript and Rust (and any future language)
  * releases share one GitHub Releases list, so they must be disambiguated:
- *   - tags are namespaced with a `js_` prefix (e.g. `js_v1.2.3`)
+ *   - tags are namespaced with a short `js-` prefix (e.g. `js-1.2.3`)
  *   - titles are prefixed with the language (e.g. `[JavaScript] 1.2.3`)
  *
- * In a single-language repo there is nothing to disambiguate, so the plain
- * `v1.2.3` tag and `JavaScript 1.2.3` title are used (backwards compatible with
- * the historical behaviour of this repository's template).
+ * In a single-language repo there is nothing to disambiguate, so the bare
+ * `1.2.3` tag and `JavaScript 1.2.3` title are used.
  *
- * Reference: the convention mirrors the four link-foundation AI-driven-development
- * pipeline templates (the C# template ships `--tag-prefix csharp_v --language "C#"`
- * out of the box; Rust/JS support the same via flags).
+ * Tag format (issue #17): tags are deliberately SHORT — no `v` prefix and a
+ * single hyphen separator (`js-1.2.3`, `rust-1.2.3`), never the longer
+ * `js_v1.2.3` / `rust_v1.2.3` forms used historically. normalizeVersion()
+ * still accepts every legacy spelling (`v`, `js-v`, `js_v`, `rust_v`, `rust-v`)
+ * so old tags remain valid inputs.
  */
 
 import { getJsRoot } from './js-paths.mjs';
@@ -41,12 +42,12 @@ export function isMultiLanguage(options = {}) {
 
 /**
  * The tag prefix to use for this repository layout.
- * Multi-language → `js_v`, single-language → `v`.
+ * Multi-language → `js-` (short, no `v`); single-language → `''` (bare semver).
  * @param {Object} [options]
  * @returns {string}
  */
 export function getTagPrefix(options = {}) {
-  return isMultiLanguage(options) ? 'js_v' : 'v';
+  return isMultiLanguage(options) ? 'js-' : '';
 }
 
 /**
@@ -55,7 +56,7 @@ export function getTagPrefix(options = {}) {
  * `js-v1.2.3` or `js_v1.2.3` and always get a consistent result.
  * @param {string} version
  * @param {Object} [options]
- * @returns {string} e.g. `js_v1.2.3` (multi) or `v1.2.3` (single)
+ * @returns {string} e.g. `js-1.2.3` (multi) or `1.2.3` (single)
  */
 export function buildReleaseTag(version, options = {}) {
   return `${getTagPrefix(options)}${normalizeVersion(version)}`;

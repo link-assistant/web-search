@@ -80,8 +80,8 @@ if (!version || !repository || !commitSha) {
 const jsRoot = getJsRoot({ jsRoot: jsRootArg || parseJsRootConfig() });
 
 // Resolve the tag the same way create-github-release.mjs does, so formatting
-// always targets the release that was actually created (js_v… in multi-language
-// repos, v… in single-language repos).
+// always targets the release that was actually created (js-… in multi-language
+// repos, bare semver in single-language repos).
 const tag = buildReleaseTag(version, { jsRoot });
 
 try {

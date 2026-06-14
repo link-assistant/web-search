@@ -25,28 +25,36 @@ describe('release-naming: layout detection', () => {
 });
 
 describe('release-naming: tag prefix', () => {
-  it('namespaces the tag with js_v in multi-language repos', () => {
-    expect(getTagPrefix(MULTI)).toBe('js_v');
+  it('namespaces the tag with the short js- prefix in multi-language repos', () => {
+    expect(getTagPrefix(MULTI)).toBe('js-');
   });
 
-  it('uses a plain v prefix in single-language repos', () => {
-    expect(getTagPrefix(SINGLE)).toBe('v');
+  it('uses no prefix (bare semver) in single-language repos', () => {
+    expect(getTagPrefix(SINGLE)).toBe('');
   });
 });
 
 describe('release-naming: buildReleaseTag', () => {
-  it('produces js_v<semver> for multi-language repos', () => {
-    expect(buildReleaseTag('1.2.3', MULTI)).toBe('js_v1.2.3');
+  it('produces js-<semver> for multi-language repos (short, no v)', () => {
+    expect(buildReleaseTag('1.2.3', MULTI)).toBe('js-1.2.3');
   });
 
-  it('produces v<semver> for single-language repos', () => {
-    expect(buildReleaseTag('1.2.3', SINGLE)).toBe('v1.2.3');
+  it('produces a bare <semver> for single-language repos (no v)', () => {
+    expect(buildReleaseTag('1.2.3', SINGLE)).toBe('1.2.3');
   });
 
-  it('is idempotent when handed a value that already carries a prefix', () => {
-    expect(buildReleaseTag('js_v1.2.3', MULTI)).toBe('js_v1.2.3');
-    expect(buildReleaseTag('js-v1.2.3', MULTI)).toBe('js_v1.2.3');
-    expect(buildReleaseTag('v1.2.3', SINGLE)).toBe('v1.2.3');
+  it('never emits a v prefix or underscore separator', () => {
+    expect(buildReleaseTag('1.2.3', MULTI)).not.toContain('v');
+    expect(buildReleaseTag('1.2.3', MULTI)).not.toContain('_');
+    expect(buildReleaseTag('1.2.3', SINGLE)).not.toContain('v');
+  });
+
+  it('is idempotent across legacy and new spellings', () => {
+    expect(buildReleaseTag('js-1.2.3', MULTI)).toBe('js-1.2.3');
+    expect(buildReleaseTag('js_v1.2.3', MULTI)).toBe('js-1.2.3');
+    expect(buildReleaseTag('js-v1.2.3', MULTI)).toBe('js-1.2.3');
+    expect(buildReleaseTag('v1.2.3', SINGLE)).toBe('1.2.3');
+    expect(buildReleaseTag('1.2.3', SINGLE)).toBe('1.2.3');
   });
 });
 
@@ -72,6 +80,8 @@ describe('release-naming: normalizeVersion', () => {
     ['js_v1.2.3', '1.2.3'],
     ['rust_v0.2.0', '0.2.0'],
     ['rust-v0.2.0', '0.2.0'],
+    ['rust-0.2.0', '0.2.0'],
+    ['js-1.2.3', '1.2.3'],
     ['1.2.3-beta.1', '1.2.3-beta.1'],
     ['js_v1.2.3-beta.1', '1.2.3-beta.1'],
     ['', ''],
