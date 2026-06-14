@@ -28,18 +28,53 @@ A web search microservice and library that aggregates results from 20+ search en
 - **Dual language parity**: Identical behavior and an extensive shared test suite across JavaScript and Rust.
 - **Multi-runtime support**: The JavaScript build works with Bun, Node.js, and Deno.
 
+## Entry points
+
+`web-search` ships the same three entry points in both languages. Every entry
+point is available from the published packages — no Git checkout or path
+dependency required.
+
+| Entry point     | JavaScript (`@link-assistant/web-search`)                         | Rust (`web-search` crate)                  |
+| --------------- | ----------------------------------------------------------------- | ------------------------------------------ |
+| **Library**     | `import { createSearchEngine } from '@link-assistant/web-search'` | `use web_search::WebSearchEngine;`         |
+| **CLI**         | `npx web-search "query"` (bin `web-search`)                       | `web-search "query"` (binary `web-search`) |
+| **HTTP server** | `npx web-search serve --port 3000`                                | `web-search serve --port 3000`             |
+
+- npm package: [`@link-assistant/web-search`](https://www.npmjs.com/package/@link-assistant/web-search)
+- crates.io crate: [`web-search`](https://crates.io/crates/web-search)
+- GitHub releases: [`js-v*`](https://github.com/link-assistant/web-search/releases?q=js-v) (JavaScript) and [`rust-v*`](https://github.com/link-assistant/web-search/releases?q=rust-v) (Rust)
+
 ## Installation
 
+### JavaScript (npm)
+
 ```bash
-# With npm
-npm install @link-assistant/web-search
+# Install the latest published version
+npm install @link-assistant/web-search        # npm
+bun add @link-assistant/web-search            # bun
+yarn add @link-assistant/web-search           # yarn
 
-# With bun
-bun add @link-assistant/web-search
-
-# With yarn
-yarn add @link-assistant/web-search
+# Pin a specific published version (recommended for CI / reproducible builds)
+npm install @link-assistant/web-search@0.9.0
 ```
+
+### Rust (cargo)
+
+```bash
+# Add the latest published crate
+cargo add web-search
+
+# Pin a specific published version (recommended for CI / reproducible builds)
+cargo add web-search@0.2.0
+
+# Or install the CLI/server binary directly from crates.io
+cargo install web-search            # latest
+cargo install web-search@0.2.0      # pinned
+```
+
+> The pinned versions above match the current published baseline
+> (npm `@link-assistant/web-search@0.9.0`, crates.io `web-search@0.2.0`). Replace
+> them with the latest tags shown on the badges at the top of this README.
 
 ## Quick Start
 

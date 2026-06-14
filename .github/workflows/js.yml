@@ -340,6 +340,19 @@ jobs:
         working-directory: .
         run: node js/scripts/check-changesets.mjs --js-root js
 
+      # Self-healing release detection (issue #6).
+      # When a previous release attempt bumped package.json but failed to publish
+      # to npm (e.g. the failed 0.9.0 publish), the changeset is already consumed,
+      # so a plain "has changesets?" gate would never retry. This step checks npm
+      # — the source of truth — and asks for a release when the current version is
+      # not yet published, with skip_bump=true so no new version is minted.
+      - name: Check if release is needed
+        id: check_release
+        working-directory: .
+        env:
+          HAS_CHANGESETS: ${{ steps.check_changesets.outputs.has_changesets }}
+        run: node js/scripts/check-release-needed.mjs --js-root js
+
       - name: Merge multiple changesets
         if: steps.check_changesets.outputs.has_changesets == 'true' && steps.check_changesets.outputs.changeset_count > 1
         working-directory: .
@@ -352,7 +365,13 @@ jobs:
         run: node js/scripts/version-and-commit.mjs --mode changeset --js-root js
 
       - name: Publish to npm
-        if: steps.version.outputs.version_committed == 'true' || steps.version.outputs.already_released == 'true'
+        # Publish when a changeset minted a new version, when a previous attempt
+        # already committed the bump (re-run), or when self-healing detected an
+        # unpublished version that needs to be (re)published (issue #6).
+        if: >-
+          steps.version.outputs.version_committed == 'true' ||
+          steps.version.outputs.already_released == 'true' ||
+          (steps.check_release.outputs.should_release == 'true' && steps.check_release.outputs.skip_bump == 'true')
         id: publish
         working-directory: .
         # NODE_AUTH_TOKEN is an OPTIONAL bootstrap fallback. When the NPM_TOKEN
@@ -377,6 +396,15 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: node js/scripts/format-github-release.mjs --release-version "${{ steps.publish.outputs.published_version }}" --repository "${{ github.repository }}" --commit-sha "${{ github.sha }}"
+
+      # Install-from-package smoke test (issue #6): prove the just-published
+      # artifact is actually installable from npm and that the library, CLI and
+      # HTTP-server entry points all work from a clean install (not the repo
+      # checkout). Fails the release loudly if a broken package was published.
+      - name: Smoke-test published npm package
+        if: steps.publish.outputs.published == 'true'
+        working-directory: .
+        run: node js/scripts/smoke-test-package.mjs --package-version "${{ steps.publish.outputs.published_version }}" --js-root js
 
   instant-release:
     name: JS - Instant Release
