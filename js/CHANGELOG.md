@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.10.3
+
+### Patch Changes
+
+- 134c184: Bump the JavaScript dependency baseline, including Express 5.
+
 ## 0.10.2
 
 ### Patch Changes
