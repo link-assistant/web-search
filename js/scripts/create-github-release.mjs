@@ -63,7 +63,7 @@ if (!version || !repository) {
 }
 
 // Tag and title honour the single-vs-multi-language layout (see release-naming.mjs).
-// Multi-language repos namespace the tag (`js_v1.2.3`) and prefix the title
+// Multi-language repos namespace the tag (`js-1.2.3`) and prefix the title
 // (`[JavaScript] 1.2.3`) so JS and Rust releases never collide in one list.
 const tag = buildReleaseTag(version, { jsRoot });
 const releaseTitle = buildReleaseTitle(version, { jsRoot });
