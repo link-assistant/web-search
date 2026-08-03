@@ -142,6 +142,7 @@ jobs:
         working-directory: .
         run: |
           cargo check --manifest-path rust/Cargo.toml --no-default-features --lib --verbose
+          cargo test --manifest-path rust/Cargo.toml --no-default-features --lib --verbose
           rust-script rust/scripts/check-core-feature-boundary.rs --rust-root rust
 
       - name: Check formatting
