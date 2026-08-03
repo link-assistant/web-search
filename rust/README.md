@@ -74,6 +74,33 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 ```
 
+### Caller-owned transport and detailed outcomes
+
+Implement `SearchTransport` for a cache or HTTP stack, then pass it to the
+detailed API. Each `ProviderOutcome` retains an independent status/error and
+the exact `TransportResponse` bytes (plus an optional opaque cache receipt).
+
+```rust,ignore
+use std::sync::Arc;
+use web_search::{SearchOptions, SearchTransport, WebSearchEngine};
+
+let transport: Arc<dyn SearchTransport> = Arc::new(MyCachedTransport::new());
+let detailed = engine
+    .search_detailed_with_options(
+        "graph neural networks",
+        SearchOptions::default(),
+        Some(vec!["arxiv".into(), "github".into()]),
+        None,
+        transport,
+    )
+    .await;
+```
+
+Provider work is polled within the returned aggregate future instead of being
+detached with `tokio::spawn`; dropping that future therefore drops all in-flight
+requests. Single-provider callers can use `search_single_with_transport`, and
+provider implementations expose `SearchProvider::search_with_transport`.
+
 ## CLI
 
 ```bash
@@ -111,8 +138,8 @@ search rate limit.
 
 `wc:wikipedia`, `wc:duckduckgo`, `wc:google`, `wc:bing`, and `wc:brave` delegate
 to the published `web-capture` crate. Runtime errors from that component are
-logged and converted to an empty result set so other selected providers can
-still return results.
+retained as provider errors by detailed aggregate searches, so other selected
+providers can still return results without erasing the diagnostic.
 
 ```rust
 use web_search::providers::{SearchOptions, SearchProvider, WebCaptureProvider};

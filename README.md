@@ -104,6 +104,30 @@ const results = await engine.search('machine learning', {
 const googleResults = await engine.searchSingle('deep learning', 'google');
 ```
 
+### Transport, cancellation, and diagnostics
+
+Callers can inject a fetch-compatible transport per engine or per search. The
+detailed API keeps fused results together with each provider's outcome and an
+exact response capture (or the opaque `captureReceipt` returned by a custom
+transport):
+
+```javascript
+const controller = new AbortController();
+const { results, outcomes } = await engine.searchDetailed('cached query', {
+  providers: ['wikipedia', 'github'],
+  transport: cachedFetch,
+  signal: controller.signal,
+});
+
+// outcomes[i] has status, unmerged results, receipts, and an optional error.
+```
+
+Rust exposes the equivalent `SearchTransport` trait and
+`search_detailed_with_options`. Its aggregate future owns all provider futures;
+dropping that future cancels the work rather than leaving detached tasks.
+`ProviderOutcome.responses` contains the exact bytes and optional cache receipt
+returned by the caller's transport.
+
 ### As a REST API Server
 
 ```bash

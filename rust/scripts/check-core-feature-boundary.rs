@@ -11,6 +11,7 @@ const FORBIDDEN_PACKAGES: &[&str] = &[
     "async-trait",
     "axum",
     "clap",
+    "futures",
     "openssl",
     "openssl-sys",
     "regex",

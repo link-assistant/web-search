@@ -97,6 +97,25 @@ const provider = createWebCaptureProvider({ engine: 'wikipedia' });
 const results = await provider.search('OpenAI', { limit: 5 });
 ```
 
+## Caller-owned transport and detailed outcomes
+
+`transport` accepts a fetch-compatible function or an object with a `fetch`
+method. It can be configured on the engine or supplied per call. `signal` is
+forwarded to every provider request.
+
+```javascript
+const { results, outcomes } = await engine.searchDetailed('OpenAI', {
+  providers: ['wikipedia', 'github'],
+  transport: cachedTransport,
+  signal: abortController.signal,
+});
+```
+
+Each outcome reports `success`, `error`, or `unavailable`, retains the
+provider's unmerged results, and includes response receipts. Native `Response`
+objects are cloned into an exact byte capture; a custom transport may instead
+attach an opaque `captureReceipt` property to its response.
+
 ## Release
 
 The JavaScript release workflow publishes through npm trusted publishing and

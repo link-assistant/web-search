@@ -27,6 +27,7 @@ import { mergeResults } from './merger.js';
  * @property {Object<string, number>} [weights] - Weights for each provider
  * @property {'rrf' | 'weighted' | 'interleave'} [mergeStrategy] - Default merge strategy
  * @property {Function} [fetchImpl] - Injectable fetch implementation (for tests)
+ * @property {Function|{fetch: Function}} [transport] - Caller-owned transport
  */
 
 /**
@@ -134,6 +135,8 @@ export class WebSearchEngine {
             language: options.language,
             region: options.region,
             safeSearch: options.safeSearch,
+            signal: options.signal,
+            transport: options.transport,
           })
         );
       }
@@ -162,6 +165,96 @@ export class WebSearchEngine {
       weights,
       removeDuplicates: true,
     });
+  }
+
+  /**
+   * Search while retaining each provider's success/error and response provenance.
+   * Dropping/aborting the supplied signal cancels fetch-compatible transports.
+   *
+   * @param {string} query
+   * @param {Object} [options]
+   * @returns {Promise<{results: SearchResult[], outcomes: Object[]}>}
+   */
+  async searchDetailed(query, options = {}) {
+    if (!query || typeof query !== 'string' || query.trim().length === 0) {
+      return { results: [], outcomes: [] };
+    }
+
+    const providersToUse = options.providers || this.defaultProviders;
+    const weights = options.weights || this.defaultWeights;
+    const strategy = options.strategy || this.defaultMergeStrategy;
+    const executions = providersToUse.map(async (requestedName) => {
+      const providerName = requestedName.toLowerCase();
+      const provider = this.providers.get(providerName);
+      const receipts = [];
+      if (!provider) {
+        return {
+          provider: requestedName,
+          status: 'error',
+          results: [],
+          receipts,
+          error: {
+            name: 'UnknownProviderError',
+            message: `Unknown provider: ${requestedName}`,
+          },
+        };
+      }
+      if (!provider.isAvailable()) {
+        return {
+          provider: requestedName,
+          status: 'unavailable',
+          results: [],
+          receipts,
+        };
+      }
+      try {
+        const results = await provider.search(query, {
+          limit: options.limit,
+          language: options.language,
+          region: options.region,
+          safeSearch: options.safeSearch,
+          signal: options.signal,
+          transport: options.transport,
+          throwOnError: true,
+          captureResponse: (receipt) => receipts.push(receipt),
+        });
+        if (!Array.isArray(results)) {
+          throw new TypeError('Provider returned an invalid result');
+        }
+        return {
+          provider: requestedName,
+          status: 'success',
+          results,
+          receipts,
+        };
+      } catch (error) {
+        return {
+          provider: requestedName,
+          status: 'error',
+          results: [],
+          receipts,
+          error: {
+            name: error?.name || 'Error',
+            message: error?.message || String(error),
+          },
+        };
+      }
+    });
+
+    const outcomes = await Promise.all(executions);
+    const resultsByProvider = Object.fromEntries(
+      outcomes
+        .filter((outcome) => outcome.status === 'success')
+        .map((outcome) => [outcome.provider, outcome.results])
+    );
+    return {
+      results: mergeResults(resultsByProvider, {
+        strategy,
+        weights,
+        removeDuplicates: true,
+      }),
+      outcomes,
+    };
   }
 
   /**

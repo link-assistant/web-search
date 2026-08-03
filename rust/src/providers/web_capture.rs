@@ -10,9 +10,11 @@
 //! component errors.
 
 use async_trait::async_trait;
+use std::collections::BTreeMap;
 
 use super::base::{SearchOptions, SearchProvider, SearchResult};
 use crate::error::SearchError;
+use crate::transport::{ReqwestTransport, SearchTransport, TransportRequest};
 
 /// Providers exposed by web-capture's search contract.
 pub const SUPPORTED_PROVIDERS: [&str; 5] = web_capture::SEARCH_PROVIDERS;
@@ -103,22 +105,66 @@ impl SearchProvider for WebCaptureProvider {
         query: &str,
         options: &SearchOptions,
     ) -> Result<Vec<SearchResult>, SearchError> {
+        match self
+            .search_with_transport(query, options, &ReqwestTransport::default())
+            .await
+        {
+            Ok(results) => Ok(results),
+            Err(error) => {
+                tracing::warn!(
+                    provider = self.name(),
+                    error = %error,
+                    "WebCaptureProvider returned no results"
+                );
+                Ok(Vec::new())
+            }
+        }
+    }
+
+    async fn search_with_transport(
+        &self,
+        query: &str,
+        options: &SearchOptions,
+        transport: &dyn SearchTransport,
+    ) -> Result<Vec<SearchResult>, SearchError> {
         if query.trim().is_empty() {
             return Ok(Vec::new());
         }
 
         let limit = options.limit.unwrap_or(web_capture::DEFAULT_LIMIT);
 
-        match web_capture::search(query, &self.engine, limit, "fetch", "").await {
-            Ok(result) => Ok(self.adapt_items(result.results)),
-            Err(message) => {
-                tracing::warn!(
-                    provider = self.name(),
-                    error = %message,
-                    "WebCaptureProvider returned no results"
-                );
-                Ok(Vec::new())
-            }
+        let url = web_capture::search::build_search_url(&self.engine, query, limit).map_err(
+            |message| SearchError::ApiError {
+                provider: self.name.clone(),
+                message,
+            },
+        )?;
+        let response = transport
+            .execute(TransportRequest {
+                method: "GET".to_string(),
+                url,
+                headers: BTreeMap::from([(
+                    "User-Agent".to_string(),
+                    "Mozilla/5.0 (compatible; web-search/0.3)".to_string(),
+                )]),
+                body: None,
+            })
+            .await?;
+        if !(200..300).contains(&response.status) {
+            return Err(SearchError::ApiError {
+                provider: self.name.clone(),
+                message: format!("HTTP {}", response.status),
+            });
         }
+        let body = String::from_utf8_lossy(&response.body);
+        let (items, blocked) =
+            web_capture::search::parse_search_results(&self.engine, &body, limit);
+        if blocked {
+            return Err(SearchError::ApiError {
+                provider: self.name.clone(),
+                message: "provider returned a CAPTCHA page".to_string(),
+            });
+        }
+        Ok(self.adapt_items(items))
     }
 }

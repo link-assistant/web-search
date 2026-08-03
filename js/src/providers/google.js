@@ -6,6 +6,7 @@
 
 import { BaseSearchProvider } from './base.js';
 import { decodeHtmlEntities } from './html-utils.js';
+import { request } from '../transport.js';
 
 /**
  * Google search provider implementation
@@ -21,6 +22,7 @@ export class GoogleProvider extends BaseSearchProvider {
     super('google');
     this.apiKey = config.apiKey || process.env.GOOGLE_API_KEY;
     this.searchEngineId = config.searchEngineId || process.env.GOOGLE_CX;
+    this.transport = config.transport || config.fetchImpl;
     this.apiUrl = 'https://www.googleapis.com/customsearch/v1';
     this.webUrl = 'https://www.google.com/search';
   }
@@ -82,7 +84,12 @@ export class GoogleProvider extends BaseSearchProvider {
         params.set('safe', 'off');
       }
 
-      const response = await fetch(`${this.apiUrl}?${params}`);
+      const response = await request(
+        this.transport,
+        `${this.apiUrl}?${params}`,
+        {},
+        options
+      );
 
       if (!response.ok) {
         const error = await response.text();
@@ -143,15 +150,20 @@ export class GoogleProvider extends BaseSearchProvider {
         params.set('safe', 'active');
       }
 
-      const response = await fetch(`${this.webUrl}?${params}`, {
-        headers: {
-          'User-Agent':
-            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-          Accept:
-            'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-          'Accept-Language': 'en-US,en;q=0.5',
+      const response = await request(
+        this.transport,
+        `${this.webUrl}?${params}`,
+        {
+          headers: {
+            'User-Agent':
+              'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            Accept:
+              'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+            'Accept-Language': 'en-US,en;q=0.5',
+          },
         },
-      });
+        options
+      );
 
       if (!response.ok) {
         throw new Error(`Google returned status ${response.status}`);
@@ -160,6 +172,9 @@ export class GoogleProvider extends BaseSearchProvider {
       const html = await response.text();
       return this.parseScrapedResults(html, limit);
     } catch (error) {
+      if (options.throwOnError) {
+        throw error;
+      }
       console.error(`Google scraping search error: ${error.message}`);
       return [];
     }

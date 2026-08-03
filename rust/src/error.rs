@@ -9,6 +9,10 @@ pub enum SearchError {
     #[error("HTTP request failed: {0}")]
     RequestError(#[from] reqwest::Error),
 
+    /// Caller-owned transport failed.
+    #[error("Transport failed: {0}")]
+    Transport(String),
+
     /// Failed to parse HTML response
     #[error("Failed to parse HTML: {0}")]
     ParseError(String),

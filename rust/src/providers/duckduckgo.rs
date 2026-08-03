@@ -2,16 +2,17 @@
 
 use async_trait::async_trait;
 use scraper::{Html, Selector};
+use std::collections::BTreeMap;
 
 use super::base::{SearchOptions, SearchProvider, SearchResult};
 use crate::error::SearchError;
+use crate::transport::{ReqwestTransport, SearchTransport, TransportRequest};
 
 /// DuckDuckGo search provider
 pub struct DuckDuckGoProvider {
     name: String,
     enabled: bool,
     weight: f64,
-    client: reqwest::Client,
     base_url: String,
 }
 
@@ -22,10 +23,6 @@ impl DuckDuckGoProvider {
             name: "duckduckgo".to_string(),
             enabled: true,
             weight: 1.0,
-            client: reqwest::Client::builder()
-                .user_agent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
-                .build()
-                .expect("Failed to create HTTP client"),
             base_url: "https://html.duckduckgo.com/html/".to_string(),
         }
     }
@@ -112,6 +109,16 @@ impl SearchProvider for DuckDuckGoProvider {
         query: &str,
         options: &SearchOptions,
     ) -> Result<Vec<SearchResult>, SearchError> {
+        self.search_with_transport(query, options, &ReqwestTransport::default())
+            .await
+    }
+
+    async fn search_with_transport(
+        &self,
+        query: &str,
+        options: &SearchOptions,
+        transport: &dyn SearchTransport,
+    ) -> Result<Vec<SearchResult>, SearchError> {
         if query.is_empty() {
             return Ok(Vec::new());
         }
@@ -129,21 +136,43 @@ impl SearchProvider for DuckDuckGoProvider {
             params.push(("kp", if safe { "1" } else { "-2" }.to_string()));
         }
 
-        let response = self
-            .client
-            .post(&self.base_url)
-            .form(&params)
-            .send()
+        let body = params
+            .into_iter()
+            .map(|(name, value)| {
+                format!(
+                    "{}={}",
+                    urlencoding::encode(name),
+                    urlencoding::encode(&value)
+                )
+            })
+            .collect::<Vec<_>>()
+            .join("&");
+        let response = transport
+            .execute(TransportRequest {
+                method: "POST".to_string(),
+                url: self.base_url.clone(),
+                headers: BTreeMap::from([
+                    (
+                        "Content-Type".to_string(),
+                        "application/x-www-form-urlencoded".to_string(),
+                    ),
+                    (
+                        "User-Agent".to_string(),
+                        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36".to_string(),
+                    ),
+                ]),
+                body: Some(body.into_bytes()),
+            })
             .await?;
 
-        if !response.status().is_success() {
+        if !(200..300).contains(&response.status) {
             return Err(SearchError::ApiError {
                 provider: self.name.clone(),
-                message: format!("HTTP {}", response.status()),
+                message: format!("HTTP {}", response.status),
             });
         }
 
-        let html = response.text().await?;
+        let html = String::from_utf8_lossy(&response.body);
         Ok(self.parse_results(&html, limit))
     }
 }

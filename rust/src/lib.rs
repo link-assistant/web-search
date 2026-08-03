@@ -21,6 +21,8 @@ pub mod merger;
 pub mod providers;
 #[cfg(feature = "server")]
 pub mod search;
+#[cfg(feature = "server")]
+pub mod transport;
 mod types;
 
 #[cfg(feature = "server")]
@@ -32,5 +34,10 @@ pub use providers::{
     SearchOptions, CATEGORIES,
 };
 #[cfg(feature = "server")]
-pub use search::{WebSearchConfig, WebSearchEngine};
+pub use search::{
+    DetailedSearchResult, ProviderError, ProviderOutcome, ProviderOutcomeStatus, WebSearchConfig,
+    WebSearchEngine,
+};
+#[cfg(feature = "server")]
+pub use transport::{ReqwestTransport, SearchTransport, TransportRequest, TransportResponse};
 pub use types::SearchResult;

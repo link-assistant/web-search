@@ -6,6 +6,7 @@
 
 import { BaseSearchProvider } from './base.js';
 import { decodeHtmlEntities, stripHtml } from './html-utils.js';
+import { request } from '../transport.js';
 
 /**
  * Bing search provider implementation
@@ -19,6 +20,7 @@ export class BingProvider extends BaseSearchProvider {
   constructor(config = {}) {
     super('bing');
     this.apiKey = config.apiKey || process.env.BING_API_KEY;
+    this.transport = config.transport || config.fetchImpl;
     this.apiUrl = 'https://api.bing.microsoft.com/v7.0/search';
     this.webUrl = 'https://www.bing.com/search';
   }
@@ -80,11 +82,16 @@ export class BingProvider extends BaseSearchProvider {
         params.set('safeSearch', 'Moderate');
       }
 
-      const response = await fetch(`${this.apiUrl}?${params}`, {
-        headers: {
-          'Ocp-Apim-Subscription-Key': this.apiKey,
+      const response = await request(
+        this.transport,
+        `${this.apiUrl}?${params}`,
+        {
+          headers: {
+            'Ocp-Apim-Subscription-Key': this.apiKey,
+          },
         },
-      });
+        options
+      );
 
       if (!response.ok) {
         const error = await response.text();
@@ -143,15 +150,20 @@ export class BingProvider extends BaseSearchProvider {
         params.set('safeSearch', 'Off');
       }
 
-      const response = await fetch(`${this.webUrl}?${params}`, {
-        headers: {
-          'User-Agent':
-            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-          Accept:
-            'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-          'Accept-Language': 'en-US,en;q=0.5',
+      const response = await request(
+        this.transport,
+        `${this.webUrl}?${params}`,
+        {
+          headers: {
+            'User-Agent':
+              'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            Accept:
+              'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+            'Accept-Language': 'en-US,en;q=0.5',
+          },
         },
-      });
+        options
+      );
 
       if (!response.ok) {
         throw new Error(`Bing returned status ${response.status}`);
@@ -160,6 +172,9 @@ export class BingProvider extends BaseSearchProvider {
       const html = await response.text();
       return this.parseScrapedResults(html, limit);
     } catch (error) {
+      if (options.throwOnError) {
+        throw error;
+      }
       console.error(`Bing scraping search error: ${error.message}`);
       return [];
     }
