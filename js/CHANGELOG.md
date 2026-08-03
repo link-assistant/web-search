@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.11.0
+
+### Minor Changes
+
+- c4ef723: Add caller-owned transports, AbortSignal cancellation, exact response captures, and structured per-provider outcomes through `searchDetailed`.
+
 ## 0.10.3
 
 ### Patch Changes
