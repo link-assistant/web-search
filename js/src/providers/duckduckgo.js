@@ -5,14 +5,16 @@
 
 import { BaseSearchProvider } from './base.js';
 import { decodeHtmlEntities, stripHtml } from './html-utils.js';
+import { request } from '../transport.js';
 
 /**
  * DuckDuckGo search provider implementation
  * @extends BaseSearchProvider
  */
 export class DuckDuckGoProvider extends BaseSearchProvider {
-  constructor() {
+  constructor(config = {}) {
     super('duckduckgo');
+    this.transport = config.transport || config.fetchImpl;
     this.baseUrl = 'https://html.duckduckgo.com/html/';
   }
 
@@ -41,15 +43,20 @@ export class DuckDuckGoProvider extends BaseSearchProvider {
         params.set('kp', '1');
       }
 
-      const response = await fetch(this.baseUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'User-Agent':
-            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+      const response = await request(
+        this.transport,
+        this.baseUrl,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'User-Agent':
+              'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+          },
+          body: params.toString(),
         },
-        body: params.toString(),
-      });
+        options
+      );
 
       if (!response.ok) {
         throw new Error(`DuckDuckGo returned status ${response.status}`);
@@ -58,6 +65,9 @@ export class DuckDuckGoProvider extends BaseSearchProvider {
       const html = await response.text();
       return this.parseResults(html, limit);
     } catch (error) {
+      if (options.throwOnError) {
+        throw error;
+      }
       console.error(`DuckDuckGo search error: ${error.message}`);
       return [];
     }

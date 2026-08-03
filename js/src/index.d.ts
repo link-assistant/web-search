@@ -23,6 +23,32 @@ export interface SearchResult {
   sources?: string[];
 }
 
+/** Fetch-compatible caller-owned transport. */
+export type SearchTransport =
+  | typeof fetch
+  | { fetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response> };
+
+/** Exact response capture or opaque receipt returned by a custom transport. */
+export type CaptureReceipt = unknown;
+
+export interface ProviderError {
+  name: string;
+  message: string;
+}
+
+export interface ProviderOutcome {
+  provider: string;
+  status: 'success' | 'error' | 'unavailable';
+  results: SearchResult[];
+  receipts: CaptureReceipt[];
+  error?: ProviderError;
+}
+
+export interface DetailedSearchResult {
+  results: SearchResult[];
+  outcomes: ProviderOutcome[];
+}
+
 /**
  * Options for search queries
  */
@@ -41,6 +67,10 @@ export interface SearchOptions {
   strategy?: 'rrf' | 'weighted' | 'interleave';
   /** Provider weights */
   weights?: Record<string, number>;
+  /** Caller cancellation signal */
+  signal?: AbortSignal;
+  /** Per-search caller-owned transport */
+  transport?: SearchTransport;
 }
 
 /**
@@ -140,6 +170,7 @@ export interface GoogleConfig {
   apiKey?: string;
   /** Google Custom Search Engine ID */
   searchEngineId?: string;
+  transport?: SearchTransport;
 }
 
 /**
@@ -148,6 +179,7 @@ export interface GoogleConfig {
 export interface BingConfig {
   /** Bing Search API key */
   apiKey?: string;
+  transport?: SearchTransport;
 }
 
 /**
@@ -166,6 +198,8 @@ export interface WebSearchConfig {
   mergeStrategy?: 'rrf' | 'weighted' | 'interleave';
   /** Injectable fetch implementation (primarily for testing) */
   fetchImpl?: typeof fetch;
+  /** Caller-owned fetch-compatible transport */
+  transport?: SearchTransport;
 }
 
 /**
@@ -223,7 +257,10 @@ export declare class GoogleProvider extends BaseSearchProvider {
  * DuckDuckGo search provider
  */
 export declare class DuckDuckGoProvider extends BaseSearchProvider {
-  constructor();
+  constructor(config?: {
+    transport?: SearchTransport;
+    fetchImpl?: typeof fetch;
+  });
   search(query: string, options?: SearchOptions): Promise<SearchResult[]>;
 }
 
@@ -255,7 +292,7 @@ export declare class BrowserSearchProvider extends BaseSearchProvider {
 export declare class GenericProvider extends BaseSearchProvider {
   constructor(
     descriptor: EngineDescriptor,
-    config?: { fetchImpl?: typeof fetch }
+    config?: { transport?: SearchTransport; fetchImpl?: typeof fetch }
   );
   readonly category: ProviderCategory;
   readonly label: string;
@@ -271,12 +308,14 @@ export declare class WebCaptureProvider extends BaseSearchProvider {
   static readonly SUPPORTED_PROVIDERS: string[];
   constructor(config?: {
     engine?: string;
+    transport?: SearchTransport;
     fetchImpl?: typeof fetch;
     searchImpl?: (args: {
       query: string;
       provider: string;
       limit: number;
       fetchImpl?: typeof fetch;
+      signal?: AbortSignal;
     }) => Promise<{ results?: SearchResult[] }>;
   });
   readonly engine: string;
@@ -293,6 +332,12 @@ export declare class WebSearchEngine {
    * Search across multiple providers
    */
   search(query: string, options?: SearchOptions): Promise<SearchResult[]>;
+
+  /** Search with structured per-provider outcomes and response provenance. */
+  searchDetailed(
+    query: string,
+    options?: SearchOptions
+  ): Promise<DetailedSearchResult>;
 
   /**
    * Search with a single provider
@@ -355,7 +400,7 @@ export declare function createBrowserProvider(config?: {
  */
 export declare function createGenericProvider(
   descriptor: EngineDescriptor,
-  config?: { fetchImpl?: typeof fetch }
+  config?: { transport?: SearchTransport; fetchImpl?: typeof fetch }
 ): GenericProvider;
 
 /**
@@ -363,6 +408,7 @@ export declare function createGenericProvider(
  */
 export declare function createWebCaptureProvider(config?: {
   engine?: string;
+  transport?: SearchTransport;
   fetchImpl?: typeof fetch;
 }): WebCaptureProvider;
 

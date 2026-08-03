@@ -24,6 +24,7 @@ pub mod error;
 pub mod merger;
 pub mod providers;
 pub mod search;
+pub mod transport;
 
 pub use error::SearchError;
 pub use merger::{MergeOptions, MergeStrategy};
@@ -31,4 +32,8 @@ pub use providers::{
     get_default_provider_ids, get_provider_ids, get_registry, is_known_category, RegistryEntry,
     SearchOptions, SearchResult, CATEGORIES,
 };
-pub use search::{WebSearchConfig, WebSearchEngine};
+pub use search::{
+    DetailedSearchResult, ProviderError, ProviderOutcome, ProviderOutcomeStatus, WebSearchConfig,
+    WebSearchEngine,
+};
+pub use transport::{ReqwestTransport, SearchTransport, TransportRequest, TransportResponse};

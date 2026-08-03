@@ -3,6 +3,9 @@
 use std::collections::HashMap;
 use std::sync::Arc;
 
+use async_trait::async_trait;
+use futures::future::join_all;
+use serde::Serialize;
 use tokio::sync::RwLock;
 
 use crate::error::SearchError;
@@ -11,6 +14,90 @@ use crate::providers::{
     build_providers, get_default_provider_ids, get_registry, BuildConfig, RegistryEntry,
     SearchOptions, SearchProvider, SearchResult,
 };
+use crate::transport::{ReqwestTransport, SearchTransport, TransportRequest, TransportResponse};
+
+struct RecordingTransport {
+    inner: Arc<dyn SearchTransport>,
+    responses: Arc<std::sync::Mutex<Vec<TransportResponse>>>,
+}
+
+#[async_trait]
+impl SearchTransport for RecordingTransport {
+    async fn execute(&self, request: TransportRequest) -> Result<TransportResponse, SearchError> {
+        let response = self.inner.execute(request).await?;
+        self.responses
+            .lock()
+            .expect("response capture mutex poisoned")
+            .push(response.clone());
+        Ok(response)
+    }
+}
+
+/// Status of one provider in a detailed search.
+#[derive(Debug, Clone, Serialize, PartialEq, Eq)]
+#[serde(rename_all = "lowercase")]
+pub enum ProviderOutcomeStatus {
+    /// Provider returned a valid result list (which may be empty).
+    Success,
+    /// Provider returned an error.
+    Error,
+    /// Provider is registered but disabled.
+    Unavailable,
+}
+
+/// Serializable provider error that does not erase its broad category.
+#[derive(Debug, Clone, Serialize)]
+pub struct ProviderError {
+    /// Stable broad error category.
+    pub kind: String,
+    /// Human-readable error detail.
+    pub message: String,
+}
+
+impl From<&SearchError> for ProviderError {
+    fn from(error: &SearchError) -> Self {
+        let kind = match error {
+            SearchError::RequestError(_) => "request",
+            SearchError::Transport(_) => "transport",
+            SearchError::ParseError(_) | SearchError::JsonError(_) => "parse",
+            SearchError::UrlError(_) => "url",
+            SearchError::UnknownProvider(_) => "unknown_provider",
+            SearchError::ProviderDisabled(_) => "provider_disabled",
+            SearchError::ApiError { .. } => "api",
+            SearchError::ConfigError(_) => "configuration",
+        };
+        Self {
+            kind: kind.to_string(),
+            message: error.to_string(),
+        }
+    }
+}
+
+/// Results, diagnostics, and exact captures for one provider.
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ProviderOutcome {
+    /// Requested provider id.
+    pub provider: String,
+    /// Success/error/unavailable status.
+    pub status: ProviderOutcomeStatus,
+    /// Unmerged results from this provider.
+    pub results: Vec<SearchResult>,
+    /// Every exact HTTP response observed for this provider.
+    pub responses: Vec<TransportResponse>,
+    /// Structured error, when status is `Error`.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub error: Option<ProviderError>,
+}
+
+/// Fused results alongside every provider outcome.
+#[derive(Debug, Clone, Serialize)]
+pub struct DetailedSearchResult {
+    /// Fused successful provider results.
+    pub results: Vec<SearchResult>,
+    /// Per-provider results, errors, and response captures.
+    pub outcomes: Vec<ProviderOutcome>,
+}
 
 /// Configuration for the web search engine
 #[derive(Debug, Clone, Default)]
@@ -102,8 +189,39 @@ impl WebSearchEngine {
         providers: Option<Vec<String>>,
         merge_options: Option<MergeOptions>,
     ) -> Result<Vec<SearchResult>, SearchError> {
+        let detailed = self
+            .search_detailed_with_options(
+                query,
+                options,
+                providers,
+                merge_options,
+                Arc::new(ReqwestTransport::default()),
+            )
+            .await;
+        for outcome in &detailed.outcomes {
+            if let Some(error) = &outcome.error {
+                tracing::error!("Provider {} failed: {}", outcome.provider, error.message);
+            }
+        }
+        Ok(detailed.results)
+    }
+
+    /// Search through a caller-owned transport and retain per-provider errors
+    /// and exact response bytes. These provider futures are not spawned: when
+    /// the returned future is dropped, all in-flight work is dropped with it.
+    pub async fn search_detailed_with_options(
+        &self,
+        query: &str,
+        options: SearchOptions,
+        providers: Option<Vec<String>>,
+        merge_options: Option<MergeOptions>,
+        transport: Arc<dyn SearchTransport>,
+    ) -> DetailedSearchResult {
         if query.is_empty() {
-            return Ok(Vec::new());
+            return DetailedSearchResult {
+                results: Vec::new(),
+                outcomes: Vec::new(),
+            };
         }
 
         let providers_to_use = providers.unwrap_or_else(|| self.default_providers.clone());
@@ -113,44 +231,71 @@ impl WebSearchEngine {
             rrf_k: None,
             remove_duplicates: true,
         });
-
-        let mut handles = Vec::new();
-
-        for provider_name in &providers_to_use {
-            let provider = self.providers.get(provider_name).cloned();
-            if provider.is_none() {
-                continue;
-            }
-
-            let provider = provider.unwrap();
-            let query = query.to_string();
-            let opts = options.clone();
-            let name = provider_name.clone();
-
-            handles.push(tokio::spawn(async move {
+        let futures = providers_to_use.into_iter().map(|name| {
+            let provider = self.providers.get(&name).cloned();
+            let options = options.clone();
+            let transport = transport.clone();
+            async move {
+                let Some(provider) = provider else {
+                    let error = SearchError::UnknownProvider(name.clone());
+                    return ProviderOutcome {
+                        provider: name,
+                        status: ProviderOutcomeStatus::Error,
+                        results: Vec::new(),
+                        responses: Vec::new(),
+                        error: Some(ProviderError::from(&error)),
+                    };
+                };
                 let provider = provider.read().await;
                 if !provider.is_available() {
-                    return (name, Vec::new());
+                    return ProviderOutcome {
+                        provider: name,
+                        status: ProviderOutcomeStatus::Unavailable,
+                        results: Vec::new(),
+                        responses: Vec::new(),
+                        error: None,
+                    };
                 }
-                match provider.search(&query, &opts).await {
-                    Ok(results) => (name, results),
-                    Err(e) => {
-                        tracing::error!("Provider {} failed: {}", name, e);
-                        (name, Vec::new())
-                    }
+                let responses = Arc::new(std::sync::Mutex::new(Vec::new()));
+                let recording = RecordingTransport {
+                    inner: transport,
+                    responses: responses.clone(),
+                };
+                let result = provider
+                    .search_with_transport(query, &options, &recording)
+                    .await;
+                let captures = responses
+                    .lock()
+                    .expect("response capture mutex poisoned")
+                    .clone();
+                match result {
+                    Ok(results) => ProviderOutcome {
+                        provider: name,
+                        status: ProviderOutcomeStatus::Success,
+                        results,
+                        responses: captures,
+                        error: None,
+                    },
+                    Err(error) => ProviderOutcome {
+                        provider: name,
+                        status: ProviderOutcomeStatus::Error,
+                        results: Vec::new(),
+                        responses: captures,
+                        error: Some(ProviderError::from(&error)),
+                    },
                 }
-            }));
-        }
-
-        let mut results_by_provider = HashMap::new();
-
-        for handle in handles {
-            if let Ok((name, results)) = handle.await {
-                results_by_provider.insert(name, results);
             }
+        });
+        let outcomes = join_all(futures).await;
+        let results_by_provider = outcomes
+            .iter()
+            .filter(|outcome| outcome.status == ProviderOutcomeStatus::Success)
+            .map(|outcome| (outcome.provider.clone(), outcome.results.clone()))
+            .collect();
+        DetailedSearchResult {
+            results: merge_results(&results_by_provider, &merge_opts),
+            outcomes,
         }
-
-        Ok(merge_results(&results_by_provider, &merge_opts))
     }
 
     /// Search with a single provider
@@ -172,6 +317,27 @@ impl WebSearchEngine {
         }
 
         provider.search(query, &options).await
+    }
+
+    /// Search one provider through a caller-owned transport.
+    pub async fn search_single_with_transport(
+        &self,
+        query: &str,
+        provider_name: &str,
+        options: SearchOptions,
+        transport: &dyn SearchTransport,
+    ) -> Result<Vec<SearchResult>, SearchError> {
+        let provider = self
+            .providers
+            .get(provider_name)
+            .ok_or_else(|| SearchError::UnknownProvider(provider_name.to_string()))?;
+        let provider = provider.read().await;
+        if !provider.is_available() {
+            return Err(SearchError::ProviderDisabled(provider_name.to_string()));
+        }
+        provider
+            .search_with_transport(query, &options, transport)
+            .await
     }
 
     /// Get available provider names

@@ -17,6 +17,7 @@
  */
 
 import { BaseSearchProvider } from './base.js';
+import { request } from '../transport.js';
 
 /** Providers exposed by web-capture's search contract. */
 const SUPPORTED = ['wikipedia', 'duckduckgo', 'google', 'bing', 'brave'];
@@ -62,6 +63,7 @@ export class WebCaptureProvider extends BaseSearchProvider {
     super(`wc:${config.engine || 'wikipedia'}`);
     this.engine = config.engine || 'wikipedia';
     this.fetchImpl = config.fetchImpl;
+    this.transport = config.transport || config.fetchImpl;
     this.searchImpl = config.searchImpl;
   }
 
@@ -90,14 +92,24 @@ export class WebCaptureProvider extends BaseSearchProvider {
     }
 
     try {
+      const transport = options.transport || this.transport;
+      const fetchImpl = (url, init = {}) =>
+        request(this.transport, url, init, {
+          ...options,
+          transport,
+        });
       const result = await search({
         query,
         provider: this.engine,
         limit: options.limit || 10,
-        ...(this.fetchImpl ? { fetchImpl: this.fetchImpl } : {}),
+        fetchImpl,
+        ...(options.signal ? { signal: options.signal } : {}),
       });
       return this.adapt(result);
     } catch (error) {
+      if (options.throwOnError) {
+        throw error;
+      }
       console.error(
         `WebCaptureProvider (${this.engine}) error: ${error.message}`
       );

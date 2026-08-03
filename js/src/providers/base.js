@@ -18,6 +18,10 @@
  * @property {string} [language] - Language code (e.g., 'en', 'de')
  * @property {string} [region] - Region code (e.g., 'us', 'de')
  * @property {boolean} [safeSearch] - Enable safe search filtering
+ * @property {AbortSignal} [signal] - Caller cancellation signal
+ * @property {Function|{fetch: Function}} [transport] - Per-search caller-owned transport
+ * @property {(receipt: unknown) => void} [captureResponse] - Response capture sink
+ * @property {boolean} [throwOnError] - Preserve provider errors for detailed outcomes
  */
 
 /**

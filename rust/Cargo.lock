@@ -4068,6 +4068,7 @@ dependencies = [
  "async-trait",
  "axum",
  "clap",
+ "futures",
  "regex",
  "reqwest 0.13.4",
  "scraper 0.27.0",

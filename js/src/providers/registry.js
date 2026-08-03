@@ -44,7 +44,11 @@ const CLASS_ENGINES = {
     corsReadable: false,
     defaultForCategory: false,
     access: 'hybrid',
-    create: (config) => new GoogleProvider(config.google),
+    create: (config) =>
+      new GoogleProvider({
+        ...config.google,
+        transport: config.transport || config.fetchImpl,
+      }),
   },
   bing: {
     id: 'bing',
@@ -53,7 +57,11 @@ const CLASS_ENGINES = {
     corsReadable: false,
     defaultForCategory: false,
     access: 'hybrid',
-    create: (config) => new BingProvider(config.bing),
+    create: (config) =>
+      new BingProvider({
+        ...config.bing,
+        transport: config.transport || config.fetchImpl,
+      }),
   },
   duckduckgo: {
     id: 'duckduckgo',
@@ -62,7 +70,7 @@ const CLASS_ENGINES = {
     corsReadable: false,
     defaultForCategory: true,
     access: 'html',
-    create: () => new DuckDuckGoProvider(),
+    create: (config) => new DuckDuckGoProvider(config),
   },
 };
 
@@ -86,7 +94,10 @@ const WEB_CAPTURE_ENGINES = WebCaptureProvider.SUPPORTED_PROVIDERS.map(
     defaultForCategory: false,
     access: 'component',
     create: (config) =>
-      new WebCaptureProvider({ engine, fetchImpl: config.fetchImpl }),
+      new WebCaptureProvider({
+        engine,
+        transport: config.transport || config.fetchImpl,
+      }),
   })
 );
 
@@ -180,7 +191,9 @@ export function buildProviders(config = {}) {
   for (const d of Object.values(DESCRIPTOR_ENGINES)) {
     providers.set(
       d.id,
-      new GenericProvider(d, { fetchImpl: config.fetchImpl })
+      new GenericProvider(d, {
+        transport: config.transport || config.fetchImpl,
+      })
     );
   }
   for (const w of WEB_CAPTURE_ENGINES) {

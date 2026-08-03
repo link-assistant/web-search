@@ -52,20 +52,29 @@ describe('WebCaptureProvider', () => {
     expect(results[1].rank).toBe(2);
   });
 
-  it('passes an injected fetchImpl through to web-capture', async () => {
+  it('routes web-capture through the caller transport with cancellation and capture', async () => {
     const calls = [];
-    const fetchImpl = async () => ({ ok: true });
+    const fetchImpl = async (url, init) => {
+      calls.push({ url, init });
+      return new Response('exact bytes', { status: 200 });
+    };
     const searchImpl = async (args) => {
-      calls.push(args);
+      await args.fetchImpl('https://example.test/search');
       return { results: [] };
     };
+    const controller = new AbortController();
+    const captures = [];
     const provider = new WebCaptureProvider({
       engine: 'google',
-      fetchImpl,
       searchImpl,
     });
-    await provider.search('x');
-    expect(calls[0].fetchImpl).toBe(fetchImpl);
+    await provider.search('x', {
+      transport: fetchImpl,
+      signal: controller.signal,
+      captureResponse: (capture) => captures.push(capture),
+    });
+    expect(calls[0].init.signal).toBe(controller.signal);
+    expect(new TextDecoder().decode(captures[0].body)).toBe('exact bytes');
   });
 
   it('returns [] for empty queries', async () => {
