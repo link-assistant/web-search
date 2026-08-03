@@ -87,8 +87,16 @@ impl SearchProvider for GenericProvider {
         query: &str,
         options: &SearchOptions,
     ) -> Result<Vec<SearchResult>, SearchError> {
-        self.search_with_transport(query, options, &ReqwestTransport::default())
+        match self
+            .search_with_transport(query, options, &ReqwestTransport::default())
             .await
+        {
+            Ok(results) => Ok(results),
+            Err(error) => {
+                tracing::error!("{} search error: {}", self.name(), error);
+                Ok(Vec::new())
+            }
+        }
     }
 
     async fn search_with_transport(

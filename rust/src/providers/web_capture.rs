@@ -105,8 +105,20 @@ impl SearchProvider for WebCaptureProvider {
         query: &str,
         options: &SearchOptions,
     ) -> Result<Vec<SearchResult>, SearchError> {
-        self.search_with_transport(query, options, &ReqwestTransport::default())
+        match self
+            .search_with_transport(query, options, &ReqwestTransport::default())
             .await
+        {
+            Ok(results) => Ok(results),
+            Err(error) => {
+                tracing::warn!(
+                    provider = self.name(),
+                    error = %error,
+                    "WebCaptureProvider returned no results"
+                );
+                Ok(Vec::new())
+            }
+        }
     }
 
     async fn search_with_transport(

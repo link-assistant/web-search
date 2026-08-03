@@ -198,6 +198,11 @@ impl WebSearchEngine {
                 Arc::new(ReqwestTransport::default()),
             )
             .await;
+        for outcome in &detailed.outcomes {
+            if let Some(error) = &outcome.error {
+                tracing::error!("Provider {} failed: {}", outcome.provider, error.message);
+            }
+        }
         Ok(detailed.results)
     }
 
