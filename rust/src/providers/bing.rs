@@ -103,10 +103,7 @@ impl BingProvider {
                 method: "GET".to_string(),
                 url,
                 headers: BTreeMap::from([
-                    (
-                        "Ocp-Apim-Subscription-Key".to_string(),
-                        api_key.clone(),
-                    ),
+                    ("Ocp-Apim-Subscription-Key".to_string(), api_key.clone()),
                     ("User-Agent".to_string(), USER_AGENT.to_string()),
                 ]),
                 body: None,
