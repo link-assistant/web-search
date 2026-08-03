@@ -138,6 +138,81 @@ describe('WebSearchEngine + registry', () => {
     );
   });
 
+  it('returns transport captures and per-provider errors from detailed search', async () => {
+    const calls = [];
+    const controller = new AbortController();
+    const transport = {
+      async fetch(url, init) {
+        calls.push({ url, init });
+        if (url.includes('wikipedia.org')) {
+          return new Response(
+            JSON.stringify({
+              pages: [{ key: 'Cat', title: 'Cat', excerpt: 'A cat' }],
+            }),
+            { status: 200, headers: { 'content-type': 'application/json' } }
+          );
+        }
+        throw new Error('github transport failed');
+      },
+    };
+
+    const engine = new WebSearchEngine();
+    const detailed = await engine.searchDetailed('cat', {
+      providers: ['wikipedia', 'github'],
+      transport,
+      signal: controller.signal,
+    });
+
+    expect(detailed.results.length).toBe(1);
+    expect(detailed.outcomes[0].status).toBe('success');
+    expect(detailed.outcomes[0].receipts.length).toBe(1);
+    expect(
+      new TextDecoder().decode(detailed.outcomes[0].receipts[0].body)
+    ).toContain('"title":"Cat"');
+    expect(detailed.outcomes[1].status).toBe('error');
+    expect(detailed.outcomes[1].error.message).toContain(
+      'github transport failed'
+    );
+    expect(calls.every((call) => call.init.signal === controller.signal)).toBe(
+      true
+    );
+  });
+
+  it('threads caller transport through class-based providers', async () => {
+    const calls = [];
+    const engine = new WebSearchEngine({
+      providers: ['duckduckgo'],
+      transport: async (url, init) => {
+        calls.push({ url, init });
+        return new Response(
+          '<a class="result__a" href="https://example.com">Example</a>',
+          { status: 200 }
+        );
+      },
+    });
+    const detailed = await engine.searchDetailed('x');
+    expect(detailed.results[0].url).toBe('https://example.com');
+    expect(calls.length).toBe(1);
+  });
+
+  it('reports caller cancellation as a provider error', async () => {
+    const controller = new AbortController();
+    controller.abort();
+    const engine = new WebSearchEngine({
+      transport: async (_url, init) => {
+        if (init.signal.aborted) {
+          throw new DOMException('cancelled', 'AbortError');
+        }
+      },
+    });
+    const detailed = await engine.searchDetailed('x', {
+      providers: ['wikipedia'],
+      signal: controller.signal,
+    });
+    expect(detailed.outcomes[0].status).toBe('error');
+    expect(detailed.outcomes[0].error.name).toBe('AbortError');
+  });
+
   it('returns [] for an empty query', async () => {
     const engine = new WebSearchEngine();
     expect((await engine.search('')).length).toBe(0);
