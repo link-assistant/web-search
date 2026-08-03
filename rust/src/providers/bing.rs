@@ -2,9 +2,14 @@
 
 use async_trait::async_trait;
 use serde::Deserialize;
+use std::collections::BTreeMap;
 
 use super::base::{SearchOptions, SearchProvider, SearchResult};
 use crate::error::SearchError;
+use crate::transport::{ReqwestTransport, SearchTransport, TransportRequest};
+
+const USER_AGENT: &str = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 \
+                          (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
 
 /// Bing Web Search API response
 #[derive(Debug, Deserialize)]
@@ -37,7 +42,6 @@ pub struct BingProvider {
     name: String,
     enabled: bool,
     weight: f64,
-    client: reqwest::Client,
     config: BingConfig,
     api_url: String,
 }
@@ -49,10 +53,6 @@ impl BingProvider {
             name: "bing".to_string(),
             enabled: true,
             weight: 1.0,
-            client: reqwest::Client::builder()
-                .user_agent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
-                .build()
-                .expect("Failed to create HTTP client"),
             config,
             api_url: "https://api.bing.microsoft.com/v7.0/search".to_string(),
         }
@@ -74,6 +74,7 @@ impl BingProvider {
         &self,
         query: &str,
         options: &SearchOptions,
+        transport: &dyn SearchTransport,
     ) -> Result<Vec<SearchResult>, SearchError> {
         let api_key = self.config.api_key.as_ref().unwrap();
         let limit = options.limit.unwrap_or(10).min(50);
@@ -97,22 +98,30 @@ impl BingProvider {
         };
         url.push_str(&format!("&safeSearch={}", safe_search));
 
-        let response = self
-            .client
-            .get(&url)
-            .header("Ocp-Apim-Subscription-Key", api_key)
-            .send()
+        let response = transport
+            .execute(TransportRequest {
+                method: "GET".to_string(),
+                url,
+                headers: BTreeMap::from([
+                    (
+                        "Ocp-Apim-Subscription-Key".to_string(),
+                        api_key.clone(),
+                    ),
+                    ("User-Agent".to_string(), USER_AGENT.to_string()),
+                ]),
+                body: None,
+            })
             .await?;
 
-        if !response.status().is_success() {
-            let error_text = response.text().await.unwrap_or_default();
+        if !(200..300).contains(&response.status) {
+            let error_text = String::from_utf8_lossy(&response.body).into_owned();
             return Err(SearchError::ApiError {
                 provider: self.name.clone(),
                 message: error_text,
             });
         }
 
-        let api_response: BingApiResponse = response.json().await?;
+        let api_response: BingApiResponse = serde_json::from_slice(&response.body)?;
 
         let results = api_response
             .web_pages
@@ -138,6 +147,7 @@ impl BingProvider {
         &self,
         query: &str,
         options: &SearchOptions,
+        transport: &dyn SearchTransport,
     ) -> Result<Vec<SearchResult>, SearchError> {
         let limit = options.limit.unwrap_or(10);
         let mut url = format!(
@@ -150,25 +160,31 @@ impl BingProvider {
             url.push_str(&format!("&cc={}", region.to_uppercase()));
         }
 
-        let response = self
-            .client
-            .get(&url)
-            .header(
-                "Accept",
-                "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-            )
-            .header("Accept-Language", "en-US,en;q=0.5")
-            .send()
+        let response = transport
+            .execute(TransportRequest {
+                method: "GET".to_string(),
+                url,
+                headers: BTreeMap::from([
+                    (
+                        "Accept".to_string(),
+                        "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
+                            .to_string(),
+                    ),
+                    ("Accept-Language".to_string(), "en-US,en;q=0.5".to_string()),
+                    ("User-Agent".to_string(), USER_AGENT.to_string()),
+                ]),
+                body: None,
+            })
             .await?;
 
-        if !response.status().is_success() {
+        if !(200..300).contains(&response.status) {
             return Err(SearchError::ApiError {
                 provider: self.name.clone(),
-                message: format!("HTTP {}", response.status()),
+                message: format!("HTTP {}", response.status),
             });
         }
 
-        let html = response.text().await?;
+        let html = String::from_utf8_lossy(&response.body);
         Ok(self.parse_scraped_results(&html, limit))
     }
 
@@ -263,12 +279,22 @@ impl SearchProvider for BingProvider {
         query: &str,
         options: &SearchOptions,
     ) -> Result<Vec<SearchResult>, SearchError> {
+        self.search_with_transport(query, options, &ReqwestTransport::default())
+            .await
+    }
+
+    async fn search_with_transport(
+        &self,
+        query: &str,
+        options: &SearchOptions,
+        transport: &dyn SearchTransport,
+    ) -> Result<Vec<SearchResult>, SearchError> {
         if query.is_empty() {
             return Ok(Vec::new());
         }
 
         if self.has_api_credentials() {
-            match self.search_with_api(query, options).await {
+            match self.search_with_api(query, options, transport).await {
                 Ok(results) => return Ok(results),
                 Err(e) => {
                     tracing::warn!("Bing API search failed, falling back to scraping: {}", e);
@@ -276,6 +302,6 @@ impl SearchProvider for BingProvider {
             }
         }
 
-        self.search_with_scraping(query, options).await
+        self.search_with_scraping(query, options, transport).await
     }
 }

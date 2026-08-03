@@ -4,6 +4,7 @@ use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 
 use crate::error::SearchError;
+use crate::transport::SearchTransport;
 
 /// A single search result
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -57,10 +58,25 @@ pub trait SearchProvider: Send + Sync {
     /// Enable or disable the provider
     fn set_enabled(&mut self, enabled: bool);
 
-    /// Perform a search
+    /// Perform a search with the provider's default transport.
     async fn search(
         &self,
         query: &str,
         options: &SearchOptions,
     ) -> Result<Vec<SearchResult>, SearchError>;
+
+    /// Perform a search with a caller-owned transport.
+    ///
+    /// The default preserves compatibility for third-party providers; built-in
+    /// providers override this method so every network request is routed through
+    /// the supplied transport.
+    async fn search_with_transport(
+        &self,
+        query: &str,
+        options: &SearchOptions,
+        transport: &dyn SearchTransport,
+    ) -> Result<Vec<SearchResult>, SearchError> {
+        let _ = transport;
+        self.search(query, options).await
+    }
 }

@@ -11,6 +11,7 @@
  */
 
 import { BaseSearchProvider } from './base.js';
+import { request } from '../transport.js';
 
 const USER_AGENT =
   'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 ' +
@@ -48,7 +49,8 @@ export class GenericProvider extends BaseSearchProvider {
     this.category = descriptor.category;
     this.label = descriptor.label;
     this.corsReadable = Boolean(descriptor.corsReadable);
-    this.fetchImpl = config.fetchImpl || globalThis.fetch;
+    this.transport = config.transport || config.fetchImpl;
+    this.fetchImpl = this.transport || globalThis.fetch;
   }
 
   /**
@@ -84,7 +86,7 @@ export class GenericProvider extends BaseSearchProvider {
     }
 
     try {
-      const response = await this.fetchImpl(url, init);
+      const response = await request(this.transport, url, init, options);
       if (!response.ok) {
         throw new Error(`${d.id} returned status ${response.status}`);
       }
@@ -92,6 +94,9 @@ export class GenericProvider extends BaseSearchProvider {
         d.kind === 'json' ? await response.json() : await response.text();
       return d.parse(payload, limit, options);
     } catch (error) {
+      if (options.throwOnError) {
+        throw error;
+      }
       console.error(`${d.id} search error: ${error.message}`);
       return [];
     }

@@ -7,12 +7,12 @@
 //! `src/providers/generic.js` (issue #3 parity requirement).
 
 use async_trait::async_trait;
-use reqwest::header::{HeaderMap, HeaderName, HeaderValue, ACCEPT, ACCEPT_LANGUAGE, CONTENT_TYPE};
-use reqwest::Method;
+use std::collections::BTreeMap;
 
 use super::base::{SearchOptions, SearchProvider, SearchResult};
 use super::engines::{EngineDescriptor, EngineKind, HttpMethod};
 use crate::error::SearchError;
+use crate::transport::{ReqwestTransport, SearchTransport, TransportRequest};
 
 const USER_AGENT: &str = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 \
                           (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
@@ -22,7 +22,6 @@ pub struct GenericProvider {
     descriptor: EngineDescriptor,
     enabled: bool,
     weight: f64,
-    client: reqwest::Client,
 }
 
 impl GenericProvider {
@@ -32,10 +31,6 @@ impl GenericProvider {
             descriptor,
             enabled: true,
             weight: 1.0,
-            client: reqwest::Client::builder()
-                .user_agent(USER_AGENT)
-                .build()
-                .expect("Failed to create HTTP client"),
         }
     }
 
@@ -44,25 +39,21 @@ impl GenericProvider {
         &self.descriptor
     }
 
-    fn build_headers(&self, options: &SearchOptions) -> HeaderMap {
-        let mut headers = HeaderMap::new();
-        headers.insert(ACCEPT_LANGUAGE, HeaderValue::from_static("en-US,en;q=0.9"));
+    fn build_headers(&self, options: &SearchOptions) -> BTreeMap<String, String> {
+        let mut headers = BTreeMap::new();
+        headers.insert("User-Agent".to_string(), USER_AGENT.to_string());
+        headers.insert("Accept-Language".to_string(), "en-US,en;q=0.9".to_string());
         let accept = match self.descriptor.kind {
             EngineKind::Json => "application/json",
             EngineKind::Text | EngineKind::Html => {
                 "text/html,application/xhtml+xml,application/xml;q=0.9"
             }
         };
-        headers.insert(ACCEPT, HeaderValue::from_static(accept));
+        headers.insert("Accept".to_string(), accept.to_string());
 
         if let Some(extra) = self.descriptor.headers {
             for (name, value) in extra(options) {
-                if let (Ok(name), Ok(value)) = (
-                    HeaderName::from_bytes(name.as_bytes()),
-                    HeaderValue::from_str(&value),
-                ) {
-                    headers.insert(name, value);
-                }
+                headers.insert(name, value);
             }
         }
         headers
@@ -96,6 +87,16 @@ impl SearchProvider for GenericProvider {
         query: &str,
         options: &SearchOptions,
     ) -> Result<Vec<SearchResult>, SearchError> {
+        self.search_with_transport(query, options, &ReqwestTransport::default())
+            .await
+    }
+
+    async fn search_with_transport(
+        &self,
+        query: &str,
+        options: &SearchOptions,
+        transport: &dyn SearchTransport,
+    ) -> Result<Vec<SearchResult>, SearchError> {
         if query.trim().is_empty() {
             return Ok(Vec::new());
         }
@@ -106,39 +107,33 @@ impl SearchProvider for GenericProvider {
         let mut headers = self.build_headers(options);
 
         let method = match d.method {
-            HttpMethod::Get => Method::GET,
-            HttpMethod::Post => Method::POST,
+            HttpMethod::Get => "GET",
+            HttpMethod::Post => "POST",
         };
-
-        let mut request = self.client.request(method, &url);
+        let mut body = None;
         if let (HttpMethod::Post, Some(build_body)) = (d.method, d.build_body) {
             headers.insert(
-                CONTENT_TYPE,
-                HeaderValue::from_static("application/x-www-form-urlencoded"),
+                "Content-Type".to_string(),
+                "application/x-www-form-urlencoded".to_string(),
             );
-            request = request.body((build_body)(query, options));
+            body = Some((build_body)(query, options).into_bytes());
         }
-        request = request.headers(headers);
+        let response = transport
+            .execute(TransportRequest {
+                method: method.to_string(),
+                url,
+                headers,
+                body,
+            })
+            .await?;
 
-        let response = match request.send().await {
-            Ok(response) => response,
-            Err(error) => {
-                tracing::error!("{} search error: {}", d.id, error);
-                return Ok(Vec::new());
-            }
-        };
-
-        if !response.status().is_success() {
-            tracing::error!("{} returned status {}", d.id, response.status());
-            return Ok(Vec::new());
+        if !(200..300).contains(&response.status) {
+            return Err(SearchError::ApiError {
+                provider: d.id.to_string(),
+                message: format!("HTTP {}", response.status),
+            });
         }
-
-        match response.text().await {
-            Ok(body) => Ok((d.parse)(&body, limit, options)),
-            Err(error) => {
-                tracing::error!("{} body read error: {}", d.id, error);
-                Ok(Vec::new())
-            }
-        }
+        let body = String::from_utf8_lossy(&response.body);
+        Ok((d.parse)(&body, limit, options))
     }
 }
