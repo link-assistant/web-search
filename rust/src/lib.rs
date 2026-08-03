@@ -1,39 +1,43 @@
 //! Web Search - Multi-provider web search aggregator
 //!
-//! A library for aggregating search results from multiple search engines
-//! (Google, DuckDuckGo, Bing) with support for result merging and reranking.
+//! Deterministic result merging is always available. Network providers, the
+//! search engine, CLI, and HTTP service are enabled by the default `server`
+//! feature.
 //!
 //! # Example
 //!
-//! ```no_run
-//! use web_search::{WebSearchEngine, SearchOptions};
+//! ```
+//! use std::collections::HashMap;
+//! use web_search::{merger::merge_results, MergeOptions, SearchResult};
 //!
-//! #[tokio::main]
-//! async fn main() -> Result<(), Box<dyn std::error::Error>> {
-//!     let engine = WebSearchEngine::new();
-//!     let results = engine.search("rust programming", SearchOptions::default()).await?;
-//!
-//!     for result in results {
-//!         println!("{}: {}", result.title, result.url);
-//!     }
-//!     Ok(())
-//! }
+//! let results = HashMap::<String, Vec<SearchResult>>::new();
+//! assert!(merge_results(&results, &MergeOptions::new()).is_empty());
 //! ```
 
+#[cfg(feature = "server")]
 pub mod error;
 pub mod merger;
+#[cfg(feature = "server")]
 pub mod providers;
+#[cfg(feature = "server")]
 pub mod search;
+#[cfg(feature = "server")]
 pub mod transport;
+mod types;
 
+#[cfg(feature = "server")]
 pub use error::SearchError;
 pub use merger::{MergeOptions, MergeStrategy};
+#[cfg(feature = "server")]
 pub use providers::{
     get_default_provider_ids, get_provider_ids, get_registry, is_known_category, RegistryEntry,
-    SearchOptions, SearchResult, CATEGORIES,
+    SearchOptions, CATEGORIES,
 };
+#[cfg(feature = "server")]
 pub use search::{
     DetailedSearchResult, ProviderError, ProviderOutcome, ProviderOutcomeStatus, WebSearchConfig,
     WebSearchEngine,
 };
+#[cfg(feature = "server")]
 pub use transport::{ReqwestTransport, SearchTransport, TransportRequest, TransportResponse};
+pub use types::SearchResult;

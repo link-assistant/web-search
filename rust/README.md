@@ -30,6 +30,18 @@ From a local checkout before a crates.io release is visible:
 web-search = { path = "../web-search/rust" }
 ```
 
+For deterministic result merging without providers, the CLI/server, or their
+network and browser dependencies:
+
+```toml
+[dependencies]
+web-search = { version = "0.4", default-features = false }
+```
+
+This merge-only configuration excludes Axum, Reqwest, Tokio, `web-capture`,
+and the native-TLS/OpenSSL dependency graph. `SearchResult`, `MergeOptions`,
+`MergeStrategy`, and the functions in `web_search::merger` remain available.
+
 ## Library
 
 ```rust
@@ -150,6 +162,7 @@ is declared as this crate's MSRV in `Cargo.toml`.
 ```bash
 cargo test --all-features
 cargo test --doc
+cargo check --no-default-features --lib
 cargo fmt --all -- --check
 cargo clippy --all-targets --all-features
 cargo package --list --allow-dirty
