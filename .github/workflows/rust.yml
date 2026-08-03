@@ -127,6 +127,12 @@ jobs:
       - name: Install rust-script
         run: cargo install rust-script
 
+      - name: Check merge-only feature boundary
+        working-directory: .
+        run: |
+          cargo check --manifest-path rust/Cargo.toml --no-default-features --lib --verbose
+          rust-script rust/scripts/check-core-feature-boundary.rs --rust-root rust
+
       - name: Cache cargo registry
         uses: actions/cache@v5
         with:

@@ -2,7 +2,7 @@
 
 use std::collections::{HashMap, HashSet};
 
-use crate::providers::SearchResult;
+use crate::SearchResult;
 
 /// Merge strategy for combining results
 #[derive(Debug, Clone, Copy, Default)]
