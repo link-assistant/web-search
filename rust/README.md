@@ -35,7 +35,7 @@ network and browser dependencies:
 
 ```toml
 [dependencies]
-web-search = { version = "0.3", default-features = false }
+web-search = { version = "0.4", default-features = false }
 ```
 
 This merge-only configuration excludes Axum, Reqwest, Tokio, `web-capture`,
