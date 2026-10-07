@@ -16,7 +16,7 @@ guide was found.
 - [x] Run local CI checks before each useful implementation commit.
 - [x] Fetch main and confirm it is already an ancestor; preserve history on the prepared branch.
 - [x] Review the implementation diff for omissions and regressions.
-- [ ] Update the PR title/body with reproduction, validation, API changes, and closing references.
+- [x] Update the PR title/body with reproduction, validation, API changes, and closing references.
 - [ ] Check CI runs against the final SHA/timestamp; save and investigate any failed logs.
 - [ ] Confirm a clean working tree and passing CI, then mark PR #28 ready.
 
@@ -115,6 +115,17 @@ points. [lint-staged 17](https://github.com/lint-staged/lint-staged/releases)
 also requires newer Node. All JavaScript workflow setup steps, including parity,
 now use Node 24; the runtime package still supports Node 20. Prettier's refreshed
 version reformats the existing declaration union without changing its types.
+
+The first pushed CI run exposed another Node 24 migration detail: its test runner
+treats the explicit `tests/` directory as a module and fails with
+`MODULE_NOT_FOUND`. Run [37610001849](https://github.com/link-assistant/web-search/actions/runs/37610001849)
+failed on Windows (saved log line 3419), macOS (6884), and Ubuntu (7212), while
+the same commit passed Rust CI and parity. Reproduction with Node 24.21.0 failed
+locally before the fix. The npm test command now uses
+[documented automatic discovery](https://nodejs.org/docs/latest-v24.x/api/test.html#running-tests-from-the-command-line).
+The [minimal experiment](../../../experiments/node-test-discovery.mjs) reproduces
+the old failure and checks the corrected command; the existing full suite in CI
+verifies actual test discovery across operating systems.
 
 Core API additions are prepared as a Rust minor release. Server callers retain
 HashMap weights and the existing merger/discovery module paths. Merger functions
