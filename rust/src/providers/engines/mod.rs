@@ -72,6 +72,33 @@ pub struct EngineDescriptor {
     pub parse: ParseFn,
 }
 
+impl EngineDescriptor {
+    fn new(
+        id: &'static str,
+        kind: EngineKind,
+        method: HttpMethod,
+        build_url: BuildFn,
+        build_body: Option<BuildFn>,
+        headers: Option<HeadersFn>,
+        parse: ParseFn,
+    ) -> Self {
+        let metadata = crate::registry::provider_metadata(id).expect("engine must be registered");
+        Self {
+            id,
+            label: metadata.label,
+            category: metadata.category,
+            cors_readable: metadata.cors_readable,
+            default_for_category: metadata.default_for_category,
+            kind,
+            method,
+            build_url,
+            build_body,
+            headers,
+            parse,
+        }
+    }
+}
+
 /// The descriptor `access` label derived from its [`EngineKind`].
 pub fn access_for(kind: EngineKind) -> &'static str {
     match kind {

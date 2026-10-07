@@ -1,11 +1,11 @@
 //! Integration tests for the typed provider registry (Rust parity with
 //! `tests/registry.test.js`).
 
-use web_search::providers::{
-    build_providers, get_default_provider_ids, get_provider_ids, get_registry, is_known_category,
-    BuildConfig,
+#[cfg(feature = "server")]
+use web_search::providers::{build_providers, BuildConfig};
+use web_search::{
+    get_default_provider_ids, get_provider_ids, get_registry, is_known_category, CATEGORIES,
 };
-use web_search::CATEGORIES;
 
 #[test]
 fn categories_are_in_canonical_order() {
@@ -148,6 +148,7 @@ fn default_for_category_flags_exactly_one_default_per_category() {
     }
 }
 
+#[cfg(feature = "server")]
 #[test]
 fn build_providers_instantiates_the_whole_catalog() {
     let providers = build_providers(&BuildConfig::default());
@@ -181,4 +182,68 @@ fn web_capture_entries_use_the_component_access_label() {
     assert!(wiki.cors_readable);
     let google = wc.iter().find(|e| e.id == "wc:google").unwrap();
     assert!(!google.cors_readable);
+}
+
+#[cfg(feature = "server")]
+#[test]
+fn core_metadata_matches_every_server_descriptor_and_endpoint() {
+    use web_search::providers::{access_for, all_descriptor_engines, HttpMethod, SearchOptions};
+    use web_search::registry::provider_metadata;
+
+    for descriptor in all_descriptor_engines() {
+        let entry = provider_metadata(descriptor.id).unwrap();
+        assert_eq!(entry.label, descriptor.label);
+        assert_eq!(entry.category, descriptor.category);
+        assert_eq!(entry.cors_readable, descriptor.cors_readable);
+        assert_eq!(entry.default_for_category, descriptor.default_for_category);
+        assert_eq!(entry.access, access_for(descriptor.kind));
+        let query = "rust & web";
+        let encoded = urlencoding::encode(query);
+        let endpoint = entry
+            .endpoint_template
+            .replace("{query}", &encoded)
+            .replace("{language}", "en")
+            .replace("{limit}", "10");
+        assert_eq!(
+            endpoint,
+            (descriptor.build_url)(query, &SearchOptions::default()),
+            "endpoint mismatch for {}",
+            descriptor.id
+        );
+        assert_eq!(
+            entry.capabilities.method.as_str(),
+            match descriptor.method {
+                HttpMethod::Get => "GET",
+                HttpMethod::Post => "POST",
+            }
+        );
+        assert_eq!(
+            entry.body_template.is_some(),
+            descriptor.build_body.is_some()
+        );
+    }
+    let catalog = get_registry();
+    let mut ids: Vec<_> = catalog.iter().map(|e| e.id.as_str()).collect();
+    ids.sort();
+    ids.dedup();
+    assert_eq!(ids.len(), catalog.len());
+    assert_eq!(
+        web_search::providers::SUPPORTED_PROVIDERS,
+        ["wikipedia", "duckduckgo", "google", "bing", "brave"]
+    );
+}
+
+#[cfg(feature = "server")]
+#[test]
+fn discovery_metadata_serializes_for_wasm_consumers() {
+    let entries = get_registry();
+    let json = serde_json::to_value(&entries).unwrap();
+    assert_eq!(
+        json[0]["endpointTemplate"],
+        "https://www.google.com/search?q={query}"
+    );
+    assert_eq!(json[0]["capabilities"]["method"], "GET");
+    assert_eq!(json[0]["capabilities"]["optionalCredentials"], true);
+    let roundtrip: Vec<web_search::RegistryEntry> = serde_json::from_value(json).unwrap();
+    assert_eq!(roundtrip.len(), entries.len());
 }

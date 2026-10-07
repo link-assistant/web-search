@@ -287,7 +287,7 @@ impl WebSearchEngine {
             }
         });
         let outcomes = join_all(futures).await;
-        let results_by_provider = outcomes
+        let results_by_provider: HashMap<String, Vec<SearchResult>> = outcomes
             .iter()
             .filter(|outcome| outcome.status == ProviderOutcomeStatus::Success)
             .map(|outcome| (outcome.provider.clone(), outcome.results.clone()))

@@ -1,3 +1,5 @@
+#![cfg(feature = "server")]
+
 //! Integration tests for the shared HTML text utilities (Rust parity with
 //! `tests/html-utils.test.js`).
 

@@ -1,3 +1,5 @@
+#![cfg(feature = "server")]
+
 //! Integration coverage for the Rust web-capture component provider.
 
 use web_search::providers::{

@@ -14,6 +14,8 @@ on:
       - 'rust/**'
       - '.github/workflows/rust.yml'
       - '.github/workflows/parity.yml'
+  schedule:
+    - cron: '23 6 * * 1'
   workflow_dispatch:
 
 concurrency:
@@ -25,8 +27,26 @@ env:
   RUSTFLAGS: -Dwarnings
 
 jobs:
+  dependency-freshness:
+    name: Rust Dependency Freshness
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+      - name: Test freshness policy
+        run: python3 -m unittest discover -s rust/tests -p 'test_*.py'
+      - name: Check every direct dependency against the latest stable release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 rust/scripts/check-dependency-freshness.py --rust-root rust
+
   detect-changes:
     name: Detect Rust Changes
+    if: github.event_name != 'schedule'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     outputs:
@@ -123,6 +143,7 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt, clippy
+          targets: wasm32-unknown-unknown, thumbv7em-none-eabi
 
       - name: Install rust-script
         run: cargo install rust-script
@@ -142,7 +163,10 @@ jobs:
         working-directory: .
         run: |
           cargo check --manifest-path rust/Cargo.toml --no-default-features --lib --verbose
-          cargo test --manifest-path rust/Cargo.toml --no-default-features --lib --verbose
+          cargo test --manifest-path rust/Cargo.toml --no-default-features --features merge --lib --test merge_core --verbose
+          cargo build --manifest-path rust/Cargo.toml --no-default-features --features merge --target wasm32-unknown-unknown --locked
+          cargo check --manifest-path rust/examples/no-std-consumer/Cargo.toml --target thumbv7em-none-eabi
+          cargo check --manifest-path rust/examples/no-std-consumer/Cargo.toml --target wasm32-unknown-unknown
           rust-script rust/scripts/check-core-feature-boundary.rs --rust-root rust
 
       - name: Check formatting
@@ -203,8 +227,8 @@ jobs:
     name: Build Package
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    needs: [lint, test]
-    if: always() && !cancelled() && needs.lint.result == 'success' && needs.test.result == 'success'
+    needs: [lint, test, dependency-freshness]
+    if: always() && !cancelled() && needs.lint.result == 'success' && needs.test.result == 'success' && needs.dependency-freshness.result == 'success'
     steps:
       - uses: actions/checkout@v6
 

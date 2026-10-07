@@ -14,11 +14,16 @@
 //! assert!(merge_results(&results, &MergeOptions::new()).is_empty());
 //! ```
 
+#![cfg_attr(not(feature = "server"), no_std)]
+
+extern crate alloc;
+
 #[cfg(feature = "server")]
 pub mod error;
 pub mod merger;
 #[cfg(feature = "server")]
 pub mod providers;
+pub mod registry;
 #[cfg(feature = "server")]
 pub mod search;
 #[cfg(feature = "server")]
@@ -29,9 +34,10 @@ mod types;
 pub use error::SearchError;
 pub use merger::{MergeOptions, MergeStrategy};
 #[cfg(feature = "server")]
-pub use providers::{
-    get_default_provider_ids, get_provider_ids, get_registry, is_known_category, RegistryEntry,
-    SearchOptions, CATEGORIES,
+pub use providers::SearchOptions;
+pub use registry::{
+    get_default_provider_ids, get_provider_ids, get_registry, is_known_category,
+    ProviderCapabilities, ProviderMetadata, RegistryEntry, CATEGORIES, PROVIDER_REGISTRY,
 };
 #[cfg(feature = "server")]
 pub use search::{
