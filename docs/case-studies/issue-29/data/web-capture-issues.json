@@ -1,0 +1,718 @@
+[
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/160",
+    "labels": [],
+    "number": 160,
+    "state": "open",
+    "title": "Track native storage dependency before upgrading npm browser-commander beyond 0.10.0"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/158",
+    "labels": [
+      "enhancement"
+    ],
+    "number": 158,
+    "state": "closed",
+    "title": "Address all 5 open issues in link-assistant/web-capture"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/157",
+    "labels": [],
+    "number": 157,
+    "state": "closed",
+    "title": "Update 7 dependencies to their latest releases (reqwest 0.12->0.13, scraper 0.21->0.27, zip 4->8, async-tungstenite 0.27->0.35, ...) and enforce freshness in CI"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/156",
+    "labels": [],
+    "number": 156,
+    "state": "closed",
+    "title": "Add a content-addressed on-disk capture cache over any Transport (sha256, TTL, offline replay)"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/155",
+    "labels": [],
+    "number": 155,
+    "state": "closed",
+    "title": "`rust/Cargo.toml` pins `scraper = \"0.21\"`, which resolves `selectors 0.26` and pulls in the unmaintained `fxhash`; `scraper 0.25` clears the advisory and compiles with no source changes"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/154",
+    "labels": [],
+    "number": 154,
+    "state": "closed",
+    "title": "browser-commander 0.8 drops packaged browser executablePath"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/153",
+    "labels": [],
+    "number": 153,
+    "state": "closed",
+    "title": "Upgrade Puppeteer to remove vulnerable extract-zip chain"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/151",
+    "labels": [],
+    "number": 151,
+    "state": "closed",
+    "title": "`reqwest` is taken with default features, so every consumer inherits an OpenSSL build dependency"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/148",
+    "labels": [],
+    "number": 148,
+    "state": "closed",
+    "title": "Feature-gate pure search adapters from browser and server dependencies"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/147",
+    "labels": [],
+    "number": 147,
+    "state": "closed",
+    "title": "Expose injectable transport, cancellation, and exact response receipts"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/144",
+    "labels": [],
+    "number": 144,
+    "state": "closed",
+    "title": "archiver@7 pulls deprecated glob@10.5.0 into every consumer; archiver@8 removes it"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/143",
+    "labels": [
+      "documentation",
+      "enhancement"
+    ],
+    "number": 143,
+    "state": "closed",
+    "title": "Use all best practices from https://github.com/opendatalab/mineru but in Rust/JavaScript and using Unlicense (Public Domain)"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/141",
+    "labels": [],
+    "number": 141,
+    "state": "closed",
+    "title": "Capture replayable shared-dialog transcripts from AI share URLs"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/139",
+    "labels": [
+      "bug"
+    ],
+    "number": 139,
+    "state": "closed",
+    "title": "Check for all false positives, false negatives, warnings and errors in CI/CD and fix them all"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/137",
+    "labels": [
+      "bug"
+    ],
+    "number": 137,
+    "state": "closed",
+    "title": "Rust crate 0.3.30 fails with fresh dependency resolution"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/135",
+    "labels": [],
+    "number": 135,
+    "state": "closed",
+    "title": "FormalAI integration: document stable capture/search contract"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/130",
+    "labels": [],
+    "number": 130,
+    "state": "closed",
+    "title": "Add structured search-provider capture API"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/127",
+    "labels": [
+      "documentation",
+      "enhancement"
+    ],
+    "number": 127,
+    "state": "closed",
+    "title": "Compare features with browserbase.com"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/121",
+    "labels": [
+      "bug"
+    ],
+    "number": 121,
+    "state": "closed",
+    "title": "Trailing two-space hard breaks on every line collapse paragraphs into single `<p>` (visible in renderers)"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/120",
+    "labels": [
+      "bug"
+    ],
+    "number": 120,
+    "state": "closed",
+    "title": "Bold runs not coalesced & leak across block boundaries (`****`, `**13.1** **Foo**`, bold spanning images)"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/119",
+    "labels": [
+      "bug"
+    ],
+    "number": 119,
+    "state": "closed",
+    "title": "JS `--capture api` collapses `<br>`-separated lines into one (other 3 paths render correctly)"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/118",
+    "labels": [
+      "bug"
+    ],
+    "number": 118,
+    "state": "closed",
+    "title": "JS and Rust emit different ordered-list numbering (continuous vs per-list-restart)"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/117",
+    "labels": [
+      "bug"
+    ],
+    "number": 117,
+    "state": "closed",
+    "title": "`--keep-original-links` deletes images entirely when alt is empty (Google Docs export images vanish)"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/116",
+    "labels": [
+      "bug"
+    ],
+    "number": 116,
+    "state": "closed",
+    "title": "Rust `--capture api` silently fails to extract base64 images (regex over-captures markdown title)"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/115",
+    "labels": [
+      "bug"
+    ],
+    "number": 115,
+    "state": "closed",
+    "title": "`--capture browser` produces ~5% less text than `--capture api` (drops inline links + footnote anchors)"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/114",
+    "labels": [
+      "bug"
+    ],
+    "number": 114,
+    "state": "closed",
+    "title": "Heading numbering (e.g. 13, 13.1, 13.2) is lost or corrupted by every capture path"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/113",
+    "labels": [
+      "bug"
+    ],
+    "number": 113,
+    "state": "closed",
+    "title": "Pin default `--format archive` layout: zip = `document.md` + `document.html` + `images/`"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/112",
+    "labels": [
+      "bug"
+    ],
+    "number": 112,
+    "state": "closed",
+    "title": "Pin default image-mode contract: `-f markdown` keeps direct links; `-f archive` bundles images; flags work uniformly"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/110",
+    "labels": [
+      "bug"
+    ],
+    "number": 110,
+    "state": "closed",
+    "title": "JS api-mode: multi-paragraph table cells produce invalid GFM (Rust 0.3.10 is correct)"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/108",
+    "labels": [],
+    "number": 108,
+    "state": "closed",
+    "title": "--capture browser: numbered lists rendered as <ul> + non-list paragraphs misclassified as <blockquote>"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/106",
+    "labels": [
+      "bug"
+    ],
+    "number": 106,
+    "state": "closed",
+    "title": "--capture browser: flaky / potentially incomplete captures \u2014 neither CLI waits for DOCS_modelChunk stream to quiesce"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/104",
+    "labels": [],
+    "number": 104,
+    "state": "closed",
+    "title": "--capture browser: JS and Rust emit different HTML from the same editor model (strong/br grouping), cascading into different markdown"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/102",
+    "labels": [],
+    "number": 102,
+    "state": "closed",
+    "title": "--capture api (public-export) produces degraded markdown vs --capture browser in both CLIs (v1.7.14 / v0.3.6)"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/100",
+    "labels": [
+      "bug"
+    ],
+    "number": 100,
+    "state": "closed",
+    "title": "v0.3.4 / v1.7.12: Rust browser capture always times out on Google Docs, tables have ghost columns, images not downloaded"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/98",
+    "labels": [
+      "bug"
+    ],
+    "number": 98,
+    "state": "closed",
+    "title": "In JavaScript release version specific badge is broken"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/96",
+    "labels": [
+      "bug"
+    ],
+    "number": 96,
+    "state": "closed",
+    "title": "v0.3.3 / v1.7.11: Rust browser capture times out instantly; JS browser remaining gaps"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/94",
+    "labels": [
+      "bug"
+    ],
+    "number": 94,
+    "state": "closed",
+    "title": "Rust CI/CD release is broken"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/92",
+    "labels": [
+      "bug"
+    ],
+    "number": 92,
+    "state": "closed",
+    "title": "Google Docs capture: remaining issues across all modes (v0.3.2 / v1.7.9)"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/90",
+    "labels": [
+      "bug"
+    ],
+    "number": 90,
+    "state": "closed",
+    "title": "Add markdown round-trip test document for Google Docs capture validation"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/88",
+    "labels": [
+      "bug"
+    ],
+    "number": 88,
+    "state": "closed",
+    "title": "JavaScript CI/CD should also have prefix in tags/releases (`js-`), like we have with Rust (`rust-`)."
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/81",
+    "labels": [],
+    "number": 81,
+    "state": "closed",
+    "title": "JS: --capture browser on Google Docs drops all images and loses content"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/80",
+    "labels": [],
+    "number": 80,
+    "state": "closed",
+    "title": "Rust: --capture browser does not launch a browser, produces identical output to --capture api"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/79",
+    "labels": [],
+    "number": 79,
+    "state": "closed",
+    "title": "JavaScript CLI --version reports the caller package version"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/78",
+    "labels": [],
+    "number": 78,
+    "state": "closed",
+    "title": "Habr markdown conversion drifts from meta-theory archive format"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/77",
+    "labels": [],
+    "number": 77,
+    "state": "closed",
+    "title": "Rust markdown capture is not feature-parity with JavaScript for Habr formulas and formatting"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/76",
+    "labels": [],
+    "number": 76,
+    "state": "closed",
+    "title": "Habr article captures include page chrome instead of article-only content"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/73",
+    "labels": [
+      "bug",
+      "enhancement"
+    ],
+    "number": 73,
+    "state": "closed",
+    "title": "We should not support /gdocs route, all our routes are supported output formats, and I don't see how Google Docs (source url/format) can be used as target format"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/72",
+    "labels": [
+      "documentation",
+      "enhancement"
+    ],
+    "number": 72,
+    "state": "closed",
+    "title": "Google Docs: support all capture methods (public export, Docs API, browser DOM)"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/70",
+    "labels": [
+      "bug"
+    ],
+    "number": 70,
+    "state": "closed",
+    "title": "JS CLI: turndown-plugin-gfm missing from runtime dependencies"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/68",
+    "labels": [],
+    "number": 68,
+    "state": "closed",
+    "title": "JS CLI: yargs .strict() rejects positional URL argument"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/66",
+    "labels": [
+      "bug"
+    ],
+    "number": 66,
+    "state": "closed",
+    "title": "CI/CD for JavaScript fails"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/64",
+    "labels": [
+      "bug"
+    ],
+    "number": 64,
+    "state": "closed",
+    "title": "JavaScript CI/CD failed"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/62",
+    "labels": [
+      "bug"
+    ],
+    "number": 62,
+    "state": "closed",
+    "title": "Rust: <img> inside <h1>..<h6> dropped from markdown (html2md), creating image-count mismatch with extracted files and HTML output"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/60",
+    "labels": [
+      "bug"
+    ],
+    "number": 60,
+    "state": "closed",
+    "title": "False negative at JavaScript CI/CD"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/58",
+    "labels": [],
+    "number": 58,
+    "state": "closed",
+    "title": "v0.2.1 archive: markdown image refs point to fabricated URLs; article.html not pretty-printed; HTML-entity decoding incomplete; filenames should be document.* not article.*"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/56",
+    "labels": [],
+    "number": 56,
+    "state": "closed",
+    "title": "CI/CD: PR #54 merged fixes but no release was cut \u2014 release pipeline should process any accumulated unreleased changes on every main push"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/53",
+    "labels": [
+      "bug"
+    ],
+    "number": 53,
+    "state": "closed",
+    "title": "v0.2.0 bug: --archive zip writes raw HTML for Google Docs; default markdown strips all images"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/52",
+    "labels": [
+      "bug"
+    ],
+    "number": 52,
+    "state": "closed",
+    "title": "Find root cause and fix CI/CD for JavaScript"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/50",
+    "labels": [
+      "bug"
+    ],
+    "number": 50,
+    "state": "closed",
+    "title": "We should not execute tests on non-code files like .gitkeep, but not only this file, all of them"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/48",
+    "labels": [
+      "bug"
+    ],
+    "number": 48,
+    "state": "closed",
+    "title": "Extract images to /images folder by default instead of embedding base64 in markdown, and other issues for Rust and JavaScript versions"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/46",
+    "labels": [
+      "bug"
+    ],
+    "number": 46,
+    "state": "closed",
+    "title": "We should fallback to CARGO_TOKEN, if CARGO_REGISTRY_TOKEN not set"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/44",
+    "labels": [
+      "bug"
+    ],
+    "number": 44,
+    "state": "closed",
+    "title": "Make sure we use all the latest browser-commander and lino-arguments for both JavaScript and Rust to make sure CI/CD package publishing works for both"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/42",
+    "labels": [
+      "bug"
+    ],
+    "number": 42,
+    "state": "closed",
+    "title": "CI/CD is broken"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/40",
+    "labels": [
+      "bug"
+    ],
+    "number": 40,
+    "state": "closed",
+    "title": "CI/CD didn't work, no releases of JS and Rust"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/38",
+    "labels": [
+      "bug"
+    ],
+    "number": 38,
+    "state": "closed",
+    "title": "npm package version (1.1.2) is behind GitHub source (1.2.0) - missing critical modules"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/36",
+    "labels": [
+      "documentation",
+      "enhancement"
+    ],
+    "number": 36,
+    "state": "closed",
+    "title": "Add Google Docs (document to markdown) support"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/33",
+    "labels": [
+      "documentation",
+      "enhancement"
+    ],
+    "number": 33,
+    "state": "closed",
+    "title": "Support all best practices of web capture experience from https://github.com/link-foundation/meta-theory/tree/main/scripts"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/31",
+    "labels": [
+      "bug"
+    ],
+    "number": 31,
+    "state": "closed",
+    "title": "Fix license"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/29",
+    "labels": [
+      "documentation",
+      "enhancement"
+    ],
+    "number": 29,
+    "state": "closed",
+    "title": "Use latest version of https://github.com/link-foundation/browser-commander"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/28",
+    "labels": [
+      "documentation",
+      "enhancement"
+    ],
+    "number": 28,
+    "state": "closed",
+    "title": "Check what best experience we can integrate from https://github.com/kreuzberg-dev/html-to-markdown"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/26",
+    "labels": [
+      "documentation",
+      "enhancement"
+    ],
+    "number": 26,
+    "state": "closed",
+    "title": "Add Rust support"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/24",
+    "labels": [
+      "enhancement"
+    ],
+    "number": 24,
+    "state": "closed",
+    "title": "Use https://github.com/link-foundation/browser-commander"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/21",
+    "labels": [
+      "bug",
+      "enhancement"
+    ],
+    "number": 21,
+    "state": "closed",
+    "title": "CI/CD npm release fixes"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/19",
+    "labels": [
+      "enhancement"
+    ],
+    "number": 19,
+    "state": "closed",
+    "title": "Add support for CLI that works in both like local command for AI agent to use and is able to be a server"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/17",
+    "labels": [
+      "documentation",
+      "enhancement"
+    ],
+    "number": 17,
+    "state": "closed",
+    "title": "Add test to get https://deepwiki.com/search/-57-4-23-57_0e4aa687-7a9d-4591-8c6f-67c4b2d732f6 as markdown document"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/15",
+    "labels": [
+      "enhancement"
+    ],
+    "number": 15,
+    "state": "closed",
+    "title": "Add test to get https://xpaste.pro/p/t4q0Lsp0 as .txt file by default"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/13",
+    "labels": [
+      "enhancement"
+    ],
+    "number": 13,
+    "state": "closed",
+    "title": "Add two tests, that we can extract images from public Google Drive links"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/11",
+    "labels": [
+      "enhancement"
+    ],
+    "number": 11,
+    "state": "closed",
+    "title": "Add test that we can actually download StackOverflow page (markdown + image) in all our supported engines"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/8",
+    "labels": [
+      "enhancement"
+    ],
+    "number": 8,
+    "state": "closed",
+    "title": "Add test that we can actually download Wikipedia page (markdown + image) in all our supported engines"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/7",
+    "labels": [
+      "enhancement"
+    ],
+    "number": 7,
+    "state": "closed",
+    "title": "Add the test that we can actually download habr article (markdown and image): https://habr.com/ru/articles/895896 using all our support engines"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/5",
+    "labels": [
+      "enhancement"
+    ],
+    "number": 5,
+    "state": "closed",
+    "title": "Add test that we can actually download markdown version and screenshot of GitHub README page in all our supported engines"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/3",
+    "labels": [
+      "enhancement"
+    ],
+    "number": 3,
+    "state": "closed",
+    "title": "Add playwright integration that will work along side with pupeetter to serve the same function"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/2",
+    "labels": [],
+    "number": 2,
+    "state": "closed",
+    "title": "Support use case"
+  },
+  {
+    "html_url": "https://github.com/link-assistant/web-capture/issues/1",
+    "labels": [
+      "documentation",
+      "enhancement"
+    ],
+    "number": 1,
+    "state": "closed",
+    "title": "Useful links"
+  }
+]
