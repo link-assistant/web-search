@@ -1,0 +1,13 @@
+[package]
+name = "web-search-tower-consumer"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+web-search = { path = "../../rust", default-features = false, features = ["merge"] }
+tower-http = { version = "0.7.1", features = ["cors"] }
+
+[features]
+default = ["server"]
+server = ["web-search/server"]
