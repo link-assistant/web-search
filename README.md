@@ -76,6 +76,15 @@ cargo install web-search@0.2.0      # pinned
 > (npm `@link-assistant/web-search@0.9.0`, crates.io `web-search@0.2.0`). Replace
 > them with the latest tags shown on the badges at the top of this README.
 
+### Core-only Rust and WASM consumers
+
+The next Rust release (0.6) adds
+`web-search = { version = "0.6", default-features = false, features = ["merge"] }`
+for `no_std` + `alloc` result types, URL normalization, RRF, weighted/interleaved
+merging, and all 40 providers' metadata. The server uses the same implementation.
+See the [Rust core API documentation](rust/README.md) and
+[no_std consumer example](rust/examples/no-std-consumer).
+
 ## Quick Start
 
 ### As a Library
@@ -296,9 +305,7 @@ import { createWebCaptureProvider } from '@link-assistant/web-search';
 const provider = createWebCaptureProvider({
   engine: 'wikipedia',
   // Optional: inject a fetch/search implementation (defaults to @link-assistant/web-capture)
-  searchImpl: async (query, options) => [
-    /* { title, url, snippet } */
-  ],
+  searchImpl: async (query, options) => [/* { title, url, snippet } */],
 });
 ```
 

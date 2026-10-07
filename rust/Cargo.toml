@@ -20,30 +20,32 @@ path = "src/main.rs"
 required-features = ["server"]
 
 [dependencies]
-tokio = { version = "1.52", features = ["full"], optional = true }
-reqwest = { version = "0.13", features = ["form", "json"], optional = true }
-serde = { version = "1.0", features = ["derive"] }
-serde_json = { version = "1.0", optional = true }
-scraper = { version = "0.27", optional = true }
-regex = { version = "1", optional = true }
-thiserror = { version = "2.0", optional = true }
-async-trait = { version = "0.1", optional = true }
-futures = { version = "0.3", optional = true }
-clap = { version = "4.6", features = ["derive"], optional = true }
-axum = { version = "0.8", optional = true }
-tower-http = { version = "0.6", features = ["cors"], optional = true }
-tracing = { version = "0.1", optional = true }
-tracing-subscriber = { version = "0.3", features = ["env-filter"], optional = true }
-url = "2.5"
-urlencoding = { version = "2.1", optional = true }
-web-capture = { version = "0.3.31", optional = true }
+tokio = { version = "1.53.2", features = ["full"], optional = true }
+reqwest = { version = "0.13.5", features = ["form", "json"], optional = true }
+serde = { version = "1.0.229", default-features = false, features = ["derive", "alloc"] }
+serde_json = { version = "1.0.151", optional = true }
+scraper = { version = "0.27.0", optional = true }
+regex = { version = "1.13.1", optional = true }
+thiserror = { version = "2.0.21", optional = true }
+async-trait = { version = "0.1.92", optional = true }
+futures = { version = "0.3.34", optional = true }
+clap = { version = "4.6.7", features = ["derive"], optional = true }
+axum = { version = "0.8.9", optional = true }
+tower-http = { version = "0.7.1", features = ["cors"], optional = true }
+tracing = { version = "0.1.44", optional = true }
+tracing-subscriber = { version = "0.3.23", features = ["env-filter"], optional = true }
+url = { version = "2.5.8", default-features = false }
+urlencoding = { version = "2.1.3", optional = true }
+web-capture = { version = "0.3.37", optional = true }
 
 [dev-dependencies]
-tokio-test = "0.4"
-wiremock = "0.6"
+tokio-test = "0.4.6"
+wiremock = "0.6.5"
 
 [features]
 default = ["server"]
+# Pure merging and provider discovery also remain available without features.
+merge = []
 server = [
     "dep:async-trait",
     "dep:axum",

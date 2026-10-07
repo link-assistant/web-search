@@ -7,7 +7,7 @@
 [![Rust release tag](https://img.shields.io/badge/GitHub%20release-rust--v0.2.0-orange)](https://github.com/link-assistant/web-search/releases?q=rust-v)
 
 Rust implementation of the `web-search` library, CLI, and HTTP service. It
-mirrors the JavaScript package in `../js` with the same 22-provider catalog,
+mirrors the JavaScript package in `../js` with the same 40-provider catalog,
 provider categories, merge strategies, and discovery surface.
 
 ## Install
@@ -20,7 +20,7 @@ As a library:
 
 ```toml
 [dependencies]
-web-search = "0.2"
+web-search = "0.5"
 ```
 
 From a local checkout before a crates.io release is visible:
@@ -35,12 +35,39 @@ network and browser dependencies:
 
 ```toml
 [dependencies]
-web-search = { version = "0.4", default-features = false }
+web-search = { version = "0.6", default-features = false, features = ["merge"] }
 ```
 
 This merge-only configuration excludes Axum, Reqwest, Tokio, `web-capture`,
-and the native-TLS/OpenSSL dependency graph. `SearchResult`, `MergeOptions`,
-`MergeStrategy`, and the functions in `web_search::merger` remain available.
+and the native-TLS/OpenSSL dependency graph. With the server feature disabled,
+this crate uses `no_std` + `alloc`. `SearchResult`, `MergeOptions`, all three
+`MergeStrategy` variants, `merger::normalize_url`, and provider discovery remain
+available. The core API also stays available with no features, preserving the
+existing merge-only installation.
+
+Use `alloc::collections::BTreeMap<String, Vec<SearchResult>>` for provider lists.
+The same merge functions accept the server's `std::collections::HashMap`.
+`MergeOptions::with_weights` accepts either map; its public `weights` field
+retains a HashMap with `server` and uses BTreeMap without it. Providers, tied URLs,
+and contributing sources are ordered deterministically in both builds.
+
+`web_search::registry::PROVIDER_REGISTRY` exposes all 40 providers as static
+metadata, including endpoint/body templates and capabilities. `get_registry`,
+`get_provider_ids`, `get_default_provider_ids`, and `is_known_category` are also
+available at the crate root. Replace `{query}` with percent-encoded query text,
+`{language}` with a language code and `{limit}` with a bounded result count.
+Hybrid entries describe their HTML fallback; component entries describe upstream
+endpoints and use web-capture for retrieval. Capabilities describe HTTP method,
+API/HTML support, optional credentials, and component backing. The catalog does
+not perform HTTP requests; WASM callers supply their own transport.
+
+The `merge` feature is prepared for the next release (0.6). See
+[the no_std consumer](examples/no-std-consumer) and the three-provider
+ranking tests in `tests/merge_core.rs`.
+
+```sh
+cargo build --no-default-features --features merge --target wasm32-unknown-unknown
+```
 
 ## Library
 
@@ -121,14 +148,15 @@ curl "http://localhost:3000/categories"
 
 ## Providers
 
-The live registry has 22 providers in four categories:
+The live registry has 40 providers in four categories. The full catalog is
+available through `get_registry()` in every feature configuration:
 
-| Category    | Provider ids                                                                                             |
-| ----------- | -------------------------------------------------------------------------------------------------------- |
-| `search`    | `google`, `bing`, `duckduckgo`, `searx`, `brave`, `mojeek`, `ecosia`, `startpage`, `yahoo`, `lite`, `wc:*` |
-| `knowledge` | `wikipedia`, `wikidata`                                                                                  |
-| `papers`    | `crossref`, `openalex`, `arxiv`                                                                          |
-| `code`      | `github`, `hackernews`                                                                                   |
+| Category    | Provider ids                                                                                                                                                                                                                   |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `search`    | `google`, `bing`, `duckduckgo`, `searx`, `brave`, `mojeek`, `ecosia`, `startpage`, `yahoo`, `yandex`, `lite`, `wc:wikipedia`, `wc:duckduckgo`, `wc:google`, `wc:bing`, `wc:brave`                                              |
+| `knowledge` | `wikipedia`, `wikidata`, `wiktionary`, `wikinews`, `internet-archive`, `dbpedia`, `openlibrary`, `semantic-scholar`, `openalex`, `crossref`, `cambridge-dictionary`, `merriam-webster`, `dictionary-com`, `collins-dictionary` |
+| `papers`    | `arxiv`, `europepmc`, `doaj`                                                                                                                                                                                                   |
+| `code`      | `github`, `hackernews`, `gitlab`, `codeberg`, `gitee`, `bitbucket`, `gitflic`                                                                                                                                                  |
 
 `google` and `bing` use official APIs when credentials are configured and fall
 back to HTML parsing otherwise. `GITHUB_TOKEN` is optional and raises the GitHub
@@ -154,15 +182,17 @@ The Rust workflow publishes `web-search` to crates.io from `main` after lint,
 tests, doc tests, and package checks pass. GitHub releases are tagged as
 `rust-v<version>` so they stay distinct from JavaScript `js-v<version>` releases.
 
-The current `web-capture 0.3.31` dependency requires Rust 1.96 or newer, which
-is declared as this crate's MSRV in `Cargo.toml`.
+The `web-capture 0.3.37` dependency and all direct dependencies track their latest
+stable releases. This crate declares its supported minimum Rust version in
+`Cargo.toml`.
 
 ## Development
 
 ```bash
 cargo test --all-features
 cargo test --doc
-cargo check --no-default-features --lib
+cargo test --no-default-features --features merge
+cargo build --no-default-features --features merge --target wasm32-unknown-unknown
 cargo fmt --all -- --check
 cargo clippy --all-targets --all-features
 cargo package --list --allow-dirty
@@ -173,6 +203,22 @@ Cross-language parity is checked from the repository root:
 ```bash
 node js/scripts/check-js-rust-parity.mjs
 ```
+
+## Dependency freshness
+
+CI checks direct runtime, optional, build and development dependencies against
+the latest non-yanked stable crates.io release, including versions outside the
+manifest range. Run `python3 rust/scripts/check-dependency-freshness.py` from the
+repository root. A blocked update must have an explanatory GitHub issue URL on
+its dependency line, for example:
+
+```toml
+tower-http = "0.7.1" # Blocked by upstream API: https://github.com/owner/repo/issues/123
+```
+
+The checker verifies that the cited issue is open, has a description, and is not
+a pull request. Unverifiable issues and registry errors fail the check. Release
+jobs depend on freshness passing, and scheduled checks detect later releases.
 
 ## License
 

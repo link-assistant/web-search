@@ -147,3 +147,9 @@ deno.lock
 # Cargo build output anywhere in the tree (e.g. experiments/*/target). The
 # rust crate already ignores its own target via rust/.gitignore.
 **/target/
+
+# Python freshness-check bytecode
+__pycache__/
+
+# Local investigation and validation output
+/ci-logs/

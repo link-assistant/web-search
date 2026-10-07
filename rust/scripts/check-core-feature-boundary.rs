@@ -43,6 +43,8 @@ fn main() {
             "--manifest-path",
             manifest.to_str().expect("manifest path must be UTF-8"),
             "--no-default-features",
+            "--features",
+            "merge",
             "--edges",
             "normal",
             "--prefix",

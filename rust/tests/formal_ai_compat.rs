@@ -1,3 +1,5 @@
+#![cfg(feature = "server")]
+
 //! FormalAI provider-parity contract (Rust parity with
 //! `tests/formal-ai-compat.test.js`).
 //!

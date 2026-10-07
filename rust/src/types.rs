@@ -1,5 +1,7 @@
 //! Core data types shared by merging and network-backed search.
 
+use alloc::{string::String, vec::Vec};
+
 use serde::{Deserialize, Serialize};
 
 /// A single search result.

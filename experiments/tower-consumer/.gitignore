@@ -1,0 +1,2 @@
+# Resolve the current downstream graph when this fresh-consumer probe runs.
+/Cargo.lock

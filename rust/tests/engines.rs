@@ -1,3 +1,5 @@
+#![cfg(feature = "server")]
+
 //! Integration tests for the descriptor-driven engine parsers (Rust parity with
 //! `tests/api-engines.test.js` and `tests/html-engines.test.js`). Parsers are
 //! exercised through the public descriptor catalog, the same path the
