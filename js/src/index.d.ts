@@ -96,12 +96,7 @@ export type ProviderCategory = 'search' | 'knowledge' | 'papers' | 'code';
  * How a provider obtains its results.
  */
 export type ProviderAccess =
-  | 'api'
-  | 'html'
-  | 'hybrid'
-  | 'browser'
-  | 'component'
-  | 'unknown';
+  'api' | 'html' | 'hybrid' | 'browser' | 'component' | 'unknown';
 
 /**
  * Provider status information, enriched with registry metadata.

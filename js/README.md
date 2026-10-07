@@ -143,3 +143,14 @@ Cross-language parity is checked from the repository root:
 ```bash
 node js/scripts/check-js-rust-parity.mjs
 ```
+
+## Dependency freshness
+
+Development and release tooling use Node 24; the published runtime still supports
+Node 20 and newer. Run `node scripts/check-dependency-freshness.mjs` after `npm ci`
+to verify every direct dependency against npm's latest release. CI runs this on
+pull requests, before releases, and weekly. Because JSON cannot contain comments,
+a blocked update is recorded under a `dependencyFreshnessExceptions` object in
+`package.json`, keyed by dependency name with an open GitHub issue URL as its
+value. The checker verifies an open issue with a description, rejects pull
+requests and closed issues, and fails if GitHub cannot verify the blocker.

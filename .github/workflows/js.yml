@@ -6,6 +6,8 @@ on:
       - main
   pull_request:
     types: [opened, synchronize, reopened]
+  schedule:
+    - cron: '37 6 * * 1'
   # Manual release support is consolidated here for npm trusted publishing.
   # npm allows one trusted-publisher workflow, so JavaScript package publishing
   # goes through js.yml.
@@ -41,10 +43,30 @@ defaults:
     working-directory: js
 
 jobs:
+  dependency-freshness:
+    name: JS - Dependency Freshness
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24.x'
+          cache: npm
+          cache-dependency-path: js/package-lock.json
+      - name: Install locked dependencies
+        run: npm ci
+      - name: Test freshness policy
+        run: node --test tests/dependency-freshness.test.js
+      - name: Check direct dependency freshness
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: npm run check:dependencies
+
   detect-changes:
     name: JS - Detect Changes
     runs-on: ubuntu-latest
-    if: github.event_name != 'workflow_dispatch'
+    if: github.event_name != 'workflow_dispatch' && github.event_name != 'schedule'
     outputs:
       js-code-changed: ${{ steps.changes.outputs.js-code-changed }}
       any-js-code-changed: ${{ steps.changes.outputs.any-js-code-changed }}
@@ -96,7 +118,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: '20.x'
+          node-version: '24.x'
 
       - name: Install dependencies
         run: npm install
@@ -179,7 +201,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: '20.x'
+          node-version: '24.x'
 
       - name: Install dependencies
         run: npm install
@@ -266,7 +288,7 @@ jobs:
         if: matrix.runtime == 'node'
         uses: actions/setup-node@v6
         with:
-          node-version: '20.x'
+          node-version: '24.x'
 
       - name: Install dependencies (Node.js)
         if: matrix.runtime == 'node'
@@ -302,13 +324,14 @@ jobs:
 
   release:
     name: JS - Release
-    needs: [lint, test]
+    needs: [lint, test, dependency-freshness]
     if: |
       always() &&
       github.ref == 'refs/heads/main' &&
       github.event_name == 'push' &&
       needs.lint.result == 'success' &&
-      needs.test.result == 'success'
+      needs.test.result == 'success' &&
+      needs.dependency-freshness.result == 'success'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -408,7 +431,8 @@ jobs:
 
   instant-release:
     name: JS - Instant Release
-    if: github.event_name == 'workflow_dispatch' && github.event.inputs.release_mode == 'instant'
+    needs: [dependency-freshness]
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.release_mode == 'instant' && needs.dependency-freshness.result == 'success'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -479,7 +503,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: '20.x'
+          node-version: '24.x'
 
       - name: Install dependencies
         run: npm install
