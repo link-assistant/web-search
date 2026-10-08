@@ -29,3 +29,18 @@ width, height}` for keyword queries with an optional objective
 
 - https://docs.parallel.ai/image-search/image-search-quickstart
 - Openverse API: https://api.openverse.org/v1/
+
+## Implementation follow-through
+
+1. Extend current registry/merger with typed image descriptors, adding adapters incrementally from fixtures.
+2. Preserve supplied attribution/license and keep dimension probes optional and policy/byte bounded via WC-10.
+
+## Additional verification
+
+- Missing dimensions/source pages, lazy/relative URLs, duplicates, provider failure, and keyword/objective modes.
+- Use mocks/local servers with finite test deadlines, update types and examples, and keep live comparisons opt-in.
+
+## Planning references
+
+- [Case study and verified source snapshot](https://github.com/link-assistant/web-search/blob/issue-29-03fe983c7d11/docs/case-studies/issue-29/README.md).
+- Original requirement: https://github.com/link-assistant/web-search/issues/29

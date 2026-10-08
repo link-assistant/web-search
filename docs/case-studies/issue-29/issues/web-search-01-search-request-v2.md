@@ -39,3 +39,18 @@ providers (existing receipts) }` with `warnings[]{type, message}` for: >5
 
 - https://docs.parallel.ai/api-reference/search/search
 - Case study: docs/case-studies/issue-29/README.md
+
+## Implementation follow-through
+
+1. Extend current engine options and merger with shared validation/envelope fixtures, retaining canonical dedupe and provider receipts across queries.
+2. Bound total provider×query calls and cancellation through existing transport. Objective-only requests need injectable query planning or an explicit deterministic fallback.
+
+## Additional verification
+
+- Objective-only/query-only/invalid input, duplicate URLs, all-provider failure, finite fan-out, cancellation, and legacy wrappers.
+- Use mocks/local servers with finite test deadlines, update types and examples, and keep live comparisons opt-in.
+
+## Planning references
+
+- [Case study and verified source snapshot](https://github.com/link-assistant/web-search/blob/issue-29-03fe983c7d11/docs/case-studies/issue-29/README.md).
+- Original requirement: https://github.com/link-assistant/web-search/issues/29

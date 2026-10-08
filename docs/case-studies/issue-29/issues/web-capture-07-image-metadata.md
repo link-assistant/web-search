@@ -27,3 +27,18 @@ dimensions.
 
 - https://docs.parallel.ai/image-search/image-search-quickstart
 - Consumer: web-search WS-08
+
+## Implementation follow-through
+
+1. Add pure HTML image extraction plus optional bounded header probes, separate from screenshots.
+2. Resolve base/relative/lazy URLs and preserve source/alt/attribution without fetching whole images.
+
+## Additional verification
+
+- srcset/metadata/duplicates/data URLs, corrupt header, missing size, redirect, and probe budget.
+- Use mocks/local servers with finite test deadlines, update types and examples, and keep live comparisons opt-in.
+
+## Planning references
+
+- [Case study and verified source snapshot](https://github.com/link-assistant/web-search/blob/issue-29-03fe983c7d11/docs/case-studies/issue-29/README.md).
+- Original requirement: https://github.com/link-assistant/web-search/issues/29

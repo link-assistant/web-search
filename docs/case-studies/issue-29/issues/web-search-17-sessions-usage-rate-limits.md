@@ -25,3 +25,18 @@ SKU counters, and enforces per-API rate limits with 429 + backoff guidance
 ## Acceptance criteria
 
 - Tests for echo/generate behaviour and 429 after the configured burst.
+
+## Implementation follow-through
+
+1. Validate session/client hints and operation/SKU counters through shared envelopes.
+2. Separate usage from billing WS-34 and configurable per-key limiting from provider retry behavior.
+
+## Additional verification
+
+- Length limits, echo/generation, partial-failure usage, fake-clock 429/recovery, key isolation, and limiter disabled.
+- Use mocks/local servers with finite test deadlines, update types and examples, and keep live comparisons opt-in.
+
+## Planning references
+
+- [Case study and verified source snapshot](https://github.com/link-assistant/web-search/blob/issue-29-03fe983c7d11/docs/case-studies/issue-29/README.md).
+- Original requirement: https://github.com/link-assistant/web-search/issues/29

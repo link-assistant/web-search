@@ -27,3 +27,8 @@ jobs:
 
       - name: Check JS/Rust parity
         run: node js/scripts/check-js-rust-parity.mjs
+
+      - name: Validate issue 29 coverage and issue filing
+        run: |
+          python3 experiments/issue-29/validate-plan.py
+          python3 experiments/issue-29/test_file_issues.py

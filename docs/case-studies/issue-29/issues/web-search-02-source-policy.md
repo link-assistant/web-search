@@ -38,3 +38,18 @@ entries. `after_date` (YYYY-MM-DD) filters on publish date and is Search-only.
 
 - https://docs.parallel.ai/resources/source-policy
 - https://docs.parallel.ai/search/source-policy
+
+## Implementation follow-through
+
+1. Use one matcher before provider calls and after merging: provider operators cannot be the enforcement boundary.
+2. Treat unknown publication dates explicitly rather than equating modified/capture timestamps with publication.
+
+## Additional verification
+
+- IDN/apex/subdomain/suffix/path boundaries, overlapping include/exclude, invalid/unknown dates, and JS/Rust equivalence.
+- Use mocks/local servers with finite test deadlines, update types and examples, and keep live comparisons opt-in.
+
+## Planning references
+
+- [Case study and verified source snapshot](https://github.com/link-assistant/web-search/blob/issue-29-03fe983c7d11/docs/case-studies/issue-29/README.md).
+- Original requirement: https://github.com/link-assistant/web-search/issues/29

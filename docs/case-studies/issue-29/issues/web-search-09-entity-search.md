@@ -30,3 +30,18 @@ companies and a natural-language `objective`, `match_limit` 5–1000
 
 - https://docs.parallel.ai/findall-api/entity-search
 - https://www.wikidata.org/w/api.php
+
+## Implementation follow-through
+
+1. Separate natural-language objective planning from source adapters and validate supported source filters.
+2. Preserve ambiguous entities with stable IDs/canonical websites and provenance rather than deduping by name alone.
+
+## Additional verification
+
+- Same-name distinct entities, pagination, match_limit boundaries, unavailable licensed source, and stable ranking.
+- Use mocks/local servers with finite test deadlines, update types and examples, and keep live comparisons opt-in.
+
+## Planning references
+
+- [Case study and verified source snapshot](https://github.com/link-assistant/web-search/blob/issue-29-03fe983c7d11/docs/case-studies/issue-29/README.md).
+- Original requirement: https://github.com/link-assistant/web-search/issues/29

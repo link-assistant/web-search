@@ -32,3 +32,18 @@ OpenAI/Anthropic/Gemini, an agent skill, and marketplace listings
 
 - https://docs.parallel.ai/integrations/mcp/search-mcp
 - https://modelcontextprotocol.io/specification
+
+## Implementation follow-through
+
+1. Use official MCP SDKs and generated tool schemas: outbound research tools are WS-25 and Task tools WS-30.
+2. Validate header/query/tool overrides once with explicit precedence and forward caller scope into web_fetch.
+
+## Additional verification
+
+- SDK tools/list/call, stdio/HTTP, invalid input, cancellation, budgets, and typed partial failures.
+- Use mocks/local servers with finite test deadlines, update types and examples, and keep live comparisons opt-in.
+
+## Planning references
+
+- [Case study and verified source snapshot](https://github.com/link-assistant/web-search/blob/issue-29-03fe983c7d11/docs/case-studies/issue-29/README.md).
+- Original requirement: https://github.com/link-assistant/web-search/issues/29

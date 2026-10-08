@@ -2,7 +2,7 @@
 id: WC-06
 repo: link-assistant/web-capture
 title: Route extract through browser capture and PDF conversion when static HTML is insufficient
-depends_on: [WC-02]
+depends_on: [WC-02, WC-10]
 labels: enhancement
 ---
 
@@ -29,3 +29,18 @@ an automatic fallback policy.
 ## References
 
 - https://docs.parallel.ai/extract/extract-quickstart
+
+## Implementation follow-through
+
+1. Route by type/visible-content heuristics into existing browser/PDF modules and record the path.
+2. One end-to-end deadline and WC-10 limits cover static/browser/converter fallback and cleanup.
+
+## Additional verification
+
+- SPA/static/PDF, wrong type, encrypted/malformed PDF, finite oversized input, browser failure, and cancellation.
+- Use mocks/local servers with finite test deadlines, update types and examples, and keep live comparisons opt-in.
+
+## Planning references
+
+- [Case study and verified source snapshot](https://github.com/link-assistant/web-search/blob/issue-29-03fe983c7d11/docs/case-studies/issue-29/README.md).
+- Original requirement: https://github.com/link-assistant/web-search/issues/29

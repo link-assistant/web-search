@@ -1,38 +1,43 @@
 ---
 id: WS-14
 repo: link-assistant/web-search
-title: Grounded answers: OpenAI Responses and Chat Completions compatible endpoints with citations and structured output
+title: Grounded Task research with pluggable models and field-level basis
 depends_on: [WS-04, WS-13]
 labels: enhancement
 ---
 
 ## Summary
 
-parallel.ai's Responses API (`POST /v1/responses`, OpenAI wire format) and
-beta Chat Completions return answers with `url_citation` annotations,
-`web_search_call` items, JSON-schema structured output, streaming SSE, and a
-`reasoning.effort` knob (`responses-api_responses-quickstart.md`,
-`responses-api_features_*.md`). web-search can provide the retrieval half and
-let the caller plug any LLM.
+Parallel Task executes web-grounded text or structured research with field-level citations, reasoning, and confidence. Build the shared research engine here. WS-22/23 expose Responses/Chat, and WS-24 adds task specifications and interaction chains.
 
 ## Scope
 
-- `POST /v1/responses` and `POST /v1beta/chat/completions` that run
-  search (WS-01/02) → excerpts (WS-04) → synthesis through a configured
-  OpenAI-compatible endpoint (`LLM_BASE_URL`, `LLM_API_KEY`, `LLM_MODEL`; works
-  with Ollama, vLLM, OpenAI, Anthropic via adapter).
-- `reasoning.effort` mapped to search mode and number of search rounds;
-  `previous_response_id` via the WS-13 run store; `text.format` json_schema
-  validated with `ajv`/`jsonschema`.
-- Output annotations with character offsets; `web_search_call` items for
-  `search` and `open_page` actions; SSE event stream matching the OpenAI event names.
-- Task-style `basis[]` (citations, reasoning, confidence) for structured fields.
+- Caller-configured model backend for planning and synthesis with bounded search rounds, tool calls, tokens, and wall-clock budget.
+- Search/extract evidence through WS-04 and existing transport, then synthesize text/JSON with Task-style basis per field.
+- Model adapters for OpenAI-compatible local/remote endpoints and optional Anthropic backend, with secret-safe receipts.
+- Use ajv/jsonschema for structure, record actual source use, and report backend/citation/schema failures without fabricated evidence.
 
 ## Acceptance criteria
 
-- Tests with a stub LLM server: citations point to returned URLs; schema output validated; streaming emits `response.completed`.
+- Stub research loop, unsupported backend, budget exhaustion, invalid JSON, uncited fields, and partial sources.
+- Existing unit/integration and JS/Rust parity checks pass.
 
 ## References
 
 - https://docs.parallel.ai/responses-api/responses-quickstart
 - https://platform.openai.com/docs/api-reference/responses
+
+## Implementation follow-through
+
+1. Execute Task research through caller-configured model adapters: plan bounded retrieval, extract evidence, and synthesize text/JSON with field-level basis.
+2. Keep evidence/provenance explicit and reject invented citation URLs. WS-24 handles specs/interactions and WS-22/23 format Responses/Chat.
+
+## Additional verification
+
+- Stub research loop, unsupported backend, budget exhaustion, invalid JSON, uncited fields, and partial sources.
+- Use mocks/local servers with finite test deadlines, update types and examples, and keep live comparisons opt-in.
+
+## Planning references
+
+- [Case study and verified source snapshot](https://github.com/link-assistant/web-search/blob/issue-29-03fe983c7d11/docs/case-studies/issue-29/README.md).
+- Original requirement: https://github.com/link-assistant/web-search/issues/29

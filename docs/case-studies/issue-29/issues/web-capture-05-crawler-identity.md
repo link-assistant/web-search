@@ -30,3 +30,18 @@ success rates on well-behaved sites.
 
 - https://docs.parallel.ai/resources/crawler
 - Consumers: WC-02 extract, web-search WS-04
+
+## Implementation follow-through
+
+1. Reuse cached robots matching and per-origin scheduling with documented versioned user agent.
+2. Publish operator IP-list templates instead of asserting project-wide static IPs, and document unavailable robots/legacy behavior.
+
+## Additional verification
+
+- Allow/disallow precedence, agent groups, robots refresh/redirects, host delay/concurrency, and explicit opt-out.
+- Use mocks/local servers with finite test deadlines, update types and examples, and keep live comparisons opt-in.
+
+## Planning references
+
+- [Case study and verified source snapshot](https://github.com/link-assistant/web-search/blob/issue-29-03fe983c7d11/docs/case-studies/issue-29/README.md).
+- Original requirement: https://github.com/link-assistant/web-search/issues/29

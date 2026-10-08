@@ -32,3 +32,18 @@ and `language` whose provider mapping is undocumented.
 ## References
 
 - https://docs.parallel.ai/search/advanced-search-settings
+
+## Implementation follow-through
+
+1. Inspect provider descriptors before adding country mappings and separate country bias from language.
+2. Use data-driven code tables, preserve region/language aliases, and report unsupported provider mappings.
+
+## Additional verification
+
+- Country-only/language-only requests, uppercase/gb normalization, unsupported provider, and generated parameters.
+- Use mocks/local servers with finite test deadlines, update types and examples, and keep live comparisons opt-in.
+
+## Planning references
+
+- [Case study and verified source snapshot](https://github.com/link-assistant/web-search/blob/issue-29-03fe983c7d11/docs/case-studies/issue-29/README.md).
+- Original requirement: https://github.com/link-assistant/web-search/issues/29

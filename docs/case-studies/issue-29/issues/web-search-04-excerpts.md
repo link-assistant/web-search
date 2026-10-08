@@ -33,3 +33,18 @@ returns provider snippets only.
 ## References
 
 - https://docs.parallel.ai/search/best-practices
+
+## Implementation follow-through
+
+1. Reuse capture batch/ranker interfaces after merge with optional bounded fetching.
+2. Allocate budgets deterministically across deduplicated results and preserve original sources/fetch receipts.
+
+## Additional verification
+
+- Zero/tiny caps, Unicode, duplicate URLs, mixed failures, cancellation, and fallback snippets within the total cap.
+- Use mocks/local servers with finite test deadlines, update types and examples, and keep live comparisons opt-in.
+
+## Planning references
+
+- [Case study and verified source snapshot](https://github.com/link-assistant/web-search/blob/issue-29-03fe983c7d11/docs/case-studies/issue-29/README.md).
+- Original requirement: https://github.com/link-assistant/web-search/issues/29

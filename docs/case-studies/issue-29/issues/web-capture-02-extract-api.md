@@ -2,7 +2,7 @@
 id: WC-02
 repo: link-assistant/web-capture
 title: Add a batch Extract API compatible with parallel.ai /v1/extract
-depends_on: [WC-01, WC-03, WC-04]
+depends_on: [WC-01, WC-03, WC-04, WC-10]
 labels: enhancement
 ---
 
@@ -40,5 +40,20 @@ web-capture only has single-URL routes (`/markdown`, `/txt`, ...).
 
 - https://docs.parallel.ai/extract/extract-quickstart
 - https://docs.parallel.ai/api-reference/extract/extract
-- Case study: https://github.com/link-assistant/web-search/blob/main/docs/case-studies/issue-29/README.md
+- Case study: https://github.com/link-assistant/web-search/blob/issue-29-03fe983c7d11/docs/case-studies/issue-29/README.md
 - Consumers: web-search WS-04, WS-10, WS-14
+
+## Implementation follow-through
+
+1. Implement one batch engine over current conversion/transport interfaces: WC-11 owns its versioned wrapper.
+2. Preserve URL-to-input association, bound total/per-host work, and separate excerpt budgets from full_content caps.
+
+## Additional verification
+
+- Mixed success/404/timeout/blocked/binary, duplicates, cancellation, zero budgets, and full_content options.
+- Use mocks/local servers with finite test deadlines, update types and examples, and keep live comparisons opt-in.
+
+## Planning references
+
+- [Case study and verified source snapshot](https://github.com/link-assistant/web-search/blob/issue-29-03fe983c7d11/docs/case-studies/issue-29/README.md).
+- Original requirement: https://github.com/link-assistant/web-search/issues/29
