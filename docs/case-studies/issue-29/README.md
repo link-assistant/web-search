@@ -229,8 +229,11 @@ python3 experiments/issue-29/verify-filed-issues.py
 - Self-hosting, provider diversity, injected transports/models, and JS/Rust native
   libraries are architectural advantages. Better answer/search quality requires
   WS-41/WC-12 measurements before making performance claims.
-- This task plans and files the implementation backlog. No core library behavior
-  or package version changes, release changeset, or Rust changelog are required.
+- This task plans and files the implementation backlog. Core library behavior
+  is unchanged. The shared parity workflow activates both languages' release
+  checks, so patch release records are included. Rust's freshness check also
+  requires updating the existing web-capture dependency to 0.4.0; its provider
+  and caller-owned transport contracts are verified by the existing tests.
 
 ## Validation
 
@@ -242,4 +245,6 @@ filename-order mistakes, lost mappings, and duplicates after partial failure.
 CI runs the plan validator and filing regression tests alongside repository
 parity checks. The separate GitHub read-back verified every published body,
 title, label, and linked prerequisite. Local checks and latest-commit CI
-results are recorded in PR #30.
+results are recorded in PR #30. [CI follow-up](ci-follow-up.md) explains the
+initial release-record and stale capture dependency failures, their exact log
+evidence, and reproduction/validation commands.
