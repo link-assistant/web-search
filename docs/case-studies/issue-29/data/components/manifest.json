@@ -1,0 +1,30 @@
+{
+  "retrieved_on": "2026-10-08",
+  "sources": [
+    {
+      "file": "transformers-js.md",
+      "url": "https://raw.githubusercontent.com/huggingface/transformers.js/main/README.md",
+      "sha256": "66f60c2040f4505eec4ceaf17528d248880e0134955fb1c48beedf44ef2410b4"
+    },
+    {
+      "file": "fastembed.md",
+      "url": "https://raw.githubusercontent.com/Anush008/fastembed-rs/main/README.md",
+      "sha256": "5436cfa65fe7174eeb07cb8e4dda2ffcc643148d8c2290ae4245335b55d90b0c"
+    },
+    {
+      "file": "standard-webhooks.md",
+      "url": "https://raw.githubusercontent.com/standard-webhooks/standard-webhooks/main/README.md",
+      "sha256": "a8ca7f9d5c7eeb0e7056142556b422d18c1a5df9309b3ea7b02ad3d2428e195e"
+    },
+    {
+      "file": "mcp-rust-sdk.md",
+      "url": "https://raw.githubusercontent.com/modelcontextprotocol/rust-sdk/main/README.md",
+      "sha256": "c4f68586fc688a74a32f3177f00aa2f9d2e529f5c64326a0cfdc50eaa37679f0"
+    },
+    {
+      "file": "mcp-typescript-sdk.md",
+      "url": "https://raw.githubusercontent.com/modelcontextprotocol/typescript-sdk/main/README.md",
+      "sha256": "d776beb7f1d0194da22e7d82cc84d869bd4ae805ba5d8283b69f57dec5b64dd6"
+    }
+  ]
+}
