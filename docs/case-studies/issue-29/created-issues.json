@@ -1,0 +1,338 @@
+{
+  "WC-01": {
+    "repo": "link-assistant/web-capture",
+    "number": 161,
+    "url": "https://github.com/link-assistant/web-capture/issues/161",
+    "title": "Add an objective-aware excerpt ranking library (BM25 with optional embeddings)"
+  },
+  "WC-02": {
+    "repo": "link-assistant/web-capture",
+    "number": 165,
+    "url": "https://github.com/link-assistant/web-capture/issues/165",
+    "title": "Add a batch Extract API compatible with parallel.ai /v1/extract"
+  },
+  "WC-03": {
+    "repo": "link-assistant/web-capture",
+    "number": 162,
+    "url": "https://github.com/link-assistant/web-capture/issues/162",
+    "title": "Detect and expose publish_date and page metadata on search and capture results"
+  },
+  "WC-04": {
+    "repo": "link-assistant/web-capture",
+    "number": 163,
+    "url": "https://github.com/link-assistant/web-capture/issues/163",
+    "title": "Expose fetch_policy (max_age_seconds, live vs cached) on the public API"
+  },
+  "WC-05": {
+    "repo": "link-assistant/web-capture",
+    "number": 166,
+    "url": "https://github.com/link-assistant/web-capture/issues/166",
+    "title": "Document crawler identity and add robots.txt and per-host politeness controls"
+  },
+  "WC-06": {
+    "repo": "link-assistant/web-capture",
+    "number": 167,
+    "url": "https://github.com/link-assistant/web-capture/issues/167",
+    "title": "Route extract through browser capture and PDF conversion when static HTML is insufficient"
+  },
+  "WC-07": {
+    "repo": "link-assistant/web-capture",
+    "number": 168,
+    "url": "https://github.com/link-assistant/web-capture/issues/168",
+    "title": "Extract image candidates with dimensions and source page for image search"
+  },
+  "WC-08": {
+    "repo": "link-assistant/web-capture",
+    "number": 170,
+    "url": "https://github.com/link-assistant/web-capture/issues/170",
+    "title": "web_fetch tool schemas and installed CLI JSON output"
+  },
+  "WC-09": {
+    "repo": "link-assistant/web-capture",
+    "number": 171,
+    "url": "https://github.com/link-assistant/web-capture/issues/171",
+    "title": "Authenticated browser capture with scoped sessions and Browser Use integration"
+  },
+  "WC-10": {
+    "repo": "link-assistant/web-capture",
+    "number": 164,
+    "url": "https://github.com/link-assistant/web-capture/issues/164",
+    "title": "Capture target/redirect policy and bounded document processing"
+  },
+  "WC-11": {
+    "repo": "link-assistant/web-capture",
+    "number": 169,
+    "url": "https://github.com/link-assistant/web-capture/issues/169",
+    "title": "Standalone /v1/extract contract, OpenAPI, hints, errors, and usage"
+  },
+  "WC-12": {
+    "repo": "link-assistant/web-capture",
+    "number": 172,
+    "url": "https://github.com/link-assistant/web-capture/issues/172",
+    "title": "Extraction quality/parity fixtures for HTML, multilingual pages, JS, and PDF"
+  },
+  "WS-01": {
+    "repo": "link-assistant/web-search",
+    "number": 31,
+    "url": "https://github.com/link-assistant/web-search/issues/31",
+    "title": "Search request v2: objective, multiple search_queries, and a warnings/usage response envelope"
+  },
+  "WS-02": {
+    "repo": "link-assistant/web-search",
+    "number": 32,
+    "url": "https://github.com/link-assistant/web-search/issues/32",
+    "title": "Source policy: include/exclude domains and path prefixes, after_date, and normalization rules"
+  },
+  "WS-03": {
+    "repo": "link-assistant/web-search",
+    "number": 33,
+    "url": "https://github.com/link-assistant/web-search/issues/33",
+    "title": "ISO alpha-2 location targeting mapped to provider parameters with warnings"
+  },
+  "WS-04": {
+    "repo": "link-assistant/web-search",
+    "number": 34,
+    "url": "https://github.com/link-assistant/web-search/issues/34",
+    "title": "Objective-focused excerpts with max_chars_per_result and max_chars_total"
+  },
+  "WS-05": {
+    "repo": "link-assistant/web-search",
+    "number": 35,
+    "url": "https://github.com/link-assistant/web-search/issues/35",
+    "title": "Optional local cross-encoder reranking with relevance scores"
+  },
+  "WS-06": {
+    "repo": "link-assistant/web-search",
+    "number": 36,
+    "url": "https://github.com/link-assistant/web-search/issues/36",
+    "title": "Search modes turbo/fast/basic/advanced as configurable pipeline presets"
+  },
+  "WS-07": {
+    "repo": "link-assistant/web-search",
+    "number": 37,
+    "url": "https://github.com/link-assistant/web-search/issues/37",
+    "title": "Fetch policy and freshness: max_age_seconds, captured_at, and live refresh"
+  },
+  "WS-08": {
+    "repo": "link-assistant/web-search",
+    "number": 38,
+    "url": "https://github.com/link-assistant/web-search/issues/38",
+    "title": "Image search providers and /v1/images/search"
+  },
+  "WS-09": {
+    "repo": "link-assistant/web-search",
+    "number": 39,
+    "url": "https://github.com/link-assistant/web-search/issues/39",
+    "title": "Entity search for people and companies over open data sources"
+  },
+  "WS-10": {
+    "repo": "link-assistant/web-search",
+    "number": 40,
+    "url": "https://github.com/link-assistant/web-search/issues/40",
+    "title": "Wire-compatible /v1/search, /v1/extract, error format, 422 validation, and generated OpenAPI 3.1"
+  },
+  "WS-11": {
+    "repo": "link-assistant/web-search",
+    "number": 41,
+    "url": "https://github.com/link-assistant/web-search/issues/41",
+    "title": "MCP server with web_search and web_fetch tools, LLM tool definitions, and an agent skill"
+  },
+  "WS-12": {
+    "repo": "link-assistant/web-search",
+    "number": 42,
+    "url": "https://github.com/link-assistant/web-search/issues/42",
+    "title": "CLI parity with parallel-cli: search and extract subcommands with JSON output and policy flags"
+  },
+  "WS-13": {
+    "repo": "link-assistant/web-search",
+    "number": 43,
+    "url": "https://github.com/link-assistant/web-search/issues/43",
+    "title": "Durable async task runtime, run storage, cancellation, and recovery"
+  },
+  "WS-14": {
+    "repo": "link-assistant/web-search",
+    "number": 44,
+    "url": "https://github.com/link-assistant/web-search/issues/44",
+    "title": "Grounded Task research with pluggable models and field-level basis"
+  },
+  "WS-15": {
+    "repo": "link-assistant/web-search",
+    "number": 46,
+    "url": "https://github.com/link-assistant/web-search/issues/46",
+    "title": "GA Monitor event streams, scheduling, history, and control routes"
+  },
+  "WS-16": {
+    "repo": "link-assistant/web-search",
+    "number": 49,
+    "url": "https://github.com/link-assistant/web-search/issues/49",
+    "title": "FindAll core discovery, candidate matching, and research basis"
+  },
+  "WS-17": {
+    "repo": "link-assistant/web-search",
+    "number": 50,
+    "url": "https://github.com/link-assistant/web-search/issues/50",
+    "title": "session_id, client_model hints, usage accounting, and optional rate limiting"
+  },
+  "WS-18": {
+    "repo": "link-assistant/web-search",
+    "number": 51,
+    "url": "https://github.com/link-assistant/web-search/issues/51",
+    "title": "Scoped Memory API with ranked/recent retrieval, evict, and clear"
+  },
+  "WS-19": {
+    "repo": "link-assistant/web-search",
+    "number": 47,
+    "url": "https://github.com/link-assistant/web-search/issues/47",
+    "title": "Replayable SSE for task runs, groups, FindAll, and Responses"
+  },
+  "WS-20": {
+    "repo": "link-assistant/web-search",
+    "number": 45,
+    "url": "https://github.com/link-assistant/web-search/issues/45",
+    "title": "Durable Standard Webhooks delivery, retries, replay, and secret rotation"
+  },
+  "WS-21": {
+    "repo": "link-assistant/web-search",
+    "number": 52,
+    "url": "https://github.com/link-assistant/web-search/issues/52",
+    "title": "Task groups: bulk submission, aggregate status, pagination, and partial failures"
+  },
+  "WS-22": {
+    "repo": "link-assistant/web-search",
+    "number": 53,
+    "url": "https://github.com/link-assistant/web-search/issues/53",
+    "title": "Responses API statefulness, citations, structured output, and stream compatibility"
+  },
+  "WS-23": {
+    "repo": "link-assistant/web-search",
+    "number": 54,
+    "url": "https://github.com/link-assistant/web-search/issues/54",
+    "title": "Chat Completions compatibility over grounded research"
+  },
+  "WS-24": {
+    "repo": "link-assistant/web-search",
+    "number": 48,
+    "url": "https://github.com/link-assistant/web-search/issues/48",
+    "title": "Task schemas, processor budgets, Ingest, and interaction chains"
+  },
+  "WS-25": {
+    "repo": "link-assistant/web-search",
+    "number": 55,
+    "url": "https://github.com/link-assistant/web-search/issues/55",
+    "title": "Remote MCP tools and authenticated private sources in research runs"
+  },
+  "WS-26": {
+    "repo": "link-assistant/web-search",
+    "number": 56,
+    "url": "https://github.com/link-assistant/web-search/issues/56",
+    "title": "Research connector registry for free, paid, licensed, and BYOL data"
+  },
+  "WS-27": {
+    "repo": "link-assistant/web-search",
+    "number": 57,
+    "url": "https://github.com/link-assistant/web-search/issues/57",
+    "title": "FindAll per-candidate enrichment with schemas, citations, and partial progress"
+  },
+  "WS-28": {
+    "repo": "link-assistant/web-search",
+    "number": 58,
+    "url": "https://github.com/link-assistant/web-search/issues/58",
+    "title": "FindAll preview, exclusions, extend, cancel, and refresh lifecycle"
+  },
+  "WS-29": {
+    "repo": "link-assistant/web-search",
+    "number": 59,
+    "url": "https://github.com/link-assistant/web-search/issues/59",
+    "title": "Snapshot monitors and follow-up Task enrichment for detected events"
+  },
+  "WS-30": {
+    "repo": "link-assistant/web-search",
+    "number": 60,
+    "url": "https://github.com/link-assistant/web-search/issues/60",
+    "title": "Task MCP tools for research, enrichment, and async retrieval"
+  },
+  "WS-31": {
+    "repo": "link-assistant/web-search",
+    "number": 61,
+    "url": "https://github.com/link-assistant/web-search/issues/61",
+    "title": "Typed HTTP clients for Python, TypeScript, and Rust with polling and streams"
+  },
+  "WS-32": {
+    "repo": "link-assistant/web-search",
+    "number": 62,
+    "url": "https://github.com/link-assistant/web-search/issues/62",
+    "title": "Device OAuth login, refresh, and revoke for CLI and agent clients"
+  },
+  "WS-33": {
+    "repo": "link-assistant/web-search",
+    "number": 63,
+    "url": "https://github.com/link-assistant/web-search/issues/63",
+    "title": "Account apps, API key lifecycle, organization roles, and resource isolation"
+  },
+  "WS-34": {
+    "repo": "link-assistant/web-search",
+    "number": 64,
+    "url": "https://github.com/link-assistant/web-search/issues/64",
+    "title": "Optional hosted usage ledger, credit balance, spend limits, and reload"
+  },
+  "WS-35": {
+    "repo": "link-assistant/web-search",
+    "number": 65,
+    "url": "https://github.com/link-assistant/web-search/issues/65",
+    "title": "Optional MPP and x402 payment gateway for machine clients"
+  },
+  "WS-36": {
+    "repo": "link-assistant/web-search",
+    "number": 66,
+    "url": "https://github.com/link-assistant/web-search/issues/66",
+    "title": "LLM framework and gateway adapters for grounded search"
+  },
+  "WS-37": {
+    "repo": "link-assistant/web-search",
+    "number": 67,
+    "url": "https://github.com/link-assistant/web-search/issues/67",
+    "title": "Agent skills and editor plugins for search, extraction, and research"
+  },
+  "WS-38": {
+    "repo": "link-assistant/web-search",
+    "number": 68,
+    "url": "https://github.com/link-assistant/web-search/issues/68",
+    "title": "DataFrame and SQL enrichment: DuckDB, Polars, Spark, BigQuery, Snowflake, Supabase"
+  },
+  "WS-39": {
+    "repo": "link-assistant/web-search",
+    "number": 69,
+    "url": "https://github.com/link-assistant/web-search/issues/69",
+    "title": "Workflow integrations: n8n, Zapier, Sheets, Render, Vercel, and Superhuman"
+  },
+  "WS-40": {
+    "repo": "link-assistant/web-search",
+    "number": 70,
+    "url": "https://github.com/link-assistant/web-search/issues/70",
+    "title": "Migration guides and conformance fixtures for Parallel, Tavily, Exa, and SERP"
+  },
+  "WS-41": {
+    "repo": "link-assistant/web-search",
+    "number": 71,
+    "url": "https://github.com/link-assistant/web-search/issues/71",
+    "title": "Reproducible search/research evaluation for relevance, latency, citations, and cost"
+  },
+  "WS-42": {
+    "repo": "link-assistant/web-search",
+    "number": 72,
+    "url": "https://github.com/link-assistant/web-search/issues/72",
+    "title": "Production operations, status, retention controls, and failure diagnostics"
+  },
+  "WS-43": {
+    "repo": "link-assistant/web-search",
+    "number": 73,
+    "url": "https://github.com/link-assistant/web-search/issues/73",
+    "title": "AWS and Google Cloud marketplace deployment and subscription plans"
+  },
+  "WS-44": {
+    "repo": "link-assistant/web-search",
+    "number": 74,
+    "url": "https://github.com/link-assistant/web-search/issues/74",
+    "title": "CLI for Tasks, groups, Responses, FindAll, Monitor, Memory, and accounts"
+  }
+}

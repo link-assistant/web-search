@@ -36,7 +36,7 @@ tracing = { version = "0.1.44", optional = true }
 tracing-subscriber = { version = "0.3.23", features = ["env-filter"], optional = true }
 url = { version = "2.5.8", default-features = false }
 urlencoding = { version = "2.1.3", optional = true }
-web-capture = { version = "0.3.37", optional = true }
+web-capture = { version = "0.4.0", default-features = false, features = ["search"], optional = true }
 
 [dev-dependencies]
 tokio-test = "0.4.6"

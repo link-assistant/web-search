@@ -1,0 +1,2084 @@
+{
+  "retrieved_at": "2026-10-08T01:42:48.292202+00:00",
+  "indexed_pages": 162,
+  "issues": 56,
+  "current_operations": 44,
+  "sources": [
+    {
+      "file": "api-reference_chat-api-beta_chat-completions.md",
+      "url": "https://docs.parallel.ai/api-reference/chat-api-beta/chat-completions.md",
+      "final_url": "https://docs.parallel.ai/api-reference/chat-api-beta/chat-completions.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 36577,
+      "sha256": "63147a9b532d24df9896ddda0b779483089a4dc33e89caca75d7812864fa8cbd",
+      "issues": ["WS-23"]
+    },
+    {
+      "file": "api-reference_extract_extract.md",
+      "url": "https://docs.parallel.ai/api-reference/extract/extract.md",
+      "final_url": "https://docs.parallel.ai/api-reference/extract/extract.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 20705,
+      "sha256": "d87a7c0a99f01890f318603568f1bd18916459098d899f6a95226e8a1b45b781",
+      "issues": ["WC-02", "WC-11"]
+    },
+    {
+      "file": "api-reference_findall_add-enrichment-to-findall-run.md",
+      "url": "https://docs.parallel.ai/api-reference/findall/add-enrichment-to-findall-run.md",
+      "final_url": "https://docs.parallel.ai/api-reference/findall/add-enrichment-to-findall-run.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 18148,
+      "sha256": "3c5fed5d1556a9084c36ab49ec57e87c8352fa4ebc31cea1741a683593b22121",
+      "issues": ["WS-27"]
+    },
+    {
+      "file": "api-reference_findall_cancel-findall-run.md",
+      "url": "https://docs.parallel.ai/api-reference/findall/cancel-findall-run.md",
+      "final_url": "https://docs.parallel.ai/api-reference/findall/cancel-findall-run.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 10077,
+      "sha256": "0c08f07c3edbbc114cecc68eefd5426bb919b7e72914cf0e8ca02f04f8dd4ef3",
+      "issues": ["WS-28"]
+    },
+    {
+      "file": "api-reference_findall_create-findall-run.md",
+      "url": "https://docs.parallel.ai/api-reference/findall/create-findall-run.md",
+      "final_url": "https://docs.parallel.ai/api-reference/findall/create-findall-run.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 20168,
+      "sha256": "85628e4ce6f243dbfcb6181fa8884e2a7498db8f9e758fecd368e834b1e6b6a2",
+      "issues": ["WS-16"]
+    },
+    {
+      "file": "api-reference_findall_extend-findall-run.md",
+      "url": "https://docs.parallel.ai/api-reference/findall/extend-findall-run.md",
+      "final_url": "https://docs.parallel.ai/api-reference/findall/extend-findall-run.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 16782,
+      "sha256": "ef8e97cde697dbf7095d99339b7f0e8dbbcf91d9dc673e07ea4ec82e95459ae2",
+      "issues": ["WS-28"]
+    },
+    {
+      "file": "api-reference_findall_fast-entity-search.md",
+      "url": "https://docs.parallel.ai/api-reference/findall/fast-entity-search.md",
+      "final_url": "https://docs.parallel.ai/api-reference/findall/fast-entity-search.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 10789,
+      "sha256": "f19b76e18505b97980c083835fb53685c941ede9d9a01604829dfdfa08412b10",
+      "issues": ["WS-09"]
+    },
+    {
+      "file": "api-reference_findall_findall-run-result.md",
+      "url": "https://docs.parallel.ai/api-reference/findall/findall-run-result.md",
+      "final_url": "https://docs.parallel.ai/api-reference/findall/findall-run-result.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 19982,
+      "sha256": "8f93085e97a7d2d38470a597412576ea5f4e058330e7f8ad12f5df9db2ce8dbe",
+      "issues": ["WS-16"]
+    },
+    {
+      "file": "api-reference_findall_get-findall-run-schema.md",
+      "url": "https://docs.parallel.ai/api-reference/findall/get-findall-run-schema.md",
+      "final_url": "https://docs.parallel.ai/api-reference/findall/get-findall-run-schema.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 14752,
+      "sha256": "922319ff0fcd89fec96ecc440347fcba04a93e9013e8017fe3806017ab7585d5",
+      "issues": ["WS-16"]
+    },
+    {
+      "file": "api-reference_findall_ingest-findall-run.md",
+      "url": "https://docs.parallel.ai/api-reference/findall/ingest-findall-run.md",
+      "final_url": "https://docs.parallel.ai/api-reference/findall/ingest-findall-run.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 15194,
+      "sha256": "e34e547914d45451aa5cad1fcfdfd851d227c698a90cb28e126f00ffb0d475b2",
+      "issues": ["WS-24"]
+    },
+    {
+      "file": "api-reference_findall_retrieve-findall-run-status.md",
+      "url": "https://docs.parallel.ai/api-reference/findall/retrieve-findall-run-status.md",
+      "final_url": "https://docs.parallel.ai/api-reference/findall/retrieve-findall-run-status.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 11780,
+      "sha256": "99c53e465c1a93fea1d1a78bb007ecec7c2df7e2a43dd2c88ff5a5f4f8ff80dd",
+      "issues": ["WS-16"]
+    },
+    {
+      "file": "api-reference_findall_stream-findall-events.md",
+      "url": "https://docs.parallel.ai/api-reference/findall/stream-findall-events.md",
+      "final_url": "https://docs.parallel.ai/api-reference/findall/stream-findall-events.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 28909,
+      "sha256": "c729aa866f7ea20922443f4e17a0aadf2a6a389c88c3200cfd480d4be88085ef",
+      "issues": ["WS-19"]
+    },
+    {
+      "file": "api-reference_image-search_image-search.md",
+      "url": "https://docs.parallel.ai/api-reference/image-search/image-search.md",
+      "final_url": "https://docs.parallel.ai/api-reference/image-search/image-search.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 14871,
+      "sha256": "d7acfa3d46d091d253a63acdc9cf0c56e0f4fc9fddbe982a74b90e9210e78317",
+      "issues": ["WS-08"]
+    },
+    {
+      "file": "api-reference_memory_clear-memory.md",
+      "url": "https://docs.parallel.ai/api-reference/memory/clear-memory.md",
+      "final_url": "https://docs.parallel.ai/api-reference/memory/clear-memory.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 7666,
+      "sha256": "8f789baad6e3d92c8e451f994c0abf054bf722ad2efe88118d7d179478d477cd",
+      "issues": ["WS-18"]
+    },
+    {
+      "file": "api-reference_memory_evict-from-memory.md",
+      "url": "https://docs.parallel.ai/api-reference/memory/evict-from-memory.md",
+      "final_url": "https://docs.parallel.ai/api-reference/memory/evict-from-memory.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 8174,
+      "sha256": "7c63b90557970c5af2fd414fcf6cfc26090f78939ac5914c7facd800a4e4408f",
+      "issues": ["WS-18"]
+    },
+    {
+      "file": "api-reference_memory_retrieve-memory.md",
+      "url": "https://docs.parallel.ai/api-reference/memory/retrieve-memory.md",
+      "final_url": "https://docs.parallel.ai/api-reference/memory/retrieve-memory.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 13529,
+      "sha256": "4a299fb3f242abf3101a71d09b57fa2e0039fa2cc7b3749348123976371d8676",
+      "issues": ["WS-18"]
+    },
+    {
+      "file": "api-reference_monitor_cancel-monitor.md",
+      "url": "https://docs.parallel.ai/api-reference/monitor/cancel-monitor.md",
+      "final_url": "https://docs.parallel.ai/api-reference/monitor/cancel-monitor.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 27833,
+      "sha256": "b07de4bb99f2bd5810d731ca661774620f36060a87295d44520c113014fd6ddd",
+      "issues": ["WS-15", "WS-29"]
+    },
+    {
+      "file": "api-reference_monitor_create-monitor.md",
+      "url": "https://docs.parallel.ai/api-reference/monitor/create-monitor.md",
+      "final_url": "https://docs.parallel.ai/api-reference/monitor/create-monitor.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 32993,
+      "sha256": "4d10a355c3dbc2d9ed63442546fad44f7c73b6a7d88e8ca85df36ba46c6b88d8",
+      "issues": ["WS-15", "WS-29"]
+    },
+    {
+      "file": "api-reference_monitor_list-monitor-events.md",
+      "url": "https://docs.parallel.ai/api-reference/monitor/list-monitor-events.md",
+      "final_url": "https://docs.parallel.ai/api-reference/monitor/list-monitor-events.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 26851,
+      "sha256": "7f985f4f1eed046c7dfc2b85dd5d3ac4339e28f4fb18ef504f8c1b130124b24f",
+      "issues": ["WS-15", "WS-29"]
+    },
+    {
+      "file": "api-reference_monitor_list-monitors.md",
+      "url": "https://docs.parallel.ai/api-reference/monitor/list-monitors.md",
+      "final_url": "https://docs.parallel.ai/api-reference/monitor/list-monitors.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 31396,
+      "sha256": "7074f0978a72cdd2627b2e632b279fdafd6851544473d2388a77ed7eeaa49785",
+      "issues": ["WS-15", "WS-29"]
+    },
+    {
+      "file": "api-reference_monitor_monitor-stats.md",
+      "url": "https://docs.parallel.ai/api-reference/monitor/monitor-stats.md",
+      "final_url": "https://docs.parallel.ai/api-reference/monitor/monitor-stats.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 10042,
+      "sha256": "e1aaecd03f7633ce4d065f7b1a8ee7922c94683281da1b58c10280d610b07ef7",
+      "issues": ["WS-15", "WS-29"]
+    },
+    {
+      "file": "api-reference_monitor_retrieve-monitor.md",
+      "url": "https://docs.parallel.ai/api-reference/monitor/retrieve-monitor.md",
+      "final_url": "https://docs.parallel.ai/api-reference/monitor/retrieve-monitor.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 28146,
+      "sha256": "cc39d13c7e4a623e284866aee78e871c6c4684cd8e2cac8b7ca9027d47837c17",
+      "issues": ["WS-15", "WS-29"]
+    },
+    {
+      "file": "api-reference_monitor_trigger-monitor-run.md",
+      "url": "https://docs.parallel.ai/api-reference/monitor/trigger-monitor-run.md",
+      "final_url": "https://docs.parallel.ai/api-reference/monitor/trigger-monitor-run.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 9364,
+      "sha256": "d84f04e9bb5d1663b8feb8cdb044752d30520cdf68659390c1943386f57f8a81",
+      "issues": ["WS-15", "WS-29"]
+    },
+    {
+      "file": "api-reference_monitor_update-monitor.md",
+      "url": "https://docs.parallel.ai/api-reference/monitor/update-monitor.md",
+      "final_url": "https://docs.parallel.ai/api-reference/monitor/update-monitor.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 33552,
+      "sha256": "2fb92ecf38ab529a302f402342b3c530ec3f629a1755859b16f650c1cf8f53a0",
+      "issues": ["WS-15", "WS-29"]
+    },
+    {
+      "file": "api-reference_responses-api_create-response.md",
+      "url": "https://docs.parallel.ai/api-reference/responses-api/create-response.md",
+      "final_url": "https://docs.parallel.ai/api-reference/responses-api/create-response.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 67385,
+      "sha256": "9d84a8a2ea8445ef4107f258e798fa4bf17dac23c030ce9f9c5d3b913002e2b2",
+      "issues": ["WS-22"]
+    },
+    {
+      "file": "api-reference_search_search.md",
+      "url": "https://docs.parallel.ai/api-reference/search/search.md",
+      "final_url": "https://docs.parallel.ai/api-reference/search/search.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 22658,
+      "sha256": "0482153d06af3ff078f89ec923700086326fa0301594d3e230f6e7d046d5cbb7",
+      "issues": ["WS-01", "WS-10"]
+    },
+    {
+      "file": "api-reference_tasks_add-runs-to-task-group.md",
+      "url": "https://docs.parallel.ai/api-reference/tasks/add-runs-to-task-group.md",
+      "final_url": "https://docs.parallel.ai/api-reference/tasks/add-runs-to-task-group.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 26262,
+      "sha256": "f78c6afe37d41c2a419efbb1ec60a824d002fb5230991e5329e8f023fef6f2a2",
+      "issues": ["WS-21"]
+    },
+    {
+      "file": "api-reference_tasks_create-task-group.md",
+      "url": "https://docs.parallel.ai/api-reference/tasks/create-task-group.md",
+      "final_url": "https://docs.parallel.ai/api-reference/tasks/create-task-group.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 11045,
+      "sha256": "8548deb3b931a93deb8e28dda209e1938c8e8ccf9a7ed1c3674f55fc9f148219",
+      "issues": ["WS-21"]
+    },
+    {
+      "file": "api-reference_tasks_create-task-run.md",
+      "url": "https://docs.parallel.ai/api-reference/tasks/create-task-run.md",
+      "final_url": "https://docs.parallel.ai/api-reference/tasks/create-task-run.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 28136,
+      "sha256": "7863ff61291ed0ccf577cdfd26e3d12af4a45751e8de1f61337edebf01f0e8ec",
+      "issues": ["WS-13", "WS-14", "WS-24"]
+    },
+    {
+      "file": "api-reference_tasks_fetch-task-group-runs.md",
+      "url": "https://docs.parallel.ai/api-reference/tasks/fetch-task-group-runs.md",
+      "final_url": "https://docs.parallel.ai/api-reference/tasks/fetch-task-group-runs.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 37392,
+      "sha256": "b5e9fd7d4311d87abe3f167935bf78466c5a304ee66f43ba30279cc310a55f5e",
+      "issues": ["WS-21"]
+    },
+    {
+      "file": "api-reference_tasks_retrieve-task-group-run.md",
+      "url": "https://docs.parallel.ai/api-reference/tasks/retrieve-task-group-run.md",
+      "final_url": "https://docs.parallel.ai/api-reference/tasks/retrieve-task-group-run.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 14228,
+      "sha256": "f03a7d6f6effd25644f2e72656e9d2f6051d20e13cc7168ae84de9b013fd0a02",
+      "issues": ["WS-21"]
+    },
+    {
+      "file": "api-reference_tasks_retrieve-task-group.md",
+      "url": "https://docs.parallel.ai/api-reference/tasks/retrieve-task-group.md",
+      "final_url": "https://docs.parallel.ai/api-reference/tasks/retrieve-task-group.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 10515,
+      "sha256": "a411f652df85454e5e68379b2c1fa0530a2ec8f63032c0f952468235bc53031b",
+      "issues": ["WS-21"]
+    },
+    {
+      "file": "api-reference_tasks_retrieve-task-run-input.md",
+      "url": "https://docs.parallel.ai/api-reference/tasks/retrieve-task-run-input.md",
+      "final_url": "https://docs.parallel.ai/api-reference/tasks/retrieve-task-run-input.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 22345,
+      "sha256": "92b249ca2c61c3b88a0352d92214301be38da133eb99a91f1635c1b36b66eadc",
+      "issues": ["WS-13", "WS-14", "WS-24"]
+    },
+    {
+      "file": "api-reference_tasks_retrieve-task-run-result.md",
+      "url": "https://docs.parallel.ai/api-reference/tasks/retrieve-task-run-result.md",
+      "final_url": "https://docs.parallel.ai/api-reference/tasks/retrieve-task-run-result.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 21962,
+      "sha256": "583d447295870568f4e26bf0506e908517c8fc935cc7f1d4410bc9f68dbe024c",
+      "issues": ["WS-13", "WS-14", "WS-24"]
+    },
+    {
+      "file": "api-reference_tasks_retrieve-task-run.md",
+      "url": "https://docs.parallel.ai/api-reference/tasks/retrieve-task-run.md",
+      "final_url": "https://docs.parallel.ai/api-reference/tasks/retrieve-task-run.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 13711,
+      "sha256": "c83229bc3ed48eb76abada5f77ed3e75b3288bc49b860f734f093df874bb71e2",
+      "issues": ["WS-13", "WS-14", "WS-24"]
+    },
+    {
+      "file": "api-reference_tasks_stream-task-group-events.md",
+      "url": "https://docs.parallel.ai/api-reference/tasks/stream-task-group-events.md",
+      "final_url": "https://docs.parallel.ai/api-reference/tasks/stream-task-group-events.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 38076,
+      "sha256": "bf16457b498fef26e40e386af516e5f53b75da5e25265a002f46f16819b18353",
+      "issues": ["WS-21", "WS-19"]
+    },
+    {
+      "file": "api-reference_tasks_stream-task-run-events.md",
+      "url": "https://docs.parallel.ai/api-reference/tasks/stream-task-run-events.md",
+      "final_url": "https://docs.parallel.ai/api-reference/tasks/stream-task-run-events.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 38648,
+      "sha256": "dceb53b9ac0e76d2e5aea94f2b341c284b5002bcce771bfb90c095af9a3f879e",
+      "issues": ["WS-19"]
+    },
+    {
+      "file": "data-integrations_bigquery.md",
+      "url": "https://docs.parallel.ai/data-integrations/bigquery.md",
+      "final_url": "https://docs.parallel.ai/data-integrations/bigquery.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 7758,
+      "sha256": "077ebcab9686a2b1eebf96a7b9f8c2a4601cc3a4a992e8697ece0426e3142c8e",
+      "issues": ["WS-38"]
+    },
+    {
+      "file": "data-integrations_duckdb.md",
+      "url": "https://docs.parallel.ai/data-integrations/duckdb.md",
+      "final_url": "https://docs.parallel.ai/data-integrations/duckdb.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 9572,
+      "sha256": "d3b5dec7c79147001899fe5dde5578fb35b20467008a2491be0c9aafb662cf78",
+      "issues": ["WS-38"]
+    },
+    {
+      "file": "data-integrations_overview.md",
+      "url": "https://docs.parallel.ai/data-integrations/overview.md",
+      "final_url": "https://docs.parallel.ai/data-integrations/overview.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 5421,
+      "sha256": "b5b0e478e53e9aa51d5b17c31d579fe04d13393a3e53e2109741b038308bc503",
+      "issues": ["WS-38"]
+    },
+    {
+      "file": "data-integrations_polars.md",
+      "url": "https://docs.parallel.ai/data-integrations/polars.md",
+      "final_url": "https://docs.parallel.ai/data-integrations/polars.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 7500,
+      "sha256": "d26742186eadda5890473403b3063abb598c2635fb2f1cae316215651ac3c588",
+      "issues": ["WS-38"]
+    },
+    {
+      "file": "data-integrations_snowflake.md",
+      "url": "https://docs.parallel.ai/data-integrations/snowflake.md",
+      "final_url": "https://docs.parallel.ai/data-integrations/snowflake.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 11019,
+      "sha256": "60408f3030b7858c1e4fa83b1c688d55e44ffdc572cb021f02c9fdb64726cab9",
+      "issues": ["WS-38"]
+    },
+    {
+      "file": "data-integrations_spark.md",
+      "url": "https://docs.parallel.ai/data-integrations/spark.md",
+      "final_url": "https://docs.parallel.ai/data-integrations/spark.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 9526,
+      "sha256": "1d4a33e96ef90c8b41d5636cda5371c93e6b9505ee5567971772a6cb666e949d",
+      "issues": ["WS-38"]
+    },
+    {
+      "file": "data-integrations_supabase.md",
+      "url": "https://docs.parallel.ai/data-integrations/supabase.md",
+      "final_url": "https://docs.parallel.ai/data-integrations/supabase.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 3473,
+      "sha256": "75887fa29777f24a5fc2109067cc32617220af14e1c98adf0477c3f88556be40",
+      "issues": ["WS-38"]
+    },
+    {
+      "file": "extract_advanced-extract-settings.md",
+      "url": "https://docs.parallel.ai/extract/advanced-extract-settings.md",
+      "final_url": "https://docs.parallel.ai/extract/advanced-extract-settings.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 4669,
+      "sha256": "f98b46c7216eb611277c90a17324c5f89343c245b7e61606603c3911ef04498e",
+      "issues": ["WC-01", "WC-04", "WC-11"]
+    },
+    {
+      "file": "extract_best-practices.md",
+      "url": "https://docs.parallel.ai/extract/best-practices.md",
+      "final_url": "https://docs.parallel.ai/extract/best-practices.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 10413,
+      "sha256": "281824727a014abb854e9a4b2983ba4cdc96cb5ad5fdcf5086754638b099baa2",
+      "issues": ["WC-12"]
+    },
+    {
+      "file": "extract_extract-migration-guide.md",
+      "url": "https://docs.parallel.ai/extract/extract-migration-guide.md",
+      "final_url": "https://docs.parallel.ai/extract/extract-migration-guide.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 6936,
+      "sha256": "e881612fec2fa7dbf8738018242b59d4d2516c498a151a99c7439da33e1142ec",
+      "issues": ["WC-11", "WS-40"]
+    },
+    {
+      "file": "extract_extract-quickstart.md",
+      "url": "https://docs.parallel.ai/extract/extract-quickstart.md",
+      "final_url": "https://docs.parallel.ai/extract/extract-quickstart.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 9079,
+      "sha256": "358d13788bec1e652099ed7e8101cd5d6cd351fb630e4cdc3318929efc8b2fea",
+      "issues": ["WC-02", "WC-06", "WC-11"]
+    },
+    {
+      "file": "findall-api_core-concepts_findall-candidates.md",
+      "url": "https://docs.parallel.ai/findall-api/core-concepts/findall-candidates.md",
+      "final_url": "https://docs.parallel.ai/findall-api/core-concepts/findall-candidates.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 8140,
+      "sha256": "996be579273b824976a40835faf7981979beac08b2db9bfdd8cb9c451e9d871b",
+      "issues": ["WS-16", "WS-28"]
+    },
+    {
+      "file": "findall-api_core-concepts_findall-generator-pricing.md",
+      "url": "https://docs.parallel.ai/findall-api/core-concepts/findall-generator-pricing.md",
+      "final_url": "https://docs.parallel.ai/findall-api/core-concepts/findall-generator-pricing.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 5972,
+      "sha256": "7b9242274b3e43c14b0f3d17c6d5e37fd3ade99e87a3f43ac005f1aaabdcdc4e",
+      "issues": ["WS-16", "WS-28"]
+    },
+    {
+      "file": "findall-api_core-concepts_findall-lifecycle.md",
+      "url": "https://docs.parallel.ai/findall-api/core-concepts/findall-lifecycle.md",
+      "final_url": "https://docs.parallel.ai/findall-api/core-concepts/findall-lifecycle.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 4293,
+      "sha256": "1a01447472c1e3a2429445d2069f638d54324d2eec4cf173f9f5cd604c38ea17",
+      "issues": ["WS-28"]
+    },
+    {
+      "file": "findall-api_entity-search.md",
+      "url": "https://docs.parallel.ai/findall-api/entity-search.md",
+      "final_url": "https://docs.parallel.ai/findall-api/entity-search.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 8869,
+      "sha256": "4be3ebd858a0687ce4b7d37e9838c22e3209b5a2aaa59a4af1d76cbe8cd07804",
+      "issues": ["WS-09"]
+    },
+    {
+      "file": "findall-api_features_findall-cancel.md",
+      "url": "https://docs.parallel.ai/findall-api/features/findall-cancel.md",
+      "final_url": "https://docs.parallel.ai/findall-api/features/findall-cancel.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 3962,
+      "sha256": "e71b0a3b98f3c70409f54f4dded7c9b369204075856d02695483e17d4976d5d0",
+      "issues": ["WS-28"]
+    },
+    {
+      "file": "findall-api_features_findall-enrich.md",
+      "url": "https://docs.parallel.ai/findall-api/features/findall-enrich.md",
+      "final_url": "https://docs.parallel.ai/findall-api/features/findall-enrich.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 9041,
+      "sha256": "34508acf89ffe44fcf917496e188c942346b79975b7a45b73bf36e91d7265e4b",
+      "issues": ["WS-27"]
+    },
+    {
+      "file": "findall-api_features_findall-extend.md",
+      "url": "https://docs.parallel.ai/findall-api/features/findall-extend.md",
+      "final_url": "https://docs.parallel.ai/findall-api/features/findall-extend.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 4756,
+      "sha256": "977b5e19bf066532b40037644ff57d0a0f5a4a857b85ab3f026a4c7e01cb24ac",
+      "issues": ["WS-28"]
+    },
+    {
+      "file": "findall-api_features_findall-preview.md",
+      "url": "https://docs.parallel.ai/findall-api/features/findall-preview.md",
+      "final_url": "https://docs.parallel.ai/findall-api/features/findall-preview.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 6796,
+      "sha256": "4d94bdcbe21dbbe6fd9952889123763e6a743ca9081c8100a9e13d7340fcf82e",
+      "issues": ["WS-28"]
+    },
+    {
+      "file": "findall-api_features_findall-refresh.md",
+      "url": "https://docs.parallel.ai/findall-api/features/findall-refresh.md",
+      "final_url": "https://docs.parallel.ai/findall-api/features/findall-refresh.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 26351,
+      "sha256": "9c8f998c1b08010e669a6e9196e2e3499b5b3ab6be031f76109d4d227c0a3bfc",
+      "issues": ["WS-28"]
+    },
+    {
+      "file": "findall-api_features_findall-sse.md",
+      "url": "https://docs.parallel.ai/findall-api/features/findall-sse.md",
+      "final_url": "https://docs.parallel.ai/findall-api/features/findall-sse.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 11378,
+      "sha256": "53d621fdec5c07536a693f6680806e71c91aa2dec80652216250dd562e184bc7",
+      "issues": ["WS-19"]
+    },
+    {
+      "file": "findall-api_features_findall-webhook.md",
+      "url": "https://docs.parallel.ai/findall-api/features/findall-webhook.md",
+      "final_url": "https://docs.parallel.ai/findall-api/features/findall-webhook.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 11891,
+      "sha256": "a494f785ea2749528c64f3c03b9046ceb77164ba0a4b0d1ea21d792209d839e1",
+      "issues": ["WS-20"]
+    },
+    {
+      "file": "findall-api_findall-migration-guide.md",
+      "url": "https://docs.parallel.ai/findall-api/findall-migration-guide.md",
+      "final_url": "https://docs.parallel.ai/findall-api/findall-migration-guide.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 11216,
+      "sha256": "1a0e9705646f5230c1f677dfc3dba53e580ad269d92b40224eac921b595e99c7",
+      "issues": ["WS-40"]
+    },
+    {
+      "file": "findall-api_findall-quickstart.md",
+      "url": "https://docs.parallel.ai/findall-api/findall-quickstart.md",
+      "final_url": "https://docs.parallel.ai/findall-api/findall-quickstart.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 19005,
+      "sha256": "2feb491b4ab057e45dc1ed007ff1732543237ee65d3e1efa5e4666c513149ac9",
+      "issues": ["WS-16", "WS-28"]
+    },
+    {
+      "file": "getting-started_choose-an-api.md",
+      "url": "https://docs.parallel.ai/getting-started/choose-an-api.md",
+      "final_url": "https://docs.parallel.ai/getting-started/choose-an-api.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 24151,
+      "sha256": "8d036d0baf64f57ddd70355bcdc2a4497d0e2e705933a354dd09fb2faf6f2a36",
+      "issues": ["WS-40"]
+    },
+    {
+      "file": "getting-started_glossary.md",
+      "url": "https://docs.parallel.ai/getting-started/glossary.md",
+      "final_url": "https://docs.parallel.ai/getting-started/glossary.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 11630,
+      "sha256": "7309fabf2c0c3a7d0f554d7660aabb057611d735a2de96a7ca54948fbc445a9d",
+      "issues": ["WS-40"]
+    },
+    {
+      "file": "getting-started_overview.md",
+      "url": "https://docs.parallel.ai/getting-started/overview.md",
+      "final_url": "https://docs.parallel.ai/getting-started/overview.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 65840,
+      "sha256": "487c5856620cd3f5f60b368182a8354d449217e45bcb0e70af79807910519976",
+      "issues": ["WS-31", "WS-40"]
+    },
+    {
+      "file": "getting-started_pricing.md",
+      "url": "https://docs.parallel.ai/getting-started/pricing.md",
+      "final_url": "https://docs.parallel.ai/getting-started/pricing.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 7600,
+      "sha256": "bea42db03ec93dc0d32dbdc06bde9e8ec9759c9a4ebf714a165de8267da2eff1",
+      "issues": ["WS-34"]
+    },
+    {
+      "file": "getting-started_rate-limits.md",
+      "url": "https://docs.parallel.ai/getting-started/rate-limits.md",
+      "final_url": "https://docs.parallel.ai/getting-started/rate-limits.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 2699,
+      "sha256": "e852324ee967cade0f54b66c863309c653e8a683c28a9799925ef9782ceeb07b",
+      "issues": ["WS-17", "WC-11"]
+    },
+    {
+      "file": "image-search_best-practices.md",
+      "url": "https://docs.parallel.ai/image-search/best-practices.md",
+      "final_url": "https://docs.parallel.ai/image-search/best-practices.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 4242,
+      "sha256": "5df5aaa86327c998dbf5d384c4e6321d71699192182bd30c4ec0af88fa3b2dea",
+      "issues": ["WS-08", "WS-41"]
+    },
+    {
+      "file": "image-search_image-search-quickstart.md",
+      "url": "https://docs.parallel.ai/image-search/image-search-quickstart.md",
+      "final_url": "https://docs.parallel.ai/image-search/image-search-quickstart.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 5651,
+      "sha256": "d7c55292789a72f569febd6a87df9ee4e111a45167a944a1059c732f6384bd49",
+      "issues": ["WS-08"]
+    },
+    {
+      "file": "image-search_modes.md",
+      "url": "https://docs.parallel.ai/image-search/modes.md",
+      "final_url": "https://docs.parallel.ai/image-search/modes.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 2133,
+      "sha256": "dd3280451504fe99e71fe74eea57cfe94205231a8ec2e87f8a5f79d9fcdc397f",
+      "issues": ["WS-08", "WS-06"]
+    },
+    {
+      "file": "integrations_account-api.md",
+      "url": "https://docs.parallel.ai/integrations/account-api.md",
+      "final_url": "https://docs.parallel.ai/integrations/account-api.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 8333,
+      "sha256": "863bdd70c7922a3eb34df1e36b7431a94aee438d99df8339e44e69eadc1b1df2",
+      "issues": ["WS-32", "WS-33"]
+    },
+    {
+      "file": "integrations_agent-skills.md",
+      "url": "https://docs.parallel.ai/integrations/agent-skills.md",
+      "final_url": "https://docs.parallel.ai/integrations/agent-skills.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 5542,
+      "sha256": "dcabe50fb21530a72e51b4a32d86b2cd694c21c610f8c038f7a1afe9ab85c04d",
+      "issues": ["WS-37"]
+    },
+    {
+      "file": "integrations_agentic-payments.md",
+      "url": "https://docs.parallel.ai/integrations/agentic-payments.md",
+      "final_url": "https://docs.parallel.ai/integrations/agentic-payments.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 13409,
+      "sha256": "e4de0bb07e726c75957eff9923bb345e70224bd7e96093dfb4dee5d9bfceb003",
+      "issues": ["WS-35"]
+    },
+    {
+      "file": "integrations_anthropic-tool-calling.md",
+      "url": "https://docs.parallel.ai/integrations/anthropic-tool-calling.md",
+      "final_url": "https://docs.parallel.ai/integrations/anthropic-tool-calling.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 17072,
+      "sha256": "eeba020e45e6a750af6bf8091e5ff94f9459004b488e4f2513fffb06f6191c5f",
+      "issues": ["WS-36"]
+    },
+    {
+      "file": "integrations_aws-marketplace.md",
+      "url": "https://docs.parallel.ai/integrations/aws-marketplace.md",
+      "final_url": "https://docs.parallel.ai/integrations/aws-marketplace.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 4553,
+      "sha256": "46b143df030b12ffc437ddfe1553ef3e34e939af899a5a882331a10d62faa378",
+      "issues": ["WS-43"]
+    },
+    {
+      "file": "integrations_browseruse.md",
+      "url": "https://docs.parallel.ai/integrations/browseruse.md",
+      "final_url": "https://docs.parallel.ai/integrations/browseruse.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 6385,
+      "sha256": "27a585d4a069ff5cfcfaf4d2598e6bfd455b312b07c85d3e55f6b4d24f193662",
+      "issues": ["WC-09", "WS-25"]
+    },
+    {
+      "file": "integrations_claude-code-marketplace.md",
+      "url": "https://docs.parallel.ai/integrations/claude-code-marketplace.md",
+      "final_url": "https://docs.parallel.ai/integrations/claude-code-marketplace.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 4333,
+      "sha256": "694bcd4afbea0c68c7a19860657da316526caf9f37963f868935272c3488d651",
+      "issues": ["WS-37"]
+    },
+    {
+      "file": "integrations_clawhub.md",
+      "url": "https://docs.parallel.ai/integrations/clawhub.md",
+      "final_url": "https://docs.parallel.ai/integrations/clawhub.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 5553,
+      "sha256": "327d3f58e80476d6f5f6fa4c46899d505d615573ef073dfac41257cb879b2ac7",
+      "issues": ["WS-37"]
+    },
+    {
+      "file": "integrations_cli.md",
+      "url": "https://docs.parallel.ai/integrations/cli.md",
+      "final_url": "https://docs.parallel.ai/integrations/cli.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 16928,
+      "sha256": "8abf1b6f618279855c084bb120e866eaefa18ccb9596cb78c0548aff4720a942",
+      "issues": ["WS-12", "WS-44"]
+    },
+    {
+      "file": "integrations_cursor-marketplace.md",
+      "url": "https://docs.parallel.ai/integrations/cursor-marketplace.md",
+      "final_url": "https://docs.parallel.ai/integrations/cursor-marketplace.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 4350,
+      "sha256": "3a39a3fd316e712eef952536bff8d55848d199a85232c0b8943484eedf6a70b1",
+      "issues": ["WS-37"]
+    },
+    {
+      "file": "integrations_developer-quickstart.md",
+      "url": "https://docs.parallel.ai/integrations/developer-quickstart.md",
+      "final_url": "https://docs.parallel.ai/integrations/developer-quickstart.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 7908,
+      "sha256": "6a4843a420eab3589b40191fbbbf7112ce20375b7b35c7b9dc8a076615661109",
+      "issues": ["WS-31", "WS-37"]
+    },
+    {
+      "file": "integrations_google-cloud-marketplace.md",
+      "url": "https://docs.parallel.ai/integrations/google-cloud-marketplace.md",
+      "final_url": "https://docs.parallel.ai/integrations/google-cloud-marketplace.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 3756,
+      "sha256": "22110e3ce47412a8629067dac5c07373e01891a6259574bb3abafcf99b1895a4",
+      "issues": ["WS-43"]
+    },
+    {
+      "file": "integrations_google-gemini-enterprise.md",
+      "url": "https://docs.parallel.ai/integrations/google-gemini-enterprise.md",
+      "final_url": "https://docs.parallel.ai/integrations/google-gemini-enterprise.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 23831,
+      "sha256": "0538741ef20618f72130a9fb72c7fa502d7027c68186ad75f72c56fb7fd2b9d4",
+      "issues": ["WS-36"]
+    },
+    {
+      "file": "integrations_gsuite.md",
+      "url": "https://docs.parallel.ai/integrations/gsuite.md",
+      "final_url": "https://docs.parallel.ai/integrations/gsuite.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 6566,
+      "sha256": "e0b284a8f6149463a393bdadd70ac25ae523153e9d6d7328ca0d4273eb8f91b8",
+      "issues": ["WS-39"]
+    },
+    {
+      "file": "integrations_langchain.md",
+      "url": "https://docs.parallel.ai/integrations/langchain.md",
+      "final_url": "https://docs.parallel.ai/integrations/langchain.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 10556,
+      "sha256": "f64f8e6c21efbb36048e7adc64c7dd651d799a1a2bcf46dd5f91ef9a2c76542b",
+      "issues": ["WS-36"]
+    },
+    {
+      "file": "integrations_litellm.md",
+      "url": "https://docs.parallel.ai/integrations/litellm.md",
+      "final_url": "https://docs.parallel.ai/integrations/litellm.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 3362,
+      "sha256": "519f26938af31364bf15b0225ed2cc57041cd32eacadc16e1dde85d56e1eed3e",
+      "issues": ["WS-36"]
+    },
+    {
+      "file": "integrations_mcp_programmatic-use.md",
+      "url": "https://docs.parallel.ai/integrations/mcp/programmatic-use.md",
+      "final_url": "https://docs.parallel.ai/integrations/mcp/programmatic-use.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 13709,
+      "sha256": "65253b28bcda760a505bc4df1d836faa06758737a2627e532c20f88ec3898c92",
+      "issues": ["WS-11", "WS-30"]
+    },
+    {
+      "file": "integrations_mcp_quickstart.md",
+      "url": "https://docs.parallel.ai/integrations/mcp/quickstart.md",
+      "final_url": "https://docs.parallel.ai/integrations/mcp/quickstart.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 10957,
+      "sha256": "8b49c4d069f0d723c986387156a7d0471f5e29c14ecff65d59b8e3cf38697bad",
+      "issues": ["WS-11", "WS-30"]
+    },
+    {
+      "file": "integrations_mcp_search-mcp.md",
+      "url": "https://docs.parallel.ai/integrations/mcp/search-mcp.md",
+      "final_url": "https://docs.parallel.ai/integrations/mcp/search-mcp.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 33220,
+      "sha256": "3f2a68d026ee8ca1b59f2e9ecc742720a153a9e189eff64b5270fa33adbdeee1",
+      "issues": ["WS-11", "WC-08"]
+    },
+    {
+      "file": "integrations_mcp_task-mcp.md",
+      "url": "https://docs.parallel.ai/integrations/mcp/task-mcp.md",
+      "final_url": "https://docs.parallel.ai/integrations/mcp/task-mcp.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 30416,
+      "sha256": "3665774d4217661d34002a37763ee8167c944b68c800f627e1b6cebd18ddcbd3",
+      "issues": ["WS-30"]
+    },
+    {
+      "file": "integrations_n8n.md",
+      "url": "https://docs.parallel.ai/integrations/n8n.md",
+      "final_url": "https://docs.parallel.ai/integrations/n8n.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 2858,
+      "sha256": "7bdbddeaa234c073e5bb73c840b8c660b02eb5320e305073257c27c6ccdfade2",
+      "issues": ["WS-39"]
+    },
+    {
+      "file": "integrations_oauth-provider.md",
+      "url": "https://docs.parallel.ai/integrations/oauth-provider.md",
+      "final_url": "https://docs.parallel.ai/integrations/oauth-provider.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 5408,
+      "sha256": "745dc7924d059580853a7552b1c8bd4cb4a2d50ac1ac8b95fbe70f4a9a34f991",
+      "issues": ["WS-32"]
+    },
+    {
+      "file": "integrations_ollama-tool-calling.md",
+      "url": "https://docs.parallel.ai/integrations/ollama-tool-calling.md",
+      "final_url": "https://docs.parallel.ai/integrations/ollama-tool-calling.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 9344,
+      "sha256": "e3f61c6562cf8c4d0c5726865f142fd509152b3d63564f552b21de88d8e72b8d",
+      "issues": ["WS-36"]
+    },
+    {
+      "file": "integrations_openai-tool-calling.md",
+      "url": "https://docs.parallel.ai/integrations/openai-tool-calling.md",
+      "final_url": "https://docs.parallel.ai/integrations/openai-tool-calling.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 16541,
+      "sha256": "ecb24041772036735052c0a38a592d4cc2f5b97a2e4216c25e4d57d8ff92c46a",
+      "issues": ["WS-36"]
+    },
+    {
+      "file": "integrations_opencode-plugin.md",
+      "url": "https://docs.parallel.ai/integrations/opencode-plugin.md",
+      "final_url": "https://docs.parallel.ai/integrations/opencode-plugin.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 3215,
+      "sha256": "7966b77de96a662f50f5963d212bb1e5f35b152bda2800d6dca5690e4d8b8e4a",
+      "issues": ["WS-37"]
+    },
+    {
+      "file": "integrations_openrouter.md",
+      "url": "https://docs.parallel.ai/integrations/openrouter.md",
+      "final_url": "https://docs.parallel.ai/integrations/openrouter.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 4115,
+      "sha256": "231b96b2f4da83178518aa39076e3c901aec2f03f85af733f76630352e12d7c7",
+      "issues": ["WS-36"]
+    },
+    {
+      "file": "integrations_pi-extension.md",
+      "url": "https://docs.parallel.ai/integrations/pi-extension.md",
+      "final_url": "https://docs.parallel.ai/integrations/pi-extension.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 4108,
+      "sha256": "a643598fb25b4f56d225aa9628afc07bafa4d9e9cfba27f5d84ca5252979fc01",
+      "issues": ["WS-37"]
+    },
+    {
+      "file": "integrations_render.md",
+      "url": "https://docs.parallel.ai/integrations/render.md",
+      "final_url": "https://docs.parallel.ai/integrations/render.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 10381,
+      "sha256": "7e9d9dc55ce5c8fd46f5dffff2e1ee4ad64af53dd2794b9fca7604f30ee795a3",
+      "issues": ["WS-39"]
+    },
+    {
+      "file": "integrations_superhuman.md",
+      "url": "https://docs.parallel.ai/integrations/superhuman.md",
+      "final_url": "https://docs.parallel.ai/integrations/superhuman.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 2232,
+      "sha256": "344b421893cf6a997669013d36d771d067dd9c3873ba0d5dbea4ce7eb7db62ee",
+      "issues": ["WS-39"]
+    },
+    {
+      "file": "integrations_vercel.md",
+      "url": "https://docs.parallel.ai/integrations/vercel.md",
+      "final_url": "https://docs.parallel.ai/integrations/vercel.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 6587,
+      "sha256": "b41b8e50af6011b403dcb47cf557d0f4eb768aee44256532c185c1b6b1d88a1c",
+      "issues": ["WS-39"]
+    },
+    {
+      "file": "integrations_zapier.md",
+      "url": "https://docs.parallel.ai/integrations/zapier.md",
+      "final_url": "https://docs.parallel.ai/integrations/zapier.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 2993,
+      "sha256": "e5df5d84ec3ac160999a38fa3019cafea822dc4c19b4616e2759818af55020a9",
+      "issues": ["WS-39"]
+    },
+    {
+      "file": "monitor-api_monitor-events.md",
+      "url": "https://docs.parallel.ai/monitor-api/monitor-events.md",
+      "final_url": "https://docs.parallel.ai/monitor-api/monitor-events.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 6016,
+      "sha256": "e7b51358a94d4571ec786b196d662e248077c11bc9bfc053882bdbaa586a0c77",
+      "issues": ["WS-15", "WS-29"]
+    },
+    {
+      "file": "monitor-api_monitor-migration-guide.md",
+      "url": "https://docs.parallel.ai/monitor-api/monitor-migration-guide.md",
+      "final_url": "https://docs.parallel.ai/monitor-api/monitor-migration-guide.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 27276,
+      "sha256": "9166e51c30c6e112ccc9f163ff0f9c6a01d7de72e67a30c6248ec54a593fe05d",
+      "issues": ["WS-40"]
+    },
+    {
+      "file": "monitor-api_monitor-quickstart.md",
+      "url": "https://docs.parallel.ai/monitor-api/monitor-quickstart.md",
+      "final_url": "https://docs.parallel.ai/monitor-api/monitor-quickstart.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 10269,
+      "sha256": "cbd5bda9cad3b92b723fc8b6c283be620b6af76bde1701af6544e200f2fa8e8e",
+      "issues": ["WS-15", "WS-29"]
+    },
+    {
+      "file": "monitor-api_monitor-task.md",
+      "url": "https://docs.parallel.ai/monitor-api/monitor-task.md",
+      "final_url": "https://docs.parallel.ai/monitor-api/monitor-task.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 9394,
+      "sha256": "653257f125316e2918a3d36ee7bb9d722f41e66666063af70b1ea84837bf6cf5",
+      "issues": ["WS-29"]
+    },
+    {
+      "file": "monitor-api_monitor-webhooks.md",
+      "url": "https://docs.parallel.ai/monitor-api/monitor-webhooks.md",
+      "final_url": "https://docs.parallel.ai/monitor-api/monitor-webhooks.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 7074,
+      "sha256": "8ed51b00bb829376d4452f73b7c7fe608d8288272c0b1013ef59b4184ed9d7d8",
+      "issues": ["WS-20"]
+    },
+    {
+      "file": "monitor-api_quickstart-snapshot.md",
+      "url": "https://docs.parallel.ai/monitor-api/quickstart-snapshot.md",
+      "final_url": "https://docs.parallel.ai/monitor-api/quickstart-snapshot.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 9402,
+      "sha256": "99719223f277f135f00c4d66b099b1d9239d03ea5c47bd742dffcb142fb56770",
+      "issues": ["WS-29"]
+    },
+    {
+      "file": "resources_changelog.md",
+      "url": "https://docs.parallel.ai/resources/changelog.md",
+      "final_url": "https://docs.parallel.ai/resources/changelog.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 52450,
+      "sha256": "356754788c137fb881bbbf6513d455b3f3cd5580cc46677be77f68aa8d71ee8e",
+      "issues": ["WS-40"]
+    },
+    {
+      "file": "resources_crawler.md",
+      "url": "https://docs.parallel.ai/resources/crawler.md",
+      "final_url": "https://docs.parallel.ai/resources/crawler.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 2160,
+      "sha256": "69e7b67f6fe7b4dae57fad420d3ba32bb0bbd943c3bd94d8e97c6eb7405e220a",
+      "issues": ["WC-05"]
+    },
+    {
+      "file": "resources_data-connectors.md",
+      "url": "https://docs.parallel.ai/resources/data-connectors.md",
+      "final_url": "https://docs.parallel.ai/resources/data-connectors.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 12424,
+      "sha256": "daa90091912aaeb550cc65d6ac9af511409f87fee23824551e33a7ecff9696d2",
+      "issues": ["WS-26"]
+    },
+    {
+      "file": "resources_faqs.md",
+      "url": "https://docs.parallel.ai/resources/faqs.md",
+      "final_url": "https://docs.parallel.ai/resources/faqs.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 6082,
+      "sha256": "4101b0cf8c01078c80ba2980acdd0073e52584a2a8e51b9e521c8a3cf80cb390",
+      "issues": ["WS-42", "WS-34", "WC-09"]
+    },
+    {
+      "file": "resources_memory.md",
+      "url": "https://docs.parallel.ai/resources/memory.md",
+      "final_url": "https://docs.parallel.ai/resources/memory.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 5238,
+      "sha256": "455555fabdb60fbfe815701b4b677e49c93bfbae2af7043cbee9fdc551529f4a",
+      "issues": ["WS-18"]
+    },
+    {
+      "file": "resources_organization-roles-and-permissions.md",
+      "url": "https://docs.parallel.ai/resources/organization-roles-and-permissions.md",
+      "final_url": "https://docs.parallel.ai/resources/organization-roles-and-permissions.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 1227,
+      "sha256": "5cbc03765fd3deae06bbfbeed1ce871e455f72c4270139f53d0bd597d7eb0478",
+      "issues": ["WS-33", "WS-34"]
+    },
+    {
+      "file": "resources_source-policy.md",
+      "url": "https://docs.parallel.ai/resources/source-policy.md",
+      "final_url": "https://docs.parallel.ai/resources/source-policy.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 6342,
+      "sha256": "3c15dbec39be96e02bea9d6d75d0a2395e03d46ef0c7b1c1ac0d23ad30a4c589",
+      "issues": ["WS-02"]
+    },
+    {
+      "file": "resources_status.html",
+      "url": "https://docs.parallel.ai/resources/status.md",
+      "final_url": "https://status.parallel.ai/",
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 187453,
+      "sha256": "dfaa850f32a541a15ea961de5bfbf3817fa58e90dce08a169927f56961cf66f7",
+      "issues": ["WS-42"]
+    },
+    {
+      "file": "resources_warnings-and-errors.md",
+      "url": "https://docs.parallel.ai/resources/warnings-and-errors.md",
+      "final_url": "https://docs.parallel.ai/resources/warnings-and-errors.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 9792,
+      "sha256": "fa37bc9ba1f8b1cd1419bb30bf22279e335964fb14935b1ff0a43d0853d83a0c",
+      "issues": ["WS-10", "WC-11"]
+    },
+    {
+      "file": "resources_webhook-setup.md",
+      "url": "https://docs.parallel.ai/resources/webhook-setup.md",
+      "final_url": "https://docs.parallel.ai/resources/webhook-setup.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 14492,
+      "sha256": "74ec77d2813a8e322ac50a2718b48686fc1e2c3e9806b6bbcc6c20b87377a9a5",
+      "issues": ["WS-20"]
+    },
+    {
+      "file": "responses-api_examples_direct-requests.md",
+      "url": "https://docs.parallel.ai/responses-api/examples/direct-requests.md",
+      "final_url": "https://docs.parallel.ai/responses-api/examples/direct-requests.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 8028,
+      "sha256": "666937dc61e87dcbc063e1c3fbab952332c1a6c34eb308c1e05e1eb3844f856a",
+      "issues": ["WS-22"]
+    },
+    {
+      "file": "responses-api_examples_research-subagent.md",
+      "url": "https://docs.parallel.ai/responses-api/examples/research-subagent.md",
+      "final_url": "https://docs.parallel.ai/responses-api/examples/research-subagent.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 7066,
+      "sha256": "dc436408b0c7da4fa68258955184b772bd574a1d0aea9ad8d2a146cc37a9ef2e",
+      "issues": ["WS-22"]
+    },
+    {
+      "file": "responses-api_features_citations.md",
+      "url": "https://docs.parallel.ai/responses-api/features/citations.md",
+      "final_url": "https://docs.parallel.ai/responses-api/features/citations.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 4041,
+      "sha256": "a6b06d90698c06d69c84061c290fb28a9f37608bb94fa3d06a918f65ed6ec08c",
+      "issues": ["WS-22"]
+    },
+    {
+      "file": "responses-api_features_data-connectors.html",
+      "url": "https://docs.parallel.ai/responses-api/features/data-connectors.md",
+      "final_url": "https://docs.parallel.ai/resources/data-connectors#responses-api.md",
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 543864,
+      "sha256": "e3245e5f48061852d15f74c53beb0cba005e3fdba537fcf14a96e18722779ba7",
+      "issues": ["WS-22", "WS-26"]
+    },
+    {
+      "file": "responses-api_features_mcp-tools.md",
+      "url": "https://docs.parallel.ai/responses-api/features/mcp-tools.md",
+      "final_url": "https://docs.parallel.ai/responses-api/features/mcp-tools.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 10055,
+      "sha256": "d88af642769765699e8e4a6af84c4b88ce407480ea10e507026f4bf90ea454bd",
+      "issues": ["WS-22", "WS-25"]
+    },
+    {
+      "file": "responses-api_features_statefulness.md",
+      "url": "https://docs.parallel.ai/responses-api/features/statefulness.md",
+      "final_url": "https://docs.parallel.ai/responses-api/features/statefulness.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 3983,
+      "sha256": "76b52b9f1c9b044fea360ff46e47d6e903a8cb74afb863dbf4224897980b94bd",
+      "issues": ["WS-22"]
+    },
+    {
+      "file": "responses-api_features_streaming-events.md",
+      "url": "https://docs.parallel.ai/responses-api/features/streaming-events.md",
+      "final_url": "https://docs.parallel.ai/responses-api/features/streaming-events.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 5355,
+      "sha256": "b6ee2943ff3d7487ff0f38130561b02520b10ccb2e9a68d60f213d73f8ebdee6",
+      "issues": ["WS-22"]
+    },
+    {
+      "file": "responses-api_features_structured-outputs.md",
+      "url": "https://docs.parallel.ai/responses-api/features/structured-outputs.md",
+      "final_url": "https://docs.parallel.ai/responses-api/features/structured-outputs.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 4063,
+      "sha256": "e0bfc47cee4bfc3ebe45a26d4db7198105bbde364b6fedd9c07ca0736bcf3ed0",
+      "issues": ["WS-22"]
+    },
+    {
+      "file": "responses-api_features_web-search-tool.md",
+      "url": "https://docs.parallel.ai/responses-api/features/web-search-tool.md",
+      "final_url": "https://docs.parallel.ai/responses-api/features/web-search-tool.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 6669,
+      "sha256": "188104a2ccabe5b64dfbe99c39ceba78fbe751049124d3c33c05fff55604deb8",
+      "issues": ["WS-22", "WS-02"]
+    },
+    {
+      "file": "responses-api_openai-compatibility.md",
+      "url": "https://docs.parallel.ai/responses-api/openai-compatibility.md",
+      "final_url": "https://docs.parallel.ai/responses-api/openai-compatibility.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 8169,
+      "sha256": "cedb0db12bbc02b92a0bfad1a42d1342c0980b5ad214d252577816ae324af075",
+      "issues": ["WS-22"]
+    },
+    {
+      "file": "responses-api_responses-quickstart.md",
+      "url": "https://docs.parallel.ai/responses-api/responses-quickstart.md",
+      "final_url": "https://docs.parallel.ai/responses-api/responses-quickstart.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 7169,
+      "sha256": "13bf6e741db8feff94158c675dfeb96b94771dec93ffd99bafa5c3969225ef62",
+      "issues": ["WS-22"]
+    },
+    {
+      "file": "search_advanced-search-settings.md",
+      "url": "https://docs.parallel.ai/search/advanced-search-settings.md",
+      "final_url": "https://docs.parallel.ai/search/advanced-search-settings.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 5518,
+      "sha256": "766c0a6073782a463394259c8a871ea3d57e0d37ad5d6e91f3a0aacd9725a856",
+      "issues": ["WS-02", "WS-03", "WS-04", "WS-07"]
+    },
+    {
+      "file": "search_best-practices.md",
+      "url": "https://docs.parallel.ai/search/best-practices.md",
+      "final_url": "https://docs.parallel.ai/search/best-practices.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 9940,
+      "sha256": "c66cd78f1cbd5b84f09a403ba818be532aeadc8d1ae04b15e9e46039d2abb4d1",
+      "issues": ["WS-04", "WS-41"]
+    },
+    {
+      "file": "search_evaluating-search.md",
+      "url": "https://docs.parallel.ai/search/evaluating-search.md",
+      "final_url": "https://docs.parallel.ai/search/evaluating-search.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 23423,
+      "sha256": "99a88ad9e9e7921fc0c009023cae427d3df5b0c15cdc178ff264551834df01ee",
+      "issues": ["WS-41"]
+    },
+    {
+      "file": "search_indexed-content-for-agents.md",
+      "url": "https://docs.parallel.ai/search/indexed-content-for-agents.md",
+      "final_url": "https://docs.parallel.ai/search/indexed-content-for-agents.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 3213,
+      "sha256": "2a61dc2432aa945726e3b67c8adf6836f1853698b155cc9e7dedc13512aa44dd",
+      "issues": ["WS-07", "WC-04"]
+    },
+    {
+      "file": "search_migrate-to-parallel.md",
+      "url": "https://docs.parallel.ai/search/migrate-to-parallel.md",
+      "final_url": "https://docs.parallel.ai/search/migrate-to-parallel.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 14181,
+      "sha256": "f575c1dc1194a9336c7ccbbcfad6c205cbf7b521bb6b95e52e5e2b338c0f30e3",
+      "issues": ["WS-40"]
+    },
+    {
+      "file": "search_modes.md",
+      "url": "https://docs.parallel.ai/search/modes.md",
+      "final_url": "https://docs.parallel.ai/search/modes.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 3467,
+      "sha256": "47e85d9b2300d9b4aacb4f290f5b3acfd057a72738b8964005f6d96264a7632e",
+      "issues": ["WS-06"]
+    },
+    {
+      "file": "search_search-mcp.md",
+      "url": "https://docs.parallel.ai/search/search-mcp.md",
+      "final_url": "https://docs.parallel.ai/integrations/mcp/search-mcp.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 33220,
+      "sha256": "3f2a68d026ee8ca1b59f2e9ecc742720a153a9e189eff64b5270fa33adbdeee1",
+      "issues": ["WS-11"]
+    },
+    {
+      "file": "search_search-migration-guide.md",
+      "url": "https://docs.parallel.ai/search/search-migration-guide.md",
+      "final_url": "https://docs.parallel.ai/search/search-migration-guide.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 7529,
+      "sha256": "41103bf89b4513606fbb6ed18e74929f531fd6f47d8e68e9fd3c10b4eab166cc",
+      "issues": ["WS-40"]
+    },
+    {
+      "file": "search_search-quickstart.md",
+      "url": "https://docs.parallel.ai/search/search-quickstart.md",
+      "final_url": "https://docs.parallel.ai/search/search-quickstart.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 11790,
+      "sha256": "4eb1bb40ea00e7f81d57ef6e97c32ba62d58c812cef29e704bf0cf422cf90543",
+      "issues": ["WS-01", "WS-10"]
+    },
+    {
+      "file": "search_source-policy.md",
+      "url": "https://docs.parallel.ai/search/source-policy.md",
+      "final_url": "https://docs.parallel.ai/resources/source-policy.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 6342,
+      "sha256": "3c15dbec39be96e02bea9d6d75d0a2395e03d46ef0c7b1c1ac0d23ad30a4c589",
+      "issues": ["WS-02"]
+    },
+    {
+      "file": "service-api_apps_create-app.md",
+      "url": "https://docs.parallel.ai/service-api/apps/create-app.md",
+      "final_url": "https://docs.parallel.ai/service-api/apps/create-app.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 3219,
+      "sha256": "fed646d8165f14206710b3e8169296fa7b800663a55ccdbc26ff75271bcec9f4",
+      "issues": ["WS-33"]
+    },
+    {
+      "file": "service-api_apps_delete-app.md",
+      "url": "https://docs.parallel.ai/service-api/apps/delete-app.md",
+      "final_url": "https://docs.parallel.ai/service-api/apps/delete-app.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 2602,
+      "sha256": "0c7ad07c30429c18d0f878c0bf810dd1e01a3db89fb2fb62d0658a5c99a52f26",
+      "issues": ["WS-33"]
+    },
+    {
+      "file": "service-api_apps_list-apps.md",
+      "url": "https://docs.parallel.ai/service-api/apps/list-apps.md",
+      "final_url": "https://docs.parallel.ai/service-api/apps/list-apps.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 2581,
+      "sha256": "1639ff53934f0b568e08019d64c3fbf5decb1476c3f0318b6accf7c9684bb6fa",
+      "issues": ["WS-33"]
+    },
+    {
+      "file": "service-api_balance_add-to-balance.md",
+      "url": "https://docs.parallel.ai/service-api/balance/add-to-balance.md",
+      "final_url": "https://docs.parallel.ai/service-api/balance/add-to-balance.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 5273,
+      "sha256": "4b524504a3b721c9b8f966c5b32b610148436d9ce2b45f8113231d1898cbd64f",
+      "issues": ["WS-34"]
+    },
+    {
+      "file": "service-api_balance_get-balance.md",
+      "url": "https://docs.parallel.ai/service-api/balance/get-balance.md",
+      "final_url": "https://docs.parallel.ai/service-api/balance/get-balance.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 2845,
+      "sha256": "55e599304d11bd9b24a076e708da940adc98db863a4dbc4f681748b89c33a830",
+      "issues": ["WS-34"]
+    },
+    {
+      "file": "service-api_keys_create-key.md",
+      "url": "https://docs.parallel.ai/service-api/keys/create-key.md",
+      "final_url": "https://docs.parallel.ai/service-api/keys/create-key.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 4567,
+      "sha256": "ae0f31bd804c20b96a42c22c4192a2ad02217b8a96af95b32e37ba4ef7e321a2",
+      "issues": ["WS-33"]
+    },
+    {
+      "file": "service-api_keys_delete-key.md",
+      "url": "https://docs.parallel.ai/service-api/keys/delete-key.md",
+      "final_url": "https://docs.parallel.ai/service-api/keys/delete-key.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 2760,
+      "sha256": "a64f6d65e7f9756c358cbe2d793c09efde5c8d9736c5391ad22db4ea5e0abac4",
+      "issues": ["WS-33"]
+    },
+    {
+      "file": "task-api_best-practices.md",
+      "url": "https://docs.parallel.ai/task-api/best-practices.md",
+      "final_url": "https://docs.parallel.ai/task-api/best-practices.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 6750,
+      "sha256": "edc942e1e6218f2a940cf1aebdaf6ff4b1b713befe1863e4677579e5397e7fd7",
+      "issues": ["WS-14", "WS-24"]
+    },
+    {
+      "file": "task-api_data-connectors.md",
+      "url": "https://docs.parallel.ai/task-api/data-connectors.md",
+      "final_url": "https://docs.parallel.ai/resources/data-connectors.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 12424,
+      "sha256": "daa90091912aaeb550cc65d6ac9af511409f87fee23824551e33a7ecff9696d2",
+      "issues": ["WS-26"]
+    },
+    {
+      "file": "task-api_examples_interactive-research.md",
+      "url": "https://docs.parallel.ai/task-api/examples/interactive-research.md",
+      "final_url": "https://docs.parallel.ai/task-api/examples/interactive-research.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 10169,
+      "sha256": "d2c0a06d04cd97d897a5b2f586f6b047e9ed55dfe9215c879803035f1e3c47c5",
+      "issues": ["WS-14", "WS-24", "WS-21"]
+    },
+    {
+      "file": "task-api_examples_task-deep-research.md",
+      "url": "https://docs.parallel.ai/task-api/examples/task-deep-research.md",
+      "final_url": "https://docs.parallel.ai/task-api/examples/task-deep-research.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 31639,
+      "sha256": "708e7d761bec3a0aabcd2f3286512dd5af8762d6f5745b7b2dc926f877fca852",
+      "issues": ["WS-14", "WS-24", "WS-21"]
+    },
+    {
+      "file": "task-api_examples_task-enrichment.md",
+      "url": "https://docs.parallel.ai/task-api/examples/task-enrichment.md",
+      "final_url": "https://docs.parallel.ai/task-api/examples/task-enrichment.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 32306,
+      "sha256": "ac03d7c3c15d583684207f7bc1235db90ab847f18729569b82982fd2c019eca7",
+      "issues": ["WS-14", "WS-24", "WS-21"]
+    },
+    {
+      "file": "task-api_group-api.md",
+      "url": "https://docs.parallel.ai/task-api/group-api.md",
+      "final_url": "https://docs.parallel.ai/task-api/group-api.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 31515,
+      "sha256": "7fcd0a0c3541f67538920fb6b98945d8f846b23bfeec17e07745780cd1fcd0e7",
+      "issues": ["WS-21"]
+    },
+    {
+      "file": "task-api_guides_access-research-basis.md",
+      "url": "https://docs.parallel.ai/task-api/guides/access-research-basis.md",
+      "final_url": "https://docs.parallel.ai/task-api/guides/access-research-basis.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 12874,
+      "sha256": "8e5a82806d1c4eb078c4ff12df4725fb053e58c341d96e6995c1c146fa07b872",
+      "issues": ["WS-14"]
+    },
+    {
+      "file": "task-api_guides_choose-a-processor.md",
+      "url": "https://docs.parallel.ai/task-api/guides/choose-a-processor.md",
+      "final_url": "https://docs.parallel.ai/task-api/guides/choose-a-processor.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 9027,
+      "sha256": "c216322de0ac77cd6e50d65ac9ece6498c8eea6c0188d4a2399e485a1878bedf",
+      "issues": ["WS-24"]
+    },
+    {
+      "file": "task-api_guides_execute-task-run.md",
+      "url": "https://docs.parallel.ai/task-api/guides/execute-task-run.md",
+      "final_url": "https://docs.parallel.ai/task-api/guides/execute-task-run.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 4074,
+      "sha256": "6db6ebfbb2b60c4d1bd1aa68e84cc7eee26d817f5850f9751434ef0e367fff3c",
+      "issues": ["WS-13", "WS-14"]
+    },
+    {
+      "file": "task-api_guides_interactions.md",
+      "url": "https://docs.parallel.ai/task-api/guides/interactions.md",
+      "final_url": "https://docs.parallel.ai/task-api/guides/interactions.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 6078,
+      "sha256": "d7dac7e2b9ee2ab3eae40c4e3da7f75f50adfc72089d0e8f4cbf976105e7fc42",
+      "issues": ["WS-24", "WS-42"]
+    },
+    {
+      "file": "task-api_guides_specify-a-task.md",
+      "url": "https://docs.parallel.ai/task-api/guides/specify-a-task.md",
+      "final_url": "https://docs.parallel.ai/task-api/guides/specify-a-task.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 10263,
+      "sha256": "0ed3c1400572be9915892509afdd5895601488a380da6ed1fe539664437c34b0",
+      "issues": ["WS-24"]
+    },
+    {
+      "file": "task-api_ingest-api.md",
+      "url": "https://docs.parallel.ai/task-api/ingest-api.md",
+      "final_url": "https://docs.parallel.ai/task-api/ingest-api.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 27258,
+      "sha256": "5653a57f008f3746332e377fdf1038de2719935c0a2df0ac092b9b06104e4193",
+      "issues": ["WS-24"]
+    },
+    {
+      "file": "task-api_mcp-tool-call.md",
+      "url": "https://docs.parallel.ai/task-api/mcp-tool-call.md",
+      "final_url": "https://docs.parallel.ai/task-api/mcp-tool-call.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 9240,
+      "sha256": "494c280f83295a3134b9998650cab76479bb5907d0e43557cf853b1a8b6c6ffe",
+      "issues": ["WS-25"]
+    },
+    {
+      "file": "task-api_source-policy.md",
+      "url": "https://docs.parallel.ai/task-api/source-policy.md",
+      "final_url": "https://docs.parallel.ai/resources/source-policy.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 6342,
+      "sha256": "3c15dbec39be96e02bea9d6d75d0a2395e03d46ef0c7b1c1ac0d23ad30a4c589",
+      "issues": ["WS-02"]
+    },
+    {
+      "file": "task-api_task-mcp.md",
+      "url": "https://docs.parallel.ai/task-api/task-mcp.md",
+      "final_url": "https://docs.parallel.ai/integrations/mcp/task-mcp.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 30416,
+      "sha256": "3665774d4217661d34002a37763ee8167c944b68c800f627e1b6cebd18ddcbd3",
+      "issues": ["WS-30"]
+    },
+    {
+      "file": "task-api_task-quickstart.md",
+      "url": "https://docs.parallel.ai/task-api/task-quickstart.md",
+      "final_url": "https://docs.parallel.ai/task-api/task-quickstart.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 8852,
+      "sha256": "f2c0445a16fb504a227a8832932f26b1bf6a15d08cc3fbd0b8b8103d47548a9d",
+      "issues": ["WS-14", "WS-24"]
+    },
+    {
+      "file": "task-api_task-sse.md",
+      "url": "https://docs.parallel.ai/task-api/task-sse.md",
+      "final_url": "https://docs.parallel.ai/task-api/task-sse.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 10767,
+      "sha256": "90c26d5c8b0ba20d7ec8ca31a97010d14471dee76777a00723dc6c77ad545d4f",
+      "issues": ["WS-19"]
+    },
+    {
+      "file": "task-api_webhooks.md",
+      "url": "https://docs.parallel.ai/task-api/webhooks.md",
+      "final_url": "https://docs.parallel.ai/task-api/webhooks.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "bytes": 6086,
+      "sha256": "dfb134c3e173e8b72648e773146c5dbcca461fe118fed535833268f4750b2858",
+      "issues": ["WS-20"]
+    }
+  ],
+  "operations": [
+    {
+      "spec": "public-openapi.json",
+      "kind": "current-product",
+      "method": "POST",
+      "path": "/v1/search",
+      "issues": ["WS-01", "WS-10", "WS-40"]
+    },
+    {
+      "spec": "public-openapi.json",
+      "kind": "current-product",
+      "method": "POST",
+      "path": "/v1/images/search",
+      "issues": ["WS-08", "WS-10"]
+    },
+    {
+      "spec": "public-openapi.json",
+      "kind": "current-product",
+      "method": "POST",
+      "path": "/v1/extract",
+      "issues": ["WC-02", "WC-11", "WS-10", "WS-40"]
+    },
+    {
+      "spec": "public-openapi.json",
+      "kind": "current-product",
+      "method": "POST",
+      "path": "/v1/tasks/groups",
+      "issues": ["WS-21"]
+    },
+    {
+      "spec": "public-openapi.json",
+      "kind": "current-product",
+      "method": "GET",
+      "path": "/v1/tasks/groups/{taskgroup_id}",
+      "issues": ["WS-21"]
+    },
+    {
+      "spec": "public-openapi.json",
+      "kind": "current-product",
+      "method": "GET",
+      "path": "/v1/tasks/groups/{taskgroup_id}/events",
+      "issues": ["WS-21", "WS-19"]
+    },
+    {
+      "spec": "public-openapi.json",
+      "kind": "current-product",
+      "method": "POST",
+      "path": "/v1/tasks/groups/{taskgroup_id}/runs",
+      "issues": ["WS-21"]
+    },
+    {
+      "spec": "public-openapi.json",
+      "kind": "current-product",
+      "method": "GET",
+      "path": "/v1/tasks/groups/{taskgroup_id}/runs",
+      "issues": ["WS-21"]
+    },
+    {
+      "spec": "public-openapi.json",
+      "kind": "current-product",
+      "method": "GET",
+      "path": "/v1/tasks/groups/{taskgroup_id}/runs/{run_id}",
+      "issues": ["WS-21"]
+    },
+    {
+      "spec": "public-openapi.json",
+      "kind": "current-product",
+      "method": "POST",
+      "path": "/v1/tasks/runs",
+      "issues": ["WS-13", "WS-14", "WS-24"]
+    },
+    {
+      "spec": "public-openapi.json",
+      "kind": "current-product",
+      "method": "GET",
+      "path": "/v1/tasks/runs/{run_id}",
+      "issues": ["WS-13", "WS-14", "WS-24"]
+    },
+    {
+      "spec": "public-openapi.json",
+      "kind": "current-product",
+      "method": "GET",
+      "path": "/v1/tasks/runs/{run_id}/events",
+      "issues": ["WS-19"]
+    },
+    {
+      "spec": "public-openapi.json",
+      "kind": "current-product",
+      "method": "GET",
+      "path": "/v1/tasks/runs/{run_id}/input",
+      "issues": ["WS-13", "WS-14", "WS-24"]
+    },
+    {
+      "spec": "public-openapi.json",
+      "kind": "current-product",
+      "method": "GET",
+      "path": "/v1/tasks/runs/{run_id}/result",
+      "issues": ["WS-13", "WS-14", "WS-24"]
+    },
+    {
+      "spec": "public-openapi.json",
+      "kind": "current-product",
+      "method": "POST",
+      "path": "/v1beta/findall/entity-search",
+      "issues": ["WS-09"]
+    },
+    {
+      "spec": "public-openapi.json",
+      "kind": "current-product",
+      "method": "POST",
+      "path": "/v1beta/findall/ingest",
+      "issues": ["WS-24"]
+    },
+    {
+      "spec": "public-openapi.json",
+      "kind": "current-product",
+      "method": "POST",
+      "path": "/v1beta/findall/runs",
+      "issues": ["WS-16"]
+    },
+    {
+      "spec": "public-openapi.json",
+      "kind": "current-product",
+      "method": "GET",
+      "path": "/v1beta/findall/runs/{findall_id}",
+      "issues": ["WS-16"]
+    },
+    {
+      "spec": "public-openapi.json",
+      "kind": "current-product",
+      "method": "POST",
+      "path": "/v1beta/findall/runs/{findall_id}/cancel",
+      "issues": ["WS-28", "WS-40"]
+    },
+    {
+      "spec": "public-openapi.json",
+      "kind": "current-product",
+      "method": "POST",
+      "path": "/v1beta/findall/runs/{findall_id}/enrich",
+      "issues": ["WS-27"]
+    },
+    {
+      "spec": "public-openapi.json",
+      "kind": "current-product",
+      "method": "GET",
+      "path": "/v1beta/findall/runs/{findall_id}/events",
+      "issues": ["WS-19"]
+    },
+    {
+      "spec": "public-openapi.json",
+      "kind": "current-product",
+      "method": "POST",
+      "path": "/v1beta/findall/runs/{findall_id}/extend",
+      "issues": ["WS-28", "WS-40"]
+    },
+    {
+      "spec": "public-openapi.json",
+      "kind": "current-product",
+      "method": "GET",
+      "path": "/v1beta/findall/runs/{findall_id}/result",
+      "issues": ["WS-16"]
+    },
+    {
+      "spec": "public-openapi.json",
+      "kind": "current-product",
+      "method": "GET",
+      "path": "/v1beta/findall/runs/{findall_id}/schema",
+      "issues": ["WS-16"]
+    },
+    {
+      "spec": "public-openapi.json",
+      "kind": "current-product",
+      "method": "POST",
+      "path": "/v1/monitors",
+      "issues": ["WS-15", "WS-29", "WS-40"]
+    },
+    {
+      "spec": "public-openapi.json",
+      "kind": "current-product",
+      "method": "GET",
+      "path": "/v1/monitors",
+      "issues": ["WS-15", "WS-29", "WS-40"]
+    },
+    {
+      "spec": "public-openapi.json",
+      "kind": "current-product",
+      "method": "GET",
+      "path": "/v1/monitors/stats",
+      "issues": ["WS-15", "WS-29", "WS-40"]
+    },
+    {
+      "spec": "public-openapi.json",
+      "kind": "current-product",
+      "method": "GET",
+      "path": "/v1/monitors/{monitor_id}",
+      "issues": ["WS-15", "WS-29", "WS-40"]
+    },
+    {
+      "spec": "public-openapi.json",
+      "kind": "current-product",
+      "method": "POST",
+      "path": "/v1/monitors/{monitor_id}/cancel",
+      "issues": ["WS-15", "WS-29", "WS-40"]
+    },
+    {
+      "spec": "public-openapi.json",
+      "kind": "current-product",
+      "method": "GET",
+      "path": "/v1/monitors/{monitor_id}/events",
+      "issues": ["WS-15", "WS-29", "WS-40"]
+    },
+    {
+      "spec": "public-openapi.json",
+      "kind": "current-product",
+      "method": "POST",
+      "path": "/v1/monitors/{monitor_id}/trigger",
+      "issues": ["WS-15", "WS-29", "WS-40"]
+    },
+    {
+      "spec": "public-openapi.json",
+      "kind": "current-product",
+      "method": "POST",
+      "path": "/v1/monitors/{monitor_id}/update",
+      "issues": ["WS-15", "WS-29", "WS-40"]
+    },
+    {
+      "spec": "public-openapi.json",
+      "kind": "current-product",
+      "method": "POST",
+      "path": "/v1beta/memory/clear",
+      "issues": ["WS-18"]
+    },
+    {
+      "spec": "public-openapi.json",
+      "kind": "current-product",
+      "method": "POST",
+      "path": "/v1beta/memory/evict",
+      "issues": ["WS-18"]
+    },
+    {
+      "spec": "public-openapi.json",
+      "kind": "current-product",
+      "method": "POST",
+      "path": "/v1beta/memory/retrieve",
+      "issues": ["WS-18"]
+    },
+    {
+      "spec": "public-openapi.json",
+      "kind": "current-product",
+      "method": "POST",
+      "path": "/v1beta/chat/completions",
+      "issues": ["WS-23"]
+    },
+    {
+      "spec": "public-openapi.json",
+      "kind": "current-product",
+      "method": "POST",
+      "path": "/v1/responses",
+      "issues": ["WS-22"]
+    },
+    {
+      "spec": "account-openapi.json",
+      "kind": "current-account",
+      "method": "GET",
+      "path": "/service/v1/balance",
+      "issues": ["WS-34"]
+    },
+    {
+      "spec": "account-openapi.json",
+      "kind": "current-account",
+      "method": "POST",
+      "path": "/service/v1/balance/add",
+      "issues": ["WS-34"]
+    },
+    {
+      "spec": "account-openapi.json",
+      "kind": "current-account",
+      "method": "GET",
+      "path": "/service/v1/apps",
+      "issues": ["WS-33"]
+    },
+    {
+      "spec": "account-openapi.json",
+      "kind": "current-account",
+      "method": "POST",
+      "path": "/service/v1/apps",
+      "issues": ["WS-33"]
+    },
+    {
+      "spec": "account-openapi.json",
+      "kind": "current-account",
+      "method": "DELETE",
+      "path": "/service/v1/apps/{app_id}",
+      "issues": ["WS-33"]
+    },
+    {
+      "spec": "account-openapi.json",
+      "kind": "current-account",
+      "method": "POST",
+      "path": "/service/v1/apps/{app_id}/keys",
+      "issues": ["WS-33"]
+    },
+    {
+      "spec": "account-openapi.json",
+      "kind": "current-account",
+      "method": "DELETE",
+      "path": "/service/v1/apps/{app_id}/keys/{api_key_id}",
+      "issues": ["WS-33"]
+    },
+    {
+      "spec": "docs-legacy-openapi.json",
+      "kind": "legacy",
+      "method": "POST",
+      "path": "/v1beta/search",
+      "issues": ["WS-01", "WS-10", "WS-40"]
+    },
+    {
+      "spec": "docs-legacy-openapi.json",
+      "kind": "legacy",
+      "method": "POST",
+      "path": "/v1beta/extract",
+      "issues": ["WC-02", "WC-11", "WS-10", "WS-40"]
+    },
+    {
+      "spec": "docs-legacy-openapi.json",
+      "kind": "legacy",
+      "method": "POST",
+      "path": "/v1/tasks/groups",
+      "issues": ["WS-21"]
+    },
+    {
+      "spec": "docs-legacy-openapi.json",
+      "kind": "legacy",
+      "method": "GET",
+      "path": "/v1/tasks/groups/{taskgroup_id}",
+      "issues": ["WS-21"]
+    },
+    {
+      "spec": "docs-legacy-openapi.json",
+      "kind": "legacy",
+      "method": "GET",
+      "path": "/v1/tasks/groups/{taskgroup_id}/events",
+      "issues": ["WS-21", "WS-19"]
+    },
+    {
+      "spec": "docs-legacy-openapi.json",
+      "kind": "legacy",
+      "method": "POST",
+      "path": "/v1/tasks/groups/{taskgroup_id}/runs",
+      "issues": ["WS-21"]
+    },
+    {
+      "spec": "docs-legacy-openapi.json",
+      "kind": "legacy",
+      "method": "GET",
+      "path": "/v1/tasks/groups/{taskgroup_id}/runs",
+      "issues": ["WS-21"]
+    },
+    {
+      "spec": "docs-legacy-openapi.json",
+      "kind": "legacy",
+      "method": "GET",
+      "path": "/v1/tasks/groups/{taskgroup_id}/runs/{run_id}",
+      "issues": ["WS-21"]
+    },
+    {
+      "spec": "docs-legacy-openapi.json",
+      "kind": "legacy",
+      "method": "POST",
+      "path": "/v1/tasks/runs",
+      "issues": ["WS-13", "WS-14", "WS-24"]
+    },
+    {
+      "spec": "docs-legacy-openapi.json",
+      "kind": "legacy",
+      "method": "GET",
+      "path": "/v1/tasks/runs/{run_id}",
+      "issues": ["WS-13", "WS-14", "WS-24"]
+    },
+    {
+      "spec": "docs-legacy-openapi.json",
+      "kind": "legacy",
+      "method": "GET",
+      "path": "/v1/tasks/runs/{run_id}/events",
+      "issues": ["WS-19"]
+    },
+    {
+      "spec": "docs-legacy-openapi.json",
+      "kind": "legacy",
+      "method": "GET",
+      "path": "/v1/tasks/runs/{run_id}/input",
+      "issues": ["WS-13", "WS-14", "WS-24"]
+    },
+    {
+      "spec": "docs-legacy-openapi.json",
+      "kind": "legacy",
+      "method": "GET",
+      "path": "/v1/tasks/runs/{run_id}/result",
+      "issues": ["WS-13", "WS-14", "WS-24"]
+    },
+    {
+      "spec": "docs-legacy-openapi.json",
+      "kind": "legacy",
+      "method": "POST",
+      "path": "/v1beta/findall/candidates",
+      "issues": ["WS-28", "WS-40"]
+    },
+    {
+      "spec": "docs-legacy-openapi.json",
+      "kind": "legacy",
+      "method": "POST",
+      "path": "/v1beta/findall/entity-search",
+      "issues": ["WS-09"]
+    },
+    {
+      "spec": "docs-legacy-openapi.json",
+      "kind": "legacy",
+      "method": "POST",
+      "path": "/v1beta/findall/ingest",
+      "issues": ["WS-24"]
+    },
+    {
+      "spec": "docs-legacy-openapi.json",
+      "kind": "legacy",
+      "method": "POST",
+      "path": "/v1beta/findall/runs",
+      "issues": ["WS-16"]
+    },
+    {
+      "spec": "docs-legacy-openapi.json",
+      "kind": "legacy",
+      "method": "GET",
+      "path": "/v1beta/findall/runs/{findall_id}",
+      "issues": ["WS-16"]
+    },
+    {
+      "spec": "docs-legacy-openapi.json",
+      "kind": "legacy",
+      "method": "POST",
+      "path": "/v1beta/findall/runs/{findall_id}/cancel",
+      "issues": ["WS-28", "WS-40"]
+    },
+    {
+      "spec": "docs-legacy-openapi.json",
+      "kind": "legacy",
+      "method": "POST",
+      "path": "/v1beta/findall/runs/{findall_id}/enrich",
+      "issues": ["WS-27"]
+    },
+    {
+      "spec": "docs-legacy-openapi.json",
+      "kind": "legacy",
+      "method": "GET",
+      "path": "/v1beta/findall/runs/{findall_id}/events",
+      "issues": ["WS-19"]
+    },
+    {
+      "spec": "docs-legacy-openapi.json",
+      "kind": "legacy",
+      "method": "POST",
+      "path": "/v1beta/findall/runs/{findall_id}/extend",
+      "issues": ["WS-28", "WS-40"]
+    },
+    {
+      "spec": "docs-legacy-openapi.json",
+      "kind": "legacy",
+      "method": "GET",
+      "path": "/v1beta/findall/runs/{findall_id}/result",
+      "issues": ["WS-16"]
+    },
+    {
+      "spec": "docs-legacy-openapi.json",
+      "kind": "legacy",
+      "method": "GET",
+      "path": "/v1beta/findall/runs/{findall_id}/schema",
+      "issues": ["WS-16"]
+    },
+    {
+      "spec": "docs-legacy-openapi.json",
+      "kind": "legacy",
+      "method": "POST",
+      "path": "/v1alpha/monitors",
+      "issues": ["WS-15", "WS-29", "WS-40"]
+    },
+    {
+      "spec": "docs-legacy-openapi.json",
+      "kind": "legacy",
+      "method": "GET",
+      "path": "/v1alpha/monitors",
+      "issues": ["WS-15", "WS-29", "WS-40"]
+    },
+    {
+      "spec": "docs-legacy-openapi.json",
+      "kind": "legacy",
+      "method": "GET",
+      "path": "/v1alpha/monitors/list",
+      "issues": ["WS-15", "WS-29", "WS-40"]
+    },
+    {
+      "spec": "docs-legacy-openapi.json",
+      "kind": "legacy",
+      "method": "GET",
+      "path": "/v1alpha/monitors/{monitor_id}",
+      "issues": ["WS-15", "WS-29", "WS-40"]
+    },
+    {
+      "spec": "docs-legacy-openapi.json",
+      "kind": "legacy",
+      "method": "POST",
+      "path": "/v1alpha/monitors/{monitor_id}",
+      "issues": ["WS-15", "WS-29", "WS-40"]
+    },
+    {
+      "spec": "docs-legacy-openapi.json",
+      "kind": "legacy",
+      "method": "DELETE",
+      "path": "/v1alpha/monitors/{monitor_id}",
+      "issues": ["WS-15", "WS-29", "WS-40"]
+    },
+    {
+      "spec": "docs-legacy-openapi.json",
+      "kind": "legacy",
+      "method": "GET",
+      "path": "/v1alpha/monitors/{monitor_id}/event_groups/{event_group_id}",
+      "issues": ["WS-15", "WS-29", "WS-40"]
+    },
+    {
+      "spec": "docs-legacy-openapi.json",
+      "kind": "legacy",
+      "method": "GET",
+      "path": "/v1alpha/monitors/{monitor_id}/events",
+      "issues": ["WS-15", "WS-29", "WS-40"]
+    },
+    {
+      "spec": "docs-legacy-openapi.json",
+      "kind": "legacy",
+      "method": "POST",
+      "path": "/v1alpha/monitors/{monitor_id}/simulate_event",
+      "issues": ["WS-15", "WS-29", "WS-40"]
+    },
+    {
+      "spec": "docs-legacy-openapi.json",
+      "kind": "legacy",
+      "method": "POST",
+      "path": "/v1beta/memory/clear",
+      "issues": ["WS-18"]
+    },
+    {
+      "spec": "docs-legacy-openapi.json",
+      "kind": "legacy",
+      "method": "POST",
+      "path": "/v1beta/memory/evict",
+      "issues": ["WS-18"]
+    },
+    {
+      "spec": "docs-legacy-openapi.json",
+      "kind": "legacy",
+      "method": "POST",
+      "path": "/v1beta/memory/retrieve",
+      "issues": ["WS-18"]
+    },
+    {
+      "spec": "docs-legacy-openapi.json",
+      "kind": "legacy",
+      "method": "POST",
+      "path": "/v1beta/chat/completions",
+      "issues": ["WS-23"]
+    },
+    {
+      "spec": "docs-legacy-openapi.json",
+      "kind": "legacy",
+      "method": "POST",
+      "path": "/v1/responses",
+      "issues": ["WS-22"]
+    },
+    {
+      "spec": "docs-legacy-openapi.json",
+      "kind": "legacy",
+      "method": "POST",
+      "path": "/v1beta/tasks/groups",
+      "issues": ["WS-21"]
+    },
+    {
+      "spec": "docs-legacy-openapi.json",
+      "kind": "legacy",
+      "method": "GET",
+      "path": "/v1beta/tasks/groups/{taskgroup_id}",
+      "issues": ["WS-21"]
+    },
+    {
+      "spec": "docs-legacy-openapi.json",
+      "kind": "legacy",
+      "method": "GET",
+      "path": "/v1beta/tasks/groups/{taskgroup_id}/events",
+      "issues": ["WS-21", "WS-19"]
+    },
+    {
+      "spec": "docs-legacy-openapi.json",
+      "kind": "legacy",
+      "method": "POST",
+      "path": "/v1beta/tasks/groups/{taskgroup_id}/runs",
+      "issues": ["WS-21"]
+    },
+    {
+      "spec": "docs-legacy-openapi.json",
+      "kind": "legacy",
+      "method": "GET",
+      "path": "/v1beta/tasks/groups/{taskgroup_id}/runs",
+      "issues": ["WS-21"]
+    },
+    {
+      "spec": "docs-legacy-openapi.json",
+      "kind": "legacy",
+      "method": "GET",
+      "path": "/v1beta/tasks/groups/{taskgroup_id}/runs/{run_id}",
+      "issues": ["WS-21"]
+    }
+  ]
+}
